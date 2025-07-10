@@ -1,0 +1,11 @@
+# Errors
+
+- Always catch errors and show a helpful message to the user.
+- Use try/catch in server actions and API routes.
+- Use error boundaries in React for big problems.
+- Log errors so we can fix them later.
+- Never ignore errors or hide them.
+description:
+globs:
+alwaysApply: false
+---

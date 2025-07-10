@@ -1,0 +1,14 @@
+# Component Types (Server vs Client)
+
+- Use **Server components** by default. They are faster and better for SEO.
+- Use **Client components** only if you need:
+  - Buttons or click events
+  - Forms or user input
+  - Browser features (like localStorage, geolocation)
+  - React hooks (useState, useEffect)
+- If you see `'use client'` at the top, it is a Client component.
+- If you are not sure, ask or check with the team.
+description:
+globs:
+alwaysApply: false
+---

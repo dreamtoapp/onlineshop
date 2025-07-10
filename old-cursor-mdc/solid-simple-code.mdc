@@ -1,0 +1,20 @@
+# 🧩 SOLID & SIMPLE CODE RULE
+
+- **Always follow the SOLID principles:**
+  - **S**: Single Responsibility — Each file, function, or class should do one thing only.
+  - **O**: Open/Closed — Code should be open for extension, but closed for modification.
+  - **L**: Liskov Substitution — Subtypes must be usable in place of their base types.
+  - **I**: Interface Segregation — Don't force things to depend on what they don't use.
+  - **D**: Dependency Inversion — Depend on abstractions, not concrete things.
+- **Never write complex code.**
+  - If something feels complicated, break it into smaller, easier parts.
+  - Use clear names and short functions.
+  - Avoid deep nesting and long files.
+- **Code should always be easy, short, and simple to understand.**
+- If you see complex code, refactor it to be simpler and more readable.
+
+**Simple code is better code!**
+description:
+globs:
+alwaysApply: false
+---

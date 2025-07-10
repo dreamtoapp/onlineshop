@@ -1,0 +1,18 @@
+# ⚡ PERFORMANCE RULES
+
+1. Always use next/image for all images, with width, height, and alt.
+2. Use dynamic imports and lazy loading for large or rarely-used components.
+3. Prefer Server Components and Server Actions; minimize client-side JS.
+4. Fetch data server-side and avoid duplicate API calls.
+5. Serve assets from a CDN and set proper cache headers.
+6. Only import needed CSS/fonts; purge unused styles.
+7. Track and fix Core Web Vitals issues.
+8. Avoid blocking the main thread with heavy JS.
+9. Test performance regularly and set budgets.
+10. Keep dependencies lean and audit bundle size.
+
+**Fast site = happy users and more sales!**
+description:
+globs:
+alwaysApply: false
+---

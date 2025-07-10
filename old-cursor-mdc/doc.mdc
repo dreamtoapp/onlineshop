@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+@/.cursor/rules/folder-structure.mdc
+@/.cursor/rules/cleanup.mdc
+@/.cursor/rules/component-size.mdc
+@/.cursor/rules/component-name.mdc
+@/.cursor/rules/error.mdc
+@/.cursor/rules/best-practices.mdc
+@/.cursor/rules/form-validation.yaml

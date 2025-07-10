@@ -1,0 +1,55 @@
+# 🚨 CRITICAL SAFETY RULES
+
+## 1. NEVER DELETE FILES WITHOUT BACKUP
+**BEFORE deleting ANY file:**
+- Create a master backup folder: `backup/[DATE]/`
+- Create subfolder with route name: `backup/[DATE]/[ROUTE_NAME]/`
+- Copy the file to backup before deleting
+- Example: `backup/2025-01-15/app-checkout-page.tsx`
+
+**Example backup structure:**
+```
+backup/
+├── 2025-01-15/
+│   ├── app-checkout/
+│   │   └── page.tsx (backup before deletion)
+│   └── components-cart/
+│       └── CartButton.tsx (backup before deletion)
+```
+
+## 2. NEVER UPDATE GLOBAL FILES WITHOUT CONFIRMATION
+**Global files that need YOUR confirmation:**
+- `app/globals.css`
+- `tailwind.config.ts`
+- `next.config.ts`
+- `tsconfig.json`
+- `package.json`
+- Any config file
+- Any global layout file
+
+**I MUST ask you first before changing these files.**
+
+## 3. ALWAYS CHECK OFFICIAL DOCS FOR BEST PRACTICES
+**Before making changes, check:**
+- Next.js official docs: https://nextjs.org/docs
+- React official docs: https://react.dev
+- TypeScript docs: https://www.typescriptlang.org/docs
+- Tailwind CSS docs: https://tailwindcss.com/docs
+
+**Example:**
+- Before using new Next.js 15 features, check: https://nextjs.org/docs/app/guides/upgrading/version-15
+- Follow the latest best practices from official sources
+- Don't use deprecated methods
+
+## 🛡️ SAFETY CHECKLIST
+Before any file operation:
+- [ ] Is this a global file? → Ask for confirmation
+- [ ] Am I deleting something? → Create backup first
+- [ ] Am I using new features? → Check official docs
+- [ ] Is this a breaking change? → Test thoroughly
+
+**These rules are CRITICAL and MUST be followed every time.**
+description:
+globs:
+alwaysApply: false
+---

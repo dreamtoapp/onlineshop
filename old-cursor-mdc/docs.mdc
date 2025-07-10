@@ -1,0 +1,13 @@
+# Docs (Notes)
+
+- Before starting something big, check the docs in the `docs/` folder.
+- Update the docs as you work, so everyone knows what's happening.
+- Write down why you made changes in `why-we-did-this.md`.
+- If you fix a problem, update `problems.md`.
+- If you make things faster, update `how-fast.md`.
+- If you add tests, update `test-status.md`.
+- This helps everyone and makes the project better for the future.
+description:
+globs:
+alwaysApply: false
+---

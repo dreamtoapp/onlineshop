@@ -1,0 +1,15 @@
+# 📝 TASK COLLABORATION RULE
+
+- For every task, a Markdown file is created in `docs/task/` as a checklist and reference.
+- The user can review the file and add their own notes, edits, or feedback directly in the Markdown file.
+- When the user says **'update'**, the AI will:
+  - Read the latest version of the Markdown file
+  - Apply the user's notes and feedback
+  - Refactor or update the file as needed
+- This workflow should be used for all tasks to make collaboration easy and keep everything organized.
+
+**This ensures you always have control, and the AI keeps your plans and progress up to date!**
+description:
+globs:
+alwaysApply: false
+---

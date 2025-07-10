@@ -1,0 +1,41 @@
+# 🌟 BEST PRACTICE RULES
+
+## 1. WRITE SHORT, CLEAR COMMENTS
+- Comments must always be short and clear.
+- Never use JSDoc or long comment blocks.
+- Only use simple, direct comments (e.g., // fetch user data, // handle error).
+- Add comments to explain why, not just what, but keep them brief.
+
+## 2. USE MEANINGFUL NAMES
+- Name variables, functions, and files clearly and descriptively.
+- Avoid short or unclear names like `x`, `data1`, `temp`.
+
+## 3. KEEP FUNCTIONS SHORT
+- Each function should do one thing and be under 30 lines if possible.
+- If a function is getting long, split it up.
+
+## 4. REUSE CODE
+- Don't copy-paste code—make reusable functions or components.
+- Use shared helpers and utilities.
+
+## 5. HANDLE ERRORS GRACEFULLY
+- Always handle errors and show helpful messages.
+- Never let the app crash for the user.
+
+## 6. WRITE TESTS
+- Add tests for important logic and new features.
+- Update tests when you change code.
+
+## 7. KEEP FILES ORGANIZED
+- Use the correct folder for each file (components, actions, helpers, etc.).
+- Add or update README.md files to explain folder contents.
+
+## 8. REVIEW CODE
+- Always review your code before marking a task as done.
+- If working with others, do code reviews and give helpful feedback.
+
+**Following these best practices makes the project better for everyone!**
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,16 @@
+# 📁 FOLDER STRUCTURE RULE
+
+- When you give a relative path for a new feature or route, always use this structure:
+  - `components/` for UI components
+  - `actions/` for server actions or business logic
+  - `helpers/` for utility functions and hooks
+- If any of these folders do not exist, create them and add a `README.md` explaining what goes inside.
+- If the folder exists, make sure each file is in the correct subfolder:
+  - UI components go in `components/`
+  - Server actions go in `actions/`
+  - Utility functions/hooks go in `helpers/`
+- This keeps the project organized and easy to understand for everyone!
+description:
+globs:
+alwaysApply: false
+---

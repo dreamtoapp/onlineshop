@@ -1,0 +1,16 @@
+# 📋 CONTEXT COPY RULE
+
+- Whenever you type **copy context**, the AI MUST create a Markdown file (in the `docs/task/` folder) for each current task.
+- The file should include:
+  - What the task is
+  - What has been done so far
+  - What is left to do
+  - Any important notes or decisions
+- This way, if you restart your laptop or Cursor, you can always pick up where you left off.
+- The file name should be clear, like `docs/task/task-[short-description].md`.
+- This keeps you always on track and never starting from the beginning again!
+
+description:
+globs:
+alwaysApply: false
+---

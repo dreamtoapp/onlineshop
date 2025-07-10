@@ -1,0 +1,11 @@
+# Forms
+
+- Always use **React Hook Form** and **Zod** for forms.
+- Validate user input with Zod schemas.
+- Show clear error messages if something is wrong.
+- Use the same form style everywhere for a better user experience.
+- If you need help, look at examples in the code or ask the team.
+description:
+globs:
+alwaysApply: false
+---

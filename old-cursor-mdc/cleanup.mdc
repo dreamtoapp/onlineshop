@@ -1,0 +1,17 @@
+# 🧹 CLEANUP RULES
+
+## 1. ALWAYS REMOVE UNUSED VARIABLES
+- After writing code, check for any variables, imports, or functions that are not used.
+- Delete them to keep the code clean and easy to read.
+- This helps prevent bugs and makes the project faster.
+
+## 2. ALWAYS FIX LINTER ISSUES AFTER TASKS
+- When you finish a task, always run the linter (for example: `pnpm lint` or `npm run lint`).
+- Fix all warnings and errors before you consider the task done.
+- Clean code is easier for everyone to work with.
+
+**These cleanup steps are required every time you finish a coding task!**
+description:
+globs:
+alwaysApply: false
+---

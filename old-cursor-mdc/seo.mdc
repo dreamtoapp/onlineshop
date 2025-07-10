@@ -1,0 +1,19 @@
+# 📈 SEO RULES
+
+1. Always set unique <title> and meta tags for every page.
+2. Use Next.js Metadata API or <Head> for meta tags.
+3. Add Open Graph and Twitter Card tags for social sharing.
+4. Every image must have a meaningful alt attribute.
+5. Use clean, human-readable URLs.
+6. Optimize images and ensure fast load times.
+7. Use proper heading structure and accessibility.
+8. Support multiple languages and set correct lang/dir.
+9. Keep sitemap.xml and robots.txt up to date.
+10. Avoid duplicate content and use canonical tags.
+11. Test SEO regularly and fix issues quickly.
+
+**Good SEO = more visitors and better sales!**
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,14 @@
+# 🪓 COMPONENT SIZE RULE
+
+- If any component file is more than **70 lines**, you MUST break it into smaller components.
+- Each smaller component should:
+  - Have a clear, single responsibility
+  - Be placed in the correct folder (`components/`, `actions/`, or `helpers/`) according to its purpose
+- This keeps code easy to read, test, and maintain.
+- If you split a component, update or create a `README.md` in the folder to explain the structure.
+
+**Big components make code hard to understand. Small components are better for everyone!**
+description:
+globs:
+alwaysApply: false
+---

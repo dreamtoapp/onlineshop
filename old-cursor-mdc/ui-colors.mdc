@@ -1,0 +1,27 @@
+# 🎨 UI & COLOR CONSISTENCY RULES
+
+## 1. ALWAYS USE THE DESIGN SYSTEM COLORS
+- Use only the colors defined in `tailwind.config.ts` (like `primary`, `secondary`, `accent`, `destructive`, etc.).
+- Never use hardcoded hex colors or random Tailwind colors in components.
+- For backgrounds, borders, and text, use the semantic color names (e.g., `bg-primary`, `text-muted-foreground`).
+- For status (success, warning, error), use the provided semantic colors (e.g., `success-fg`, `danger-fg`).
+
+## 2. FOLLOW UI COMPONENT PATTERNS
+- Always use the shared UI components from `components/ui/` (Button, Card, Alert, Badge, etc.)
+- Do not create custom styles for buttons, cards, alerts, or badges—use the provided variants and props.
+- For new UI elements, follow the same structure and naming as existing components.
+
+## 3. BACKGROUND & PATTERN CONSISTENCY
+- Use the `Background` component for page/section backgrounds and patterns.
+- Use the provided background and pattern presets (e.g., `usersBlue`, `productsGreen`, `classicGrid`, `blobs`).
+- Do not use custom backgrounds or patterns unless added to the design system.
+
+## 4. RESPONSIVE & ACCESSIBLE
+- Always use responsive classes and test on all screen sizes.
+- Use semantic HTML and ensure color contrast is accessible.
+
+**These rules keep the UI looking professional and consistent everywhere!**
+description:
+globs:
+alwaysApply: false
+---
