@@ -1,7 +1,7 @@
 // mdx-components.tsx
 import type { MDXComponents } from 'mdx/types';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/link';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {

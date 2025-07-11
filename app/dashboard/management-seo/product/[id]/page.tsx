@@ -12,7 +12,7 @@ export default async function ProductSeoEditPage(props: { params: Promise<{ id: 
   const { id } = await props.params;
   const product = await getProductById(id);
   if (!product) return notFound();
-  console.log('Product:', product);
+  // console.log('Product:', product);
 
   // Fetch SEO for both locales
   const arSeo = await getProductSeoByLocale(id, 'ar-SA');

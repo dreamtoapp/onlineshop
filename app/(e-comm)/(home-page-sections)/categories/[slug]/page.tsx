@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { notFound } from 'next/navigation';
 import { getCategoryPageData } from '../action/actions';
 import { Separator } from '@/components/ui/separator';

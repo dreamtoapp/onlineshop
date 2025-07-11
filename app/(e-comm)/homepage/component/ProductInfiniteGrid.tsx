@@ -64,8 +64,8 @@ export default function ProductInfiniteGrid({ initialProducts, filters }: Produc
         <div className="container mx-auto">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="grid" aria-label="قائمة المنتجات">
                 {products.map((product: any, index: number) => (
-                    <div key={product.id || index} className="product-card" role="gridcell" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}>
-                        <ProductCardAdapter product={product} className="h-full w-full" index={index} />
+                    <div key={product.id || index} className="product-card" role="gridcell" data-index={index} style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}>
+                        <ProductCardAdapter product={product} className="h-full w-full" index={index} priority={index < 8} />
                     </div>
                 ))}
                 {loading && Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={`skeleton_${i}`} />)}

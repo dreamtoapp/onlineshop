@@ -8,7 +8,7 @@ import WishlistIconClient from './WishlistIconClient';
 import NotificationBell from './NotificationBell';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { UserRole } from '@/constant/enums';
-import Link from 'next/link';
+import Link from '@/components/link';
 
 interface User {
     id: string;

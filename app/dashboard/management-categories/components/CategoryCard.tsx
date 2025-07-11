@@ -5,7 +5,7 @@ import {
   Eye,
   PackageSearch,
 } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { toast } from 'sonner';
 
 import AddImage from '@/components/AddImage';

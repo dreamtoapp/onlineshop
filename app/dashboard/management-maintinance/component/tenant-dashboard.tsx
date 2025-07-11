@@ -1,14 +1,6 @@
 // Tenant Maintenance Dashboard (Self-Service)
 
-import {
-  FaBell,
-  FaBug,
-  FaCloudDownloadAlt,
-  FaDatabase,
-  FaHistory,
-  FaServer,
-  FaSyncAlt,
-} from 'react-icons/fa';
+import { Icon } from '@/components/icons/Icon';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,21 +24,21 @@ export default function TenantMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaServer className="text-green-500" />
+            <Icon name="Server" className="text-green-500" />
             System Health
             <Badge color="success">Healthy</Badge>
           </div>
           <div className="text-gray-500 text-sm mt-1">All systems operational. No incidents reported.</div>
         </div>
         <Button variant="outline" onClick={handleRefreshHealth}>
-          <FaSyncAlt className="mr-2" /> Refresh
+          <Icon name="RefreshCw" className="mr-2" /> Refresh
         </Button>
       </Card>
       {/* Cache Management */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaDatabase className="text-blue-500" />
+            <Icon name="Database" className="text-blue-500" />
             Cache Management
           </div>
           <div className="text-gray-500 text-sm mt-1">Clear product, order, or user cache if you notice stale data.</div>
@@ -59,20 +51,20 @@ export default function TenantMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaBug className="text-red-500" />
+            <Icon name="Bug" className="text-red-500" />
             Error Logs
           </div>
           <div className="text-gray-500 text-sm mt-1">View recent errors or download logs for support.</div>
         </div>
         <Button variant="outline" onClick={handleDownloadLogs}>
-          <FaCloudDownloadAlt className="mr-2" /> Download Logs
+          <Icon name="Download" className="mr-2" /> Download Logs
         </Button>
       </Card>
       {/* Backup & Restore */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaDatabase className="text-indigo-500" />
+            <Icon name="Database" className="text-indigo-500" />
             Backup & Restore
           </div>
           <div className="text-gray-500 text-sm mt-1">Create a backup or restore your tenant data.</div>
@@ -90,7 +82,7 @@ export default function TenantMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaHistory className="text-gray-500" />
+            <Icon name="History" className="text-gray-500" />
             Maintenance History
           </div>
           <div className="text-gray-500 text-sm mt-1">View your recent maintenance actions and outcomes.</div>
@@ -103,7 +95,7 @@ export default function TenantMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaBell className="text-yellow-500" />
+            <Icon name="Bell" className="text-yellow-500" />
             Notifications
           </div>
           <div className="text-gray-500 text-sm mt-1">Manage system alerts and maintenance notifications.</div>

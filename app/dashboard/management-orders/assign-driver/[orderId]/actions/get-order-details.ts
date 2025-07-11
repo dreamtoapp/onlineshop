@@ -43,7 +43,7 @@ export async function getOrderDetails(orderId: string): Promise<OrderDetails | n
   try {
     // Validate orderId format
     if (!orderId || orderId.length !== 24) {
-      console.warn('Invalid order ID format:', orderId);
+      // console.warn('Invalid order ID format:', orderId);
       return null;
     }
 

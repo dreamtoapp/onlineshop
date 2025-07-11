@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Product } from '@/types/databaseTypes';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { toast } from 'sonner';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import ImageCarousel from './ImageCarousel';

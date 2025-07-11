@@ -24,7 +24,7 @@ export function getPageMetadata(
     });
 
     if (!seo) {
-      console.warn(`[SEO] No metadata found for ${entityType}/${entityId}/${locale}`);
+      // console.warn(`[SEO] No metadata found for ${entityType}/${entityId}/${locale}`);
       return {};
     }
 

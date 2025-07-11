@@ -30,8 +30,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
     // console.log(productCount, clientCount);
 
     // Debug login state
-    let debug = { session, user, isLoggedIn: !!session };
-    console.log('HeaderUnified debug:', debug);
+    // console.log('HeaderUnified debug:', debug);
 
     return (
       <WishlistProvider initialIds={wishlistIds}>

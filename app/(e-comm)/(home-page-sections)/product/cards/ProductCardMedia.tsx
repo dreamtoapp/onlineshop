@@ -16,9 +16,10 @@ interface ProductCardMediaProps {
     isOutOfStock: boolean;
     lowStock: boolean;
     stockQuantity?: number | null;
+    priority?: boolean;
 }
 
-export default function ProductCardMedia({ product, inCart, isOutOfStock, lowStock, stockQuantity }: ProductCardMediaProps) {
+export default function ProductCardMedia({ product, inCart, isOutOfStock, lowStock, stockQuantity, priority }: ProductCardMediaProps) {
     const [imageError, setImageError] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
 
@@ -56,12 +57,12 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
                 fill
                 className={`object-contain w-full h-full rounded-t-2xl transition-all duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                loading="lazy"
+                loading={priority ? 'eager' : 'lazy'}
                 placeholder="blur"
                 blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgdmlld0JveD0nMCAwIDEwMCAxMDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsbD0nI2ZmZicvPjwvc3ZnPg=="
                 onError={handleImageError}
                 onLoad={handleImageLoad}
-                priority={false}
+                priority={priority}
                 quality={75}
                 unoptimized={imageError} // Skip optimization for fallback images
             />

@@ -1,5 +1,5 @@
 import { getBestSellers } from './actions/getBestSellers';
-import { FaFire } from 'react-icons/fa';
+import { Icon } from '@/components/icons/Icon';
 import BestSellerProductCard from './compnents/BestSellerProductCard';
 
 export default async function BestSellersPage() {
@@ -8,7 +8,7 @@ export default async function BestSellersPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <FaFire className="text-orange-500" />
+                <Icon name="Flame" className="text-orange-500" />
                 المنتجات الأكثر مبيعًا
             </h1>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

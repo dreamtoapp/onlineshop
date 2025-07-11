@@ -1,6 +1,6 @@
 "use client";
 
-import Link from 'next/link';
+import Link from '@/components/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -192,7 +192,7 @@ export default function UserMenuTrigger({ user, isMobile, alerts }: UserMenuTrig
                             >
                                 <Avatar className="h-8 w-8 border-2 border-border shadow-sm bg-background">
                                     <AvatarImage
-                                        src={image || "/default-avatar.png"}
+                                        src={image || "/fallback/fallback.avif"}
                                         alt={name || "User"}
                                         className="object-cover"
                                     />
@@ -212,7 +212,7 @@ export default function UserMenuTrigger({ user, isMobile, alerts }: UserMenuTrig
                                 <div className="relative">
                                     <Avatar className="h-9 w-9 border-2 border-border shadow-md bg-background group-hover:border-feature-users/50 transition-all duration-300 group-hover:shadow-lg">
                                         <AvatarImage
-                                            src={image || "/default-avatar.png"}
+                                            src={image || "/fallback/fallback.avif"}
                                             alt={name || "User"}
                                             className="object-cover"
                                         />

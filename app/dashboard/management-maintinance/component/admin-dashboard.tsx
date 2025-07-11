@@ -2,7 +2,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FaSyncAlt, FaBug, FaBell, FaDatabase, FaServer, FaCloudDownloadAlt, FaUsers, FaTools, FaGlobe } from 'react-icons/fa';
+import { Icon } from '@/components/icons/Icon';
 
 export default function AdminMaintenanceDashboard() {
   // Placeholder action handlers (replace with real backend integration)
@@ -21,21 +21,21 @@ export default function AdminMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaServer className="text-green-500" />
+            <Icon name="Server" className="text-green-500" />
             Global System Health
             <Badge color="success">Healthy</Badge>
           </div>
           <div className="text-gray-500 text-sm mt-1">All platform services are operational.</div>
         </div>
         <Button variant="outline" onClick={handleRefreshHealth}>
-          <FaSyncAlt className="mr-2" /> Refresh
+          <Icon name="RefreshCw" className="mr-2" /> Refresh
         </Button>
       </Card>
       {/* Tenant Management */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaUsers className="text-blue-500" />
+            <Icon name="Users" className="text-blue-500" />
             Tenant Management
           </div>
           <div className="text-gray-500 text-sm mt-1">View, suspend, or support tenants. Manage onboarding and offboarding.</div>
@@ -48,20 +48,20 @@ export default function AdminMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaBug className="text-red-500" />
+            <Icon name="Bug" className="text-red-500" />
             Platform Logs
           </div>
           <div className="text-gray-500 text-sm mt-1">Access error, audit, and activity logs across all tenants.</div>
         </div>
         <Button variant="outline" onClick={handleDownloadLogs}>
-          <FaCloudDownloadAlt className="mr-2" /> Download Logs
+          <Icon name="Download" className="mr-2" /> Download Logs
         </Button>
       </Card>
       {/* Database & Backups */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaDatabase className="text-purple-500" />
+            <Icon name="Database" className="text-purple-500" />
             Database & Backups
           </div>
           <div className="text-gray-500 text-sm mt-1">Monitor DB health, run backups, and restore data if needed.</div>
@@ -74,7 +74,7 @@ export default function AdminMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaBell className="text-yellow-500" />
+            <Icon name="Bell" className="text-yellow-500" />
             Platform Notifications
           </div>
           <div className="text-gray-500 text-sm mt-1">Send announcements or maintenance alerts to all tenants.</div>
@@ -87,7 +87,7 @@ export default function AdminMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaTools className="text-gray-700" />
+            <Icon name="Tools" className="text-gray-700" />
             Advanced Tools
           </div>
           <div className="text-gray-500 text-sm mt-1">Access platform settings, feature toggles, and system upgrades.</div>
@@ -100,7 +100,7 @@ export default function AdminMaintenanceDashboard() {
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FaGlobe className="text-indigo-500" />
+            <Icon name="Globe" className="text-indigo-500" />
             Global Status
           </div>
           <div className="text-gray-500 text-sm mt-1">Monitor platform-wide incidents, uptime, and SLA compliance.</div>

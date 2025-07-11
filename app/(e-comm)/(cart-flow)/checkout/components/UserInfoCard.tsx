@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Phone, AlertTriangle, CheckCircle, Edit2, Shield, Lock } from "lucide-react";
-import Link from "next/link";
+import Link from '@/components/link';
 
 export interface UserProfile {
     id: string;

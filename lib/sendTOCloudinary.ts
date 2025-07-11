@@ -41,7 +41,7 @@ export async function uploadImageToCloudinary(filePath: string, preset: string, 
   } catch (error) {
     // If preset fails, try without preset
     if (preset && error instanceof Error && error.message.includes('preset')) {
-      console.warn('[CLOUDINARY] Preset failed, trying without preset:', preset);
+      // console.warn('[CLOUDINARY] Preset failed, trying without preset:', preset);
       delete uploadOptions.upload_preset;
       result = await cloudinary.v2.uploader.upload(filePath, uploadOptions);
     } else {

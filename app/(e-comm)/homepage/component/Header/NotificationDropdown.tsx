@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Icon } from '@/components/icons/Icon';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { getUserAlerts } from '@/app/(e-comm)/actions/getUserAlerts';
 
 import {

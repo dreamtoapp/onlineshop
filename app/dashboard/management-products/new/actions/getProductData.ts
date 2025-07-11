@@ -136,14 +136,10 @@ export async function getProductFormData(): Promise<DataFetchResult> {
     }
 
     // Warn if categories are missing
-    if (categories.length === 0) {
-      console.warn('No categories found. Products may not be properly categorized.');
-    }
+    // console.warn('No categories found. Products may not be properly categorized.');
 
     // Warn if suppliers are missing
-    if (suppliers.length === 0) {
-      console.warn('No suppliers found. Product sourcing information will be incomplete.');
-    }
+    // console.warn('No suppliers found. Product sourcing information will be incomplete.');
 
     return {
       success: true,

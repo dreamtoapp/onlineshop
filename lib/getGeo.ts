@@ -24,11 +24,11 @@ const DEFAULT_OPTIONS: GeolocationOptions = {
   retries: 3,
 };
 
-const IP_GEOLOCATION_SERVICES = [
-  'https://ipapi.co/json/',
-  'https://ipinfo.io/json?token=YOUR_TOKEN', // Register for free token
-  'https://geolocation-db.com/json/',
-];
+// const IP_GEOLOCATION_SERVICES = [
+//   'https://ipapi.co/json/',
+//   'https://ipinfo.io/json?token=YOUR_TOKEN', // Register for free token
+//   'https://geolocation-db.com/json/',
+// ];
 
 const validateCoordinates = (lat: number, lng: number): boolean =>
   Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && !isNaN(lat) && !isNaN(lng);
@@ -66,41 +66,41 @@ const getGPSLocation = async (options: GeolocationOptions): Promise<GeolocationR
   }
 };
 
-const getIPLocation = async (): Promise<GeolocationResponse> => {
-  const errors: string[] = [];
+// const getIPLocation = async (): Promise<GeolocationResponse> => {
+//   const errors: string[] = [];
 
-  for (const serviceUrl of IP_GEOLOCATION_SERVICES) {
-    try {
-      const response = await fetch(serviceUrl);
-      const data = await response.json();
+//   for (const serviceUrl of IP_GEOLOCATION_SERVICES) {
+//     try {
+//       const response = await fetch(serviceUrl);
+//       const data = await response.json();
 
-      const lat = parseFloat(data.latitude || data.lat);
-      const lng = parseFloat(data.longitude || data.lon || data.lng);
+//       const lat = parseFloat(data.latitude || data.lat);
+//       const lng = parseFloat(data.longitude || data.lon || data.lng);
 
-      if (validateCoordinates(lat, lng)) {
-        return {
-          coords: {
-            latitude: lat,
-            longitude: lng,
-            accuracy: 50000,
-          },
-          source: 'ip',
-          timestamp: Date.now(),
-          warning: 'Approximate IP-based location',
-        };
-      }
-    } catch (error) {
-      errors.push(error instanceof Error ? error.message : 'Unknown IP service error');
-    }
-  }
+//       if (validateCoordinates(lat, lng)) {
+//         return {
+//           coords: {
+//             latitude: lat,
+//             longitude: lng,
+//             accuracy: 50000,
+//           },
+//           source: 'ip',
+//           timestamp: Date.now(),
+//           warning: 'Approximate IP-based location',
+//         };
+//       }
+//     } catch (error) {
+//       errors.push(error instanceof Error ? error.message : 'Unknown IP service error');
+//     }
+//   }
 
-  return {
-    coords: null,
-    source: 'ip',
-    timestamp: Date.now(),
-    error: `All IP services failed: ${errors.join(', ')}`,
-  };
-};
+//   return {
+//     coords: null,
+//     source: 'ip',
+//     timestamp: Date.now(),
+//     error: `All IP services failed: ${errors.join(', ')}`,
+//   };
+// };
 
 const getLocation = async (options: GeolocationOptions = {}): Promise<GeolocationResponse> => {
   const finalOptions = { ...DEFAULT_OPTIONS, ...options };
@@ -125,16 +125,25 @@ const getLocation = async (options: GeolocationOptions = {}): Promise<Geolocatio
   }
 
   // Fallback to IP if GPS failed
-  if (!bestResult?.coords) {
-    const ipResult = await getIPLocation();
-    return ipResult.coords
-      ? ipResult
-      : {
-          ...ipResult,
-          error: `GPS: ${bestResult?.error || 'Unknown error'}, IP: ${ipResult.error}`,
-        };
-  }
+  // if (!bestResult?.coords) {
+  //   // const ipResult = await getIPLocation();
+  //   // return ipResult.coords
+  //   //   ? ipResult
+  //   //   : {
+  //   //       ...ipResult,
+  //   //       error: `GPS: ${bestResult?.error || 'Unknown error'}, IP: ${ipResult.error}`,
+  //   //     };
+  // }
 
+  // At the end of getLocation, ensure a GeolocationResponse is always returned
+  if (!bestResult) {
+    return {
+      coords: null,
+      source: 'unknown',
+      timestamp: Date.now(),
+      error: 'Unable to determine location (GPS and IP lookup disabled)',
+    };
+  }
   return bestResult;
 };
 

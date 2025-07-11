@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icons/Icon';
-import Link from 'next/link';
+import Link from '@/components/link';
 
 export default function ManagementTrackingPage() {
     return (

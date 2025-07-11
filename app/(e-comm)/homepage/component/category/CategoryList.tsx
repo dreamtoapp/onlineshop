@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -26,7 +26,7 @@ export default async function CategoryList() {
                 </div>
                 <ScrollArea className="w-full py-3">
                     <div className="flex gap-5 pb-3">
-                        {categories.map((category) => (
+                        {categories.map((category, idx) => (
                             <Link key={category.id} href={`/categories/${category.slug}`} className="group cursor-pointer overflow-hidden rounded-xl">
                                 <div className="relative h-44 w-72 overflow-hidden rounded-xl shadow-md transition-all duration-300">
                                     {category.imageUrl ? (
@@ -36,7 +36,7 @@ export default async function CategoryList() {
                                             fill
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 288px"
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                            priority={true}
+                                            priority={idx < 8}
                                         />
                                     ) : (
                                         <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />

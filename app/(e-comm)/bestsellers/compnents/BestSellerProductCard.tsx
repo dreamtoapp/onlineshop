@@ -1,6 +1,6 @@
-import { FaFire } from 'react-icons/fa';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/link';
+import { Icon } from '@/components/icons/Icon';
 
 export interface BestSellerProductCardProps {
     id: string;
@@ -37,7 +37,7 @@ export default function BestSellerProductCard({
                     priority={rank !== undefined && rank < 4}
                 />
                 <span className="absolute top-2 left-2 flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
-                    <FaFire className="inline-block mr-1" />
+                    <Icon name="Flame" className="inline-block mr-1" />
                     الأكثر مبيعًا
                 </span>
                 {rank !== undefined && (

@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft } from "lucide-react";
 import CartItemQuantityControls from "./CartItemQuantityControls";
-import Link from "next/link";
+import Link from '@/components/link';
 import Image from "next/image";
 import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 import { useCartStore } from '../cart-controller/cartStore';

@@ -1,6 +1,6 @@
 // 'use client'; // REMOVE THIS LINE to make the component a server component
 
-import Link from 'next/link';
+import Link from '@/components/link';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import NewsletterClientWrapper from './NewsletterClientWrapper';

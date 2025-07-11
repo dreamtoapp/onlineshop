@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import { toast } from 'sonner'; // Import toast for client-side notifications
 import { Loader2, Mail, CheckSquare, Square, Trash2 } from 'lucide-react'; // Import lucide icons
-import { FaWhatsapp, FaS } from 'react-icons/fa6'; // Corrected import: FaSms -> FaS
 import { iconVariants } from '@/lib/utils'; // Import CVA variants
 
 // Removed Icon import: import { Icon } from '@/components/icons';
@@ -21,6 +20,7 @@ import {
 
 import { deleteSubscriber } from '../actions/newsletter';
 import { sendBulkEmail } from '../actions/sendBulkEmail';
+import { Icon } from '@/components/icons/Icon';
 
 interface Subscriber {
   id: string;
@@ -112,14 +112,14 @@ export default function SubscriberTable({ subscribers }: { subscribers: Subscrib
               className='flex w-full items-center justify-center bg-green-600 transition-all hover:bg-green-700 md:w-auto'
               onClick={handleSendWhatsAppSMS}
             >
-              <FaWhatsapp className={iconVariants({ size: 'xs', className: 'mr-2' })} /> {/* Use direct import + CVA */} إرسال WhatsApp
+              <Icon name="Whatsapp" className={iconVariants({ size: 'xs', className: 'mr-2' })} /> إرسال WhatsApp
             </Button>
             <Button
               type='button'
               className='flex w-full items-center justify-center bg-green-600 transition-all hover:bg-green-700 md:w-auto'
               onClick={handleSendWhatsAppSMS}
             >
-              <FaS className={iconVariants({ size: 'xs', className: 'mr-2' })} /> {/* Use correct icon FaS */} إرسال SMS
+              <Icon name="MessageSquare" className={iconVariants({ size: 'xs', className: 'mr-2' })} /> إرسال SMS
             </Button>
           </div>
         </div>

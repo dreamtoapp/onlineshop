@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/link';
 import { iconVariants } from '@/lib/utils';
 import { Icon } from '@/components/icons/Icon';
 import { Button } from '@/components/ui/button';

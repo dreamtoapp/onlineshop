@@ -3,14 +3,11 @@ import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/icons/Icon';
 import { Product } from '@/types/databaseTypes';
-import dynamic from 'next/dynamic';
 import ProductCardMedia from './ProductCardMedia';
 import ProductCardActions from './ProductCardActions';
 import { useRouter } from 'next/navigation';
 import { useProductCardOptimizations } from '@/lib/hooks/useProductCardOptimizations';
-import Link from 'next/link';
 
-const Notification = dynamic(() => import('@/app/(e-comm)/(home-page-sections)/product/cards/NotificationSection'), { ssr: false });
 
 interface ProductCardProps {
     product: Product;
@@ -18,6 +15,7 @@ interface ProductCardProps {
     isInCart: boolean;
     className?: string;
     index?: number; // For analytics tracking
+    priority?: boolean;
 }
 
 const ProductCard = memo(({
@@ -25,11 +23,11 @@ const ProductCard = memo(({
     quantity,
     isInCart,
     className,
-    index
+    index,
+    priority
 }: ProductCardProps) => {
     const router = useRouter();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
-    const [isHovered, setIsHovered] = useState(false);
 
     // Performance optimizations
     const {
@@ -124,167 +122,55 @@ const ProductCard = memo(({
 
             <Card
                 ref={cardRef}
-                className={`group relative overflow-hidden rounded-2xl bg-card
-                           shadow-md hover:shadow-xl border border-border transition-all duration-200 ease-out 
-                           card-hover-effect flex flex-col h-full cursor-pointer transform hover:-translate-y-1 ${className || ''}`}
+                className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[420px] sm:min-h-[520px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow ${className || ''}`}
                 tabIndex={0}
-                role="article"
-                aria-labelledby={`product-${product.id}-title`}
-                aria-describedby={`product-${product.id}-description`}
                 onKeyDown={handleKeyDown}
-                onMouseEnter={() => {
-                    optimizedMouseEnter();
-                    setIsHovered(true);
-                }}
-                onMouseLeave={() => {
-                    optimizedMouseLeave();
-                    setIsHovered(false);
-                }}
-                onClick={() => {
-                    trackProductView();
-                    router.push(`/product/${product.slug}`);
-                }}
+                onMouseEnter={optimizedMouseEnter}
+                onMouseLeave={optimizedMouseLeave}
+                role="button"
+                aria-label={product.name}
             >
-                {/* Screen reader only product summary */}
-                <div className="sr-only">
-                    <h2 id={`product-${product.id}-title`}>{product.name}</h2>
-                    <p id={`product-${product.id}-description`}>
-                        {product.details} - السعر: {product.price} ر.س
-                        {stockInfo.isOutOfStock ? ' - غير متوفر' : ' - متوفر'}
-                    </p>
-                </div>
-
-                {/* Badges Container */}
-                {/* Remove badge rendering here to avoid duplicate discount badges. Only ProductCardMedia will render the badge. */}
-
-                {/* Product Media */}
-                <div className="relative overflow-hidden">
-                    <ProductCardMedia
-                        product={product}
-                        inCart={currentCartState}
-                        isOutOfStock={stockInfo.isOutOfStock}
-                        lowStock={stockInfo.lowStock}
-                        stockQuantity={product.stockQuantity}
-                    />
-
-                    {/* Hover overlay effect */}
-                    <div className={`absolute inset-0 bg-background/10 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
-                </div>
-
-                {/* Product Info */}
-                <div className="flex flex-col gap-3 p-5 flex-1">
-                    {/* Brand */}
-                    {product.brand && (
-                        <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{product.brand}</div>
-                    )}
-
-                    {/* Product Title */}
-                    <div className="flex-1 flex items-center justify-between">
-                        <h3 className="font-bold text-lg leading-tight text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors duration-300"
-                            title={product.name}>
-                            {product.name}
-                        </h3>
-                        <Link
-                            href={`/product/${product.slug}`}
-                            className="ml-2 text-primary hover:text-primary/80 transition"
-                            tabIndex={0}
-                            aria-label="عرض تفاصيل المنتج"
-                        >
-                            <Icon name="FaInfoCircle" size="sm" />
-                        </Link>
-                    </div>
-
-                    {/* Rating & Reviews */}
-                    <div className="flex items-center gap-3 text-sm">
-                        <div className="flex items-center gap-1">
-                            <div className="flex">
-                                {[...Array(5)].map((_, i) => (
-                                    <Icon
-                                        key={i}
-                                        name="FaStar"
-                                        size="xs"
-                                        className={`${i < Math.floor(product.rating ?? 0) ? 'text-primary' : 'text-muted'}`}
-                                    />
-                                ))}
-                            </div>
-                            <span className="text-foreground font-medium">{product.rating ?? '--'}</span>
+                {/* Media Section */}
+                <ProductCardMedia
+                    product={product}
+                    inCart={currentCartState}
+                    isOutOfStock={stockInfo.isOutOfStock}
+                    lowStock={stockInfo.lowStock}
+                    stockQuantity={product.stockQuantity}
+                    priority={priority}
+                />
+                {/* Content Section */}
+                <div className="flex-1 flex flex-col p-3 sm:p-5 gap-3">
+                    {/* Product Name & Type */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Icon name="Package" className="h-4 w-4 text-feature-products mt-1 flex-shrink-0 icon-enhanced" />
+                            <h3 className="font-semibold text-sm leading-tight text-foreground group-hover:text-feature-products transition-colors duration-200 line-clamp-2" title={product.name}>
+                                {product.name}
+                            </h3>
                         </div>
-                        <span className="text-muted-foreground">({product.reviewCount ?? 0} تقييم)</span>
-                    </div>
-
-                    {/* Price Section */}
-                    <div className="flex items-end justify-between mb-4">
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <span className="text-2xl font-bold text-foreground">{product.price} ر.س</span>
-                                {pricingInfo.hasDiscount && (
-                                    <span className="text-sm text-muted-foreground line-through">{product.compareAtPrice} ر.س</span>
-                                )}
-                            </div>
+                        {/* Price Section */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-feature-commerce">
+                                {product.price.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
+                            </span>
                             {pricingInfo.hasDiscount && (
-                                <div className="text-sm text-primary font-medium">
-                                    توفر {((product.compareAtPrice ?? 0) - product.price).toFixed(2)} ر.س
-                                </div>
+                                <span className="text-sm line-through text-muted-foreground">
+                                    {product.compareAtPrice?.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
+                                </span>
+                            )}
+                            {pricingInfo.hasDiscount && (
+                                <span className="ml-2 rounded bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">-{pricingInfo.discountPercentage}%</span>
                             )}
                         </div>
                     </div>
-
-                    {/* Stock & Shipping Info */}
-                    <div className="flex items-center justify-between text-xs mb-4">
-                        {/* Stock Status */}
-                        {stockInfo.isOutOfStock ? (
-                            <div className="flex items-center gap-1 text-destructive bg-destructive/10 px-2 py-1 rounded-full">
-                                <Icon name="X" size="xs" />
-                                <span>غير متوفر</span>
-                            </div>
-                        ) : stockInfo.lowStock ? (
-                            <div className="flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded-full">
-                                <Icon name="FaExclamationTriangle" size="xs" />
-                                <span>متبقي ({product.stockQuantity})</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded-full">
-                                <Icon name="FaCheck" size="xs" />
-                                <span>متوفر</span>
-                            </div>
-                        )}
-
-                        {/* Shipping Info */}
-                        {product.shippingDays && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                                <Icon name="Truck" size="xs" />
-                                <span>شحن {product.shippingDays} أيام</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Views Counter */}
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
-                        <Icon name="FaEye" size="xs" />
-                        <span>{product.previewCount ?? 0} مشاهدة</span>
-                    </div>
-
                     {/* Actions */}
-                    <div className="mt-auto">
-                        <ProductCardActions
-                            product={product}
-                            quantity={quantity}
-                            isOutOfStock={stockInfo.isOutOfStock}
-                        />
-                    </div>
+                    <ProductCardActions
+                        product={product}
+                        quantity={quantity}
+                        isOutOfStock={stockInfo.isOutOfStock}
+                    />
                 </div>
-
-                {/* Notification overlay */}
-                <Notification
-                    show={false}
-                    type="add"
-                    message="تمت الإضافة إلى السلة"
-                />
-                <Notification
-                    show={false}
-                    type="remove"
-                    message="تمت الإزالة من السلة"
-                />
             </Card>
         </>
     );
@@ -292,4 +178,5 @@ const ProductCard = memo(({
 
 ProductCard.displayName = 'ProductCard';
 
-export default ProductCard; 
+export { ProductCard };
+export default ProductCard;

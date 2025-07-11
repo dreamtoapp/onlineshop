@@ -17,7 +17,7 @@ export default function PreloadScript() {
     // Preload critical resources for faster initial page load
     const preloadResources = [
       { href: '/fallback/fallback.avif', as: 'image', type: 'image/avif' },
-      { href: '/fallback/fallback.webp', as: 'image', type: 'image/webp' },
+      { href: '/fallback/fallback.avif', as: 'image', type: 'image/avif' },
       { href: '/api/products?featured=true', as: 'fetch' },
       { href: '/api/categories', as: 'fetch' },
     ];

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/link';
 
 const SuccessMessage: React.FC<{ message: string; onContinue?: () => void }> = ({ message }) => (
     <div className='flex flex-col items-center justify-center gap-2 py-8' role='alert'>

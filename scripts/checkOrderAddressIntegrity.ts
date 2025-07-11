@@ -13,7 +13,7 @@ async function main() {
     console.error('❌ Orders with empty addressId:', badOrders);
     process.exit(1);
   } else {
-    console.log('✅ All orders have valid addressId. Data integrity check passed.');
+    // console.log('✅ All orders have valid addressId. Data integrity check passed.');
   }
   await prisma.$disconnect();
 }

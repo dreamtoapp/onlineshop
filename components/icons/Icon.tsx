@@ -1,8 +1,14 @@
-import * as LucideIcons from 'lucide-react';
-import * as FaIcons from 'react-icons/fa';
-import * as Fa6Icons from 'react-icons/fa6';
 import React from 'react';
 import { cva } from 'class-variance-authority';
+import {
+    AlertCircle, Zap, Check, Minus, ChevronLeft, ChevronRight, MoreHorizontal, X, PanelLeft, Circle, Info,
+    UploadCloud, ZoomIn, Trash2, ImageOff, Map, MapPinOff, Plus, Loader2, AlertTriangle, Home, Search,
+    HelpCircle, RefreshCw, ArrowLeft, User, Mail, FileText, Calendar, CheckCircle2, Package, Calculator,
+    DollarSign, Receipt, Users, TrendingUp, Award, PlayCircle, Clock, Truck, Phone, Navigation, UserCheck,
+    Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
+    XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
+    ChevronDown, LocateFixed, Tag, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench
+} from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)
 const iconVariants = cva('inline-block shrink-0', {
@@ -41,9 +47,13 @@ const iconVariants = cva('inline-block shrink-0', {
 });
 
 const iconMap = {
-    ...LucideIcons,
-    ...FaIcons,
-    ...Fa6Icons,
+    AlertCircle, Zap, Check, Minus, ChevronLeft, ChevronRight, MoreHorizontal, X, PanelLeft, Circle, Info,
+    UploadCloud, ZoomIn, Trash2, ImageOff, Map, MapPinOff, Plus, Loader2, AlertTriangle, Home, Search,
+    HelpCircle, RefreshCw, ArrowLeft, User, Mail, FileText, Calendar, CheckCircle2, Package, Calculator,
+    DollarSign, Receipt, Users, TrendingUp, Award, PlayCircle, Clock, Truck, Phone, Navigation, UserCheck,
+    Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
+    XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
+    ChevronDown, LocateFixed, Tag, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench
 };
 
 // Types for size and variant based on iconVariants
@@ -68,7 +78,13 @@ interface IconProps {
 }
 
 export function Icon({ name, size = 'md', variant = 'default', animation = 'none', ...props }: IconProps) {
-    const IconComponent = iconMap[name as keyof typeof iconMap] as React.ComponentType<any> | undefined;
+    // Map legacy names to new lucide names
+    const nameMap: Record<string, string> = {
+        Whatsapp: 'MessageCircle',
+        Tools: 'Wrench',
+    };
+    const mappedName = nameMap[name] || name;
+    const IconComponent = iconMap[mappedName as keyof typeof iconMap] as React.ComponentType<any> | undefined;
     if (!IconComponent) return null;
     return <IconComponent className={iconVariants({ size, variant, animation })} {...props} />;
 } 

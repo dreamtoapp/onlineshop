@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useContext } from 'react';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Icon } from '@/components/icons/Icon';
@@ -14,7 +14,6 @@ import Image from 'next/image';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import SearchBar from './SearchBar';
 import CartButtonWithBadge from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
-import { FaWhatsapp, FaTag } from 'react-icons/fa';
 import useSWR from 'swr';
 import WishlistIconClient from './WishlistIconClient';
 
@@ -66,7 +65,7 @@ function NavigationItem({
                 {item.id === 'wishlist' ? (
                     <WishlistIconClient isLoggedIn={isLoggedIn} />
                 ) : item.id === 'categories' ? (
-                    <FaTag size={18} className={cn("transition-all duration-300", isActive ? `${item.color} scale-110` : "text-muted-foreground")} />
+                    <Icon name="Tag" size="sm" className={cn("transition-all duration-300", isActive ? `${item.color} scale-110` : "text-muted-foreground")} />
                 ) : item.id === 'account' ? (
                     item.userImage && !item.userImage.includes('/fallback/') ? (
                         <div className={cn(
@@ -361,7 +360,7 @@ export default function MobileBottomNav({
                                 activeTab === navItems[3].id ? navItems[3].color : "text-muted-foreground"
                             )}
                         >
-                            <FaWhatsapp size={22} color="#25D366" className="mb-0.5" />
+                            <Icon name="Whatsapp" size="sm" className="mb-0.5" />
                         </a>
                     </div>
                 </div>

@@ -3,10 +3,10 @@ import createMDX from '@next/mdx'; // Import createMDX
 
 // Enable bundle analyzer
 // Use dynamic import for bundle analyzer in ESM
-// const withBundleAnalyzer = require('@next/bundle-analyzer')({
-//   enabled: process.env.ANALYZE === 'true',
-//   openAnalyzer: true,
-// });
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: true,
+});
 
 
 /** @type {import('next').NextConfig} */
@@ -122,4 +122,4 @@ const withMDX = createMDX({
 
 // Export the combined config
 // Temporarily removing withBundleAnalyzer to isolate withMDX
-module.exports = withMDX(nextConfig);
+module.exports = withBundleAnalyzer(withMDX(nextConfig));

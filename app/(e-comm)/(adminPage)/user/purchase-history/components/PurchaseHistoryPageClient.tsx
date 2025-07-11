@@ -2,7 +2,7 @@
 
 import { iconVariants } from '@/lib/utils';
 import { Icon } from '@/components/icons/Icon';
-import Link from 'next/link';
+import Link from '@/components/link';
 import PurchaseHistoryListDynamic from './PurchaseHistoryListDynamic';
 
 export default function PurchaseHistoryPageClient({ purchaseHistory }: { purchaseHistory: any[] }) {

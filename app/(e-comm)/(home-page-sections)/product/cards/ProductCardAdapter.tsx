@@ -10,9 +10,10 @@ interface ProductCardAdapterProps {
     className?: string;
     index?: number;
     discountPercentage?: number; // Optional global discount
+    priority?: boolean;
 }
 
-const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, className, discountPercentage }: ProductCardAdapterProps) {
+const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, className, discountPercentage, priority }: ProductCardAdapterProps) {
     const { cart } = useCartStore();
     const cartQty = cart[product.id]?.quantity ?? 0;
     const inCart = cartQty > 0;
@@ -33,6 +34,7 @@ const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, cla
             className={className}
             quantity={cartQty}
             isInCart={inCart}
+            priority={priority}
         />
     );
 });

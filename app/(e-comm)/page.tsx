@@ -8,7 +8,6 @@ import ProductInfiniteGrid from './homepage/component/ProductInfiniteGrid';
 const PAGE_SIZE = 8;
 
 const CriticalCSS = dynamic(() => import('./homepage/component/CriticalCSS'), { ssr: true });
-const PreloadScript = dynamic(() => import('./homepage/component/PreloadScript'), { ssr: true });
 
 export default async function HomePage(props: { searchParams: Promise<{ slug?: string; page?: string; search?: string; description?: string; price?: string; category?: string; priceMin?: string; priceMax?: string }> }) {
   const searchParams = await props.searchParams;
@@ -35,7 +34,7 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
     <>
       <CriticalCSS />
       <div className='container mx-auto flex flex-col gap-8 bg-background text-foreground px-4 sm:px-6 lg:px-8'>
-        <PreloadScript />
+        {/* <PreloadScript /> */}
         {/* <HomepageHeroSection /> */}
         <section className="space-y-6" aria-label="Product categories">
           <CategoryList />

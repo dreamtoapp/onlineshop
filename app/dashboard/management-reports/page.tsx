@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/link';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // CardDescription not used
 import { Icon } from '@/components/icons/Icon';
 

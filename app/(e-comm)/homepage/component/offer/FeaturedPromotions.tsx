@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/link';
 import { getPromotions } from '../../actions/getPromotions';
 
 // Add Promotion type
@@ -24,7 +24,7 @@ export default async function FeaturedPromotions() {
         <section className="my-8">
             <h2 className="mb-4 text-2xl font-bold">العروض المميزة</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {activePromotions.map((offer: Promotion) => (
+                {activePromotions.map((offer: Promotion, idx: number) => (
                     <Link
                         key={offer.id}
                         href={`/offers/${offer.slug}`}
@@ -39,6 +39,7 @@ export default async function FeaturedPromotions() {
                                     fill
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    priority={idx < 8}
                                 />
                             ) : (
                                 <div className="h-full w-full bg-gradient-to-r from-primary/30 to-primary/10" />
