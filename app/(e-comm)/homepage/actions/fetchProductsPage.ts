@@ -57,8 +57,13 @@ export async function fetchProductsPage({
         imageUrl: true,
         rating: true,
         reviewCount: true,
+        previewCount: true,
         outOfStock: true,
         details: true,
+        brand: true,
+        size: true,
+        description: true,
+        features: true,
         categoryAssignments: {
           select: {
             category: {

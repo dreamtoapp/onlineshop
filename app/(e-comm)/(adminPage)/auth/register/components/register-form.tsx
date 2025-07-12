@@ -12,7 +12,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterSchemaType } from '../helpers/registerSchema';
-import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { signIn } from 'next-auth/react';
 
@@ -97,6 +96,7 @@ export default function RegisterForm({ redirect = '/' }: RegisterFormProps) {
     const result = await registerUser({}, formData);
     setIsPending(false);
     if (result?.success && result.redirectTo && result.phone && result.password) {
+      const Swal = (await import('sweetalert2')).default;
       await Swal.fire({
         title: '🎉 تم إنشاء حسابك بنجاح!',
         html: `

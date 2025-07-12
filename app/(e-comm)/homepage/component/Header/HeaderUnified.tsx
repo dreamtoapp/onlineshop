@@ -1,14 +1,12 @@
 "use client";
-import { useMemo } from 'react';
 import Logo from './Logo';
 import SearchBar from './SearchBar';
 import UserMenuTrigger from './UserMenuTrigger';
 import CartIconClient from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
-import WishlistIconClient from './WishlistIconClient';
-import NotificationBell from './NotificationBell';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { UserRole } from '@/constant/enums';
 import Link from '@/components/link';
+import { ReactNode } from 'react';
 
 interface User {
     id: string;
@@ -22,9 +20,8 @@ interface HeaderUnifiedProps {
     logo: string;
     logoAlt?: string;
     user: User | null;
-    unreadCount?: number;
-    defaultAlerts?: any[];
     isLoggedIn?: boolean;
+    notificationBell?: ReactNode;
 }
 
 function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User | null }) {
@@ -35,12 +32,13 @@ function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User
     );
 }
 
-function DesktopHeader({ logo, logoAlt, isLoggedIn, user, totalCount }: {
+function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wishlistIcon }: {
     logo: string;
     logoAlt: string;
     isLoggedIn: boolean;
     user: User | null;
-    totalCount: number;
+    notificationBell?: ReactNode;
+    wishlistIcon?: ReactNode;
 }) {
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/60 shadow-2xl shadow-black/20 dark:shadow-white/10 transition-all duration-300">
@@ -48,11 +46,11 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, totalCount }: {
                 <span className="flex items-center">
                     <Logo logo={logo} logoAlt={logoAlt} />
                 </span>
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-4 md:gap-6 bg-secondary rounded-lg px-4">
                     <SearchBar />
-                    <WishlistIconClient isLoggedIn={isLoggedIn} />
+                    {wishlistIcon}
                     <CartIconClient />
-                    <NotificationBell isLoggedIn={isLoggedIn} count={totalCount} showNumber={true} />
+                    {notificationBell}
                     <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
                 </div>
             </nav>
@@ -60,21 +58,21 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, totalCount }: {
     );
 }
 
-function MobileHeader({ logo, logoAlt, isLoggedIn, user, totalCount }: {
+function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
     logo: string;
     logoAlt: string;
     isLoggedIn: boolean;
     user: User | null;
-    totalCount: number;
+    notificationBell?: ReactNode;
 }) {
     return (
         <header className="fixed top-0 left-0 right-0 z-40 flex h-14 md:h-20 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-md sm:px-6 shadow-2xl shadow-black/20 dark:shadow-white/10 ">
             <div className=" flex justify-center">
                 <Logo logo={logo} logoAlt={logoAlt} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-secondary rounded-lg px-4">
                 <SearchBar />
-                <NotificationBell isLoggedIn={isLoggedIn} count={totalCount} showNumber={true} />
+                {notificationBell}
                 <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
             </div>
         </header>
@@ -85,12 +83,11 @@ export default function HeaderUnified({
     user,
     logo,
     logoAlt = 'Logo',
-    unreadCount = 0,
-    defaultAlerts = [],
     isLoggedIn = false,
-}: HeaderUnifiedProps) {
+    notificationBell,
+    wishlistIcon,
+}: HeaderUnifiedProps & { wishlistIcon?: ReactNode }) {
     const isDesktop = useMediaQuery('(min-width: 768px)');
-    const totalCount = useMemo(() => (unreadCount || 0) + (defaultAlerts?.length || 0), [unreadCount, defaultAlerts]);
 
     return isDesktop ? (
         <DesktopHeader
@@ -98,7 +95,8 @@ export default function HeaderUnified({
             logoAlt={logoAlt}
             isLoggedIn={isLoggedIn}
             user={user}
-            totalCount={totalCount}
+            notificationBell={notificationBell}
+            wishlistIcon={wishlistIcon}
         />
     ) : (
         <MobileHeader
@@ -106,7 +104,7 @@ export default function HeaderUnified({
             logoAlt={logoAlt}
             isLoggedIn={isLoggedIn}
             user={user}
-            totalCount={totalCount}
+            notificationBell={notificationBell}
         />
     );
 } 

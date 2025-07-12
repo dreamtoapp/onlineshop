@@ -16,7 +16,6 @@ import { ProductFormData, ProductSchema } from '../helpers/productZodAndInputs';
 import { useRouter } from 'next/navigation';
 import { createProduct } from '../actions/create-product';
 import { updateProduct } from '../actions/update-product';
-import Swal from 'sweetalert2';
 
 interface ProductUpsertProps {
     mode: 'new' | 'update';
@@ -71,6 +70,7 @@ export default function ProductUpsert({
     const selectedSupplierId = watch('supplierId') || '';
 
     const showSuccessDialog = async (productName: string) => {
+        const Swal = (await import('sweetalert2')).default;
         const result = await Swal.fire({
             title: '🎉 تم حفظ المنتج بنجاح!',
             html: `

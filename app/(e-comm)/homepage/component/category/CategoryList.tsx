@@ -44,7 +44,7 @@ export default async function CategoryList() {
                                     <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
                                         <h3 className="text-xl font-bold tracking-tight">{category.name}</h3>
                                         <div className="mt-1 flex items-center justify-between">
-                                            <Badge className={`${category.productCount > 0 ? 'bg-primary' : 'bg-destructive'} text-white`}>
+                                            <Badge className={`${category.productCount > 0 ? 'bg-primary text-primary-foreground' : 'bg-destructive text-white'}`}>
                                                 {category.productCount > 0 ? `${category.productCount} منتجات` : 'لا توجد منتجات'}
                                             </Badge>
                                             <span className="flex items-center text-sm font-medium text-white/90 transition-transform duration-300 group-hover:translate-x-1">

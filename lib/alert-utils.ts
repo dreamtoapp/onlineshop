@@ -1,5 +1,5 @@
 // lib/alert-utils.ts
-import ReactSwal from './swal-config';
+import { getReactSwal } from './swal-config';
 
 type AlertOptions = {
   title?: string;
@@ -9,11 +9,11 @@ type AlertOptions = {
 };
 
 export const Alert = {
-  // Toast-style notifications
   toast: {
-    success: (message: string) => {
+    success: async (message: string) => {
+      const ReactSwal = await getReactSwal();
       ReactSwal.fire({
-        title: 'تم بنجاح!',
+        title: '\u062a\u0645 \u0628\u0646\u062c\u0627\u062d!',
         text: message,
         icon: 'success',
         toast: true,
@@ -23,10 +23,10 @@ export const Alert = {
         timerProgressBar: true,
       });
     },
-
-    error: (message: string) => {
+    error: async (message: string) => {
+      const ReactSwal = await getReactSwal();
       ReactSwal.fire({
-        title: 'خطأ!',
+        title: '\u062e\u0637\u0623!',
         text: message,
         icon: 'error',
         toast: true,
@@ -36,23 +36,24 @@ export const Alert = {
       });
     },
   },
-
-  // Full-screen dialogs
   dialog: {
-    confirm: (options: AlertOptions) =>
-      ReactSwal.fire({
+    confirm: async (options: AlertOptions) => {
+      const ReactSwal = await getReactSwal();
+      return ReactSwal.fire({
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'تأكيد',
-        cancelButtonText: 'إلغاء',
+        confirmButtonText: '\u062a\u0623\u0643\u064a\u062f',
+        cancelButtonText: '\u0625\u0644\u063a\u0627\u0621',
         ...options,
-      }),
-
-    success: (options: AlertOptions) =>
-      ReactSwal.fire({
+      });
+    },
+    success: async (options: AlertOptions) => {
+      const ReactSwal = await getReactSwal();
+      return ReactSwal.fire({
         icon: 'success',
-        confirmButtonText: 'حسناً',
+        confirmButtonText: '\u062d\u0633\u0646\u0627\u064b',
         ...options,
-      }),
+      });
+    },
   },
 };

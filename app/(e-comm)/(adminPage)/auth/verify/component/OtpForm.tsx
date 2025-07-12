@@ -24,7 +24,6 @@ import {
 import { Alert } from '@/components/ui/alert';
 
 import { otpViaWhatsApp, verifyTheUser, resendOTP } from '../action/otp-via-whatsapp';
-import Swal from 'sweetalert2';
 
 export default function OtpForm({ phone }: { phone: string }) {
   const [otp, setOtp] = useState('');
@@ -84,6 +83,7 @@ export default function OtpForm({ phone }: { phone: string }) {
           process.env.NODE_ENV === 'development' &&
           'token' in result && result.token
         ) {
+          const Swal = (await import('sweetalert2')).default;
           await Swal.fire({
             icon: 'info',
             title: 'رمز التحقق (وضع التطوير)',
@@ -147,6 +147,7 @@ export default function OtpForm({ phone }: { phone: string }) {
       const result = await verifyTheUser(otp);
 
       if (result.success) {
+        const Swal = (await import('sweetalert2')).default;
         await Swal.fire({
           icon: 'success',
           title: 'تم التحقق بنجاح!',

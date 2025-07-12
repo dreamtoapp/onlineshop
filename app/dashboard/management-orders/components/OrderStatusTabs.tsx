@@ -91,25 +91,25 @@ export default function OrderStatusTabs({ activeStatus }: OrderStatusTabsProps) 
       label: 'تم التسليم', // TODO: Add badge showing delivered orders count
       value: ORDER_STATUS.DELIVERED,
       icon: 'CheckCircle',
-      color: 'text-green-600',
-      activeColor: 'bg-green-100 text-green-900',
-      hoverColor: 'hover:bg-green-50',
+      color: 'text-status-delivered',
+      activeColor: 'bg-status-delivered-soft text-status-delivered',
+      hoverColor: 'hover:bg-status-delivered-soft',
     },
     {
       label: 'ملغي', // TODO: Add badge showing canceled orders count
       value: ORDER_STATUS.CANCELED,
       icon: 'XCircle',
-      color: 'text-red-600',
-      activeColor: 'bg-red-100 text-red-900',
-      hoverColor: 'hover:bg-red-50',
+      color: 'text-status-canceled',
+      activeColor: 'bg-status-canceled-soft text-status-canceled',
+      hoverColor: 'hover:bg-status-canceled-soft',
     },
     {
       label: 'في السيارة',
       value: ORDER_STATUS.ASSIGNED,
       icon: 'Truck',
-      color: 'text-blue-600',
-      activeColor: 'bg-blue-100 text-blue-900',
-      hoverColor: 'hover:bg-blue-50',
+      color: 'text-status-priority',
+      activeColor: 'bg-status-priority-soft text-status-priority',
+      hoverColor: 'hover:bg-status-priority-soft',
     },
   ];
 

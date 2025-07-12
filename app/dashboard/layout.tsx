@@ -10,9 +10,9 @@ import {
 import { UserRole } from '@prisma/client';
 
 import EnhancedBreadcrumb from './management-dashboard/components/EnhancedBreadcrumb';
-import QuickActions from './management-dashboard/components/QuickActions';
-import PusherNotify from '@/app/dashboard/management/PusherNotify';
+import DashboardClientHeader from './management-dashboard/components/DashboardClientHeader';
 import NotificationPortal from '@/components/ui/NotificationPortal';
+
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   // This layout is used for the dashboard pages
@@ -37,10 +37,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
               <SidebarTrigger />
               <EnhancedBreadcrumb />
             </div>
-            <div className='flex items-center gap-3'>
-              <QuickActions />
-              <PusherNotify />
-            </div>
+            {/* Use client header for QuickActions and PusherNotify */}
+            <DashboardClientHeader />
           </header>
           {/* Main content */}
           <main className='w-full flex-1 bg-background p-6'>{children}</main>

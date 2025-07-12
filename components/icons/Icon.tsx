@@ -7,7 +7,8 @@ import {
     DollarSign, Receipt, Users, TrendingUp, Award, PlayCircle, Clock, Truck, Phone, Navigation, UserCheck,
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
-    ChevronDown, LocateFixed, Tag, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench
+    ChevronDown, LocateFixed, Tag, Share2, Flame, Star, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
+    ShoppingCart
 } from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)
@@ -53,7 +54,8 @@ const iconMap = {
     DollarSign, Receipt, Users, TrendingUp, Award, PlayCircle, Clock, Truck, Phone, Navigation, UserCheck,
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
-    ChevronDown, LocateFixed, Tag, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench
+    ChevronDown, LocateFixed, Tag, Star, Share2, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
+    ShoppingCart
 };
 
 // Types for size and variant based on iconVariants

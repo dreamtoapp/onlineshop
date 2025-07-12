@@ -115,9 +115,11 @@ export default function SearchDrawer() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button variant="outline" className="p-2 rounded-lg hover:bg-accent/50 transition-colors z-50 duration-300" aria-label="بحث البحث">
+        <Button variant="outline" className="p-2 rounded-lg hover:bg-accent/50 transition-colors z-50 duration-300">
           <Icon name="Search" className="h-7 w-7 text-foreground" />
-          <span className="text-sm font-medium text-foreground/90 hover:text-foreground transition-colors duration-200">بحث المنتجات </span>
+          <span className="text-sm font-medium text-foreground/90 hover:text-foreground transition-colors duration-200">
+            بحث المنتجات
+          </span>
         </Button>
       </DrawerTrigger>
       <DrawerContent className="max-w-xl mx-auto p-4">

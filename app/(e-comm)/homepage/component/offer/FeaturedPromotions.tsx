@@ -22,13 +22,12 @@ export default async function FeaturedPromotions() {
 
     return (
         <section className="my-8">
-            <h2 className="mb-4 text-2xl font-bold">العروض المميزة</h2>
+            <h2 className=" mb-4 text-2xl font-bold">العروض المميزة</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {activePromotions.map((offer: Promotion, idx: number) => (
-                    <Link
+                    <div
                         key={offer.id}
-                        href={`/offers/${offer.slug}`}
-                        className="group block overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="block overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                         {/* Offer Image */}
                         <div className="relative aspect-video overflow-hidden">
@@ -47,9 +46,9 @@ export default async function FeaturedPromotions() {
 
                             {/* Discount Badge */}
                             {offer.discountPercentage && (
-                                <div className="absolute right-3 top-3 rounded-full bg-red-500 px-3 py-1 text-sm font-bold text-white">
+                                <span className="absolute right-3 top-3 rounded-full bg-destructive px-3 py-1 text-sm font-bold text-destructive-foreground shadow">
                                     {offer.discountPercentage}% خصم
-                                </div>
+                                </span>
                             )}
                         </div>
 
@@ -82,11 +81,13 @@ export default async function FeaturedPromotions() {
                             )}
 
                             {/* View Products Button */}
-                            <span className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground group-hover:bg-primary/90 transition-colors">
+                            <Link href={`/offers/${offer.slug}`}
+                                className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow text-center"
+                            >
                                 تصفح المنتجات
-                            </span>
+                            </Link>
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
         </section>

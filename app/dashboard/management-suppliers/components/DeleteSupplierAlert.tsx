@@ -1,8 +1,6 @@
 'use client';
 import { useState } from 'react';
 
-import Swal from 'sweetalert2';
-
 import {
   Dialog,
   DialogClose,
@@ -29,32 +27,32 @@ export default function DeleteSupplierAlert({ supplierId }: DeleteSupplierAlertP
     setIsProcessing(true);
     try {
       const result = await deleteSupplier(supplierId);
-
+      const Swal = (await import('sweetalert2')).default;
       if (result.success) {
         Swal.fire({
           icon: 'success',
-          title: 'تم الحذف بنجاح',
-          text: 'تم إزالة بيانات العنصر بشكل نهائي من النظام',
-          confirmButtonText: 'تم',
-          confirmButtonAriaLabel: 'تأكيد استلام رسالة النجاح',
+          title: '\u062a\u0645 \u0627\u0644\u062d\u0630\u0641 \u0628\u0646\u062c\u0627\u062d',
+          text: '\u062a\u0645 \u0625\u0632\u0627\u0644\u0629 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0639\u0646\u0635\u0631 \u0628\u0634\u0643\u0644 \u0646\u0647\u0627\u0626\u064a \u0645\u0646 \u0627\u0644\u0646\u0638\u0627\u0645',
+          confirmButtonText: '\u062a\u0645',
+          confirmButtonAriaLabel: '\u062a\u0623\u0643\u064a\u062f \u0627\u0633\u062a\u0644\u0627\u0645 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0646\u062c\u0627\u062d',
         });
         // window.location.reload();
         return;
       }
-
       Swal.fire({
         icon: 'error',
-        title: 'تعذر الحذف',
-        text: result.message || 'حدث خطأ أثناء محاولة الحذف. يرجى المحاولة لاحقًا',
-        confirmButtonText: 'حسنا',
-        confirmButtonAriaLabel: 'تأكيد استلام رسالة الخطأ',
+        title: '\u062a\u0639\u0630\u0631 \u0627\u0644\u062d\u0630\u0641',
+        text: result.message || '\u062d\u062f\u062b \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0645\u062d\u0627\u0648\u0644\u0629 \u0627\u0644\u062d\u0630\u0641. \u064a\u0631\u062c\u0649 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0644\u0627\u062d\u0642\u064b\u0627',
+        confirmButtonText: '\u062d\u0633\u0646\u0627',
+        confirmButtonAriaLabel: '\u062a\u0623\u0643\u064a\u062f \u0627\u0633\u062a\u0644\u0627\u0645 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062e\u0637\u0623',
       });
     } catch {
+      const Swal = (await import('sweetalert2')).default;
       Swal.fire({
         icon: 'error',
-        title: 'خطأ غير متوقع',
-        text: 'حدث عطل تقني غير متوقع. يرجى إبلاغ الدعم الفني',
-        confirmButtonText: 'تم الإبلاغ',
+        title: '\u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639',
+        text: '\u062d\u062f\u062b \u0639\u0637\u0644 \u062a\u0642\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639. \u064a\u0631\u062c\u0649 \u0625\u0628\u0644\u0627\u063a \u0627\u0644\u062f\u0639\u0645 \u0627\u0644\u0641\u0646\u064a',
+        confirmButtonText: '\u062a\u0645 \u0627\u0644\u0625\u0628\u0644\u0627\u063a',
       });
     } finally {
       setIsProcessing(false);

@@ -2,13 +2,15 @@
 import Image from 'next/image';
 import { useState, useCallback } from 'react';
 import { Icon } from '@/components/icons/Icon';
-import { Product } from '@/types/databaseTypes';
+import type { Product } from '@/types/databaseTypes';
 import ProductCardBadges from './ProductCardBadges';
-import QuickViewButton from './QuickViewButton';
 // Compare feature is postponed; component temporarily disabled
 // import CompareButton from './CompareButton';
-import WishlistButton from './WishlistButton';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
+import QuickViewModalContent from './QuickViewModalContent';
 
 interface ProductCardMediaProps {
     product: Product;
@@ -20,8 +22,12 @@ interface ProductCardMediaProps {
 }
 
 export default function ProductCardMedia({ product, inCart, isOutOfStock, lowStock, stockQuantity, priority }: ProductCardMediaProps) {
+
     const [imageError, setImageError] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
+    const [open, setOpen] = useState(false);
+    const formatNum = (n: number) => n.toLocaleString('ar-EG');
+    const ratingFormatted = product.rating ? formatNum(Number(product.rating.toFixed(1))) : null;
 
     // Optimized image source with fallback
     const imgSrc = useCallback(() => {
@@ -41,9 +47,21 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
     return (
         <div className="relative h-36 sm:h-48 w-full overflow-hidden rounded-t-2xl bg-white p-1 shadow-lg border border-gray-100 flex items-center justify-center">
             {/* Icon actions: wishlist and quick view, top-right */}
-            <div className="absolute top-2 right-2 z-30 flex flex-col gap-2 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-md">
-                <WishlistButton productId={product.id} />
-                <QuickViewButton product={product} />
+            <div className="absolute top-2 right-2 z-30 flex flex-col gap-2 backdrop-blur-sm rounded-xl p-1 shadow-md">
+                {/* <WishlistButton productId={product.id} /> */}
+                <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label={`معاينة سريعة لـ ${product.name}`}
+                    onClick={e => {
+                        e.stopPropagation();
+                        setOpen(true);
+                        // Debug: confirm which product opens the modal
+                        console.log('QuickView opened for:', product.name, product.id);
+                    }}
+                >
+                    <Eye className="w-4 h-4" />
+                </Button>
             </div>
             {/* Loading state */}
             {imageLoading && (
@@ -79,31 +97,14 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
 
             {/* In cart check */}
             {inCart && (
-                <div className="absolute left-3 bottom-3 z-30 rounded-full bg-green-500 p-2 text-white shadow-lg animate-in fade-in-0 zoom-in-95 duration-300">
+                <div className="absolute left-3 bottom-3 z-30 rounded-full bg-success p-2 text-success-foreground shadow-lg animate-in fade-in-0 zoom-in-95 duration-300">
                     <Icon name="Check" size="md" />
                 </div>
             )}
 
-            {/* Rating and preview badge combined */}
-            {/* {(product.rating && product.rating > 0) && (
-                <Link
-                    href={`/product/${product.slug}#reviews`}
-                    className="absolute bottom-3 left-3 z-30 flex items-center gap-1.5 rounded-lg bg-black/70 px-2.5 py-1.5 text-white backdrop-blur-sm shadow-sm hover:bg-black/90 transition"
-                    tabIndex={0}
-                    aria-label={`عرض تقييمات ${product.name}`}
-                    onClick={e => e.stopPropagation()}
-                >
-                    <Icon name="Star" size="xs" className="fill-yellow-400 text-yellow-400" />
-                    <span className="text-xs font-medium underline">{product.rating.toFixed(1)}</span>
-                    <span className="text-xs">({typeof product.reviewCount === 'number' ? product.reviewCount : 0})</span>
-                    <Icon name="Eye" size="xs" className="ml-1" />
-                    <span className="text-xs">{typeof product.previewCount === 'number' ? product.previewCount : 0}</span>
-                </Link>
-            )} */}
-
             {/* Low stock badge */}
             {lowStock && (
-                <div className="absolute top-3 left-3 z-30 flex items-center gap-1 rounded-lg bg-orange-500/90 px-2.5 py-1.5 text-white shadow-md">
+                <div className="absolute top-3 left-3 z-30 flex items-center gap-1 rounded-lg bg-warning/90 px-2.5 py-1.5 text-warning-foreground shadow-md">
                     <Icon name="AlertTriangle" size="xs" />
                     <span className="text-[10px] font-semibold">متبقي {stockQuantity}</span>
                 </div>
@@ -116,14 +117,12 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
                 </div>
             )}
 
-            {/* Quick actions */}
-            <div
-                className="absolute bottom-2 right-2 z-30 flex gap-2 sm:bottom-3 sm:right-3 sm:flex-col"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* <CompareButton productId={product.id} /> */}
-            </div>
-
+            {/* QuickView Modal: Only rendered when open */}
+            {open && (
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <QuickViewModalContent product={product} ratingFormatted={ratingFormatted} formatNum={formatNum} setOpen={setOpen} />
+                </Dialog>
+            )}
             {/* Sale / New badges */}
             <ProductCardBadges product={product} />
         </div>

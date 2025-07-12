@@ -7,6 +7,7 @@ import ProductCardMedia from './ProductCardMedia';
 import ProductCardActions from './ProductCardActions';
 import { useRouter } from 'next/navigation';
 import { useProductCardOptimizations } from '@/lib/hooks/useProductCardOptimizations';
+import { Eye } from 'lucide-react';
 
 
 interface ProductCardProps {
@@ -22,12 +23,12 @@ const ProductCard = memo(({
     product,
     quantity,
     isInCart,
-    className,
     index,
     priority
 }: ProductCardProps) => {
     const router = useRouter();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
+    console.log('product data', product);
 
     // Performance optimizations
     const {
@@ -112,6 +113,8 @@ const ProductCard = memo(({
         }
     }), [product, stockInfo.isOutOfStock]);
 
+    console.log('product', product);
+
     return (
         <>
             {/* Structured Data for SEO */}
@@ -122,13 +125,11 @@ const ProductCard = memo(({
 
             <Card
                 ref={cardRef}
-                className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[420px] sm:min-h-[520px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow ${className || ''}`}
+                className={`group  relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[220px] sm:min-h-[320px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow  || ''}`}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
                 onMouseEnter={optimizedMouseEnter}
                 onMouseLeave={optimizedMouseLeave}
-                role="button"
-                aria-label={product.name}
             >
                 {/* Media Section */}
                 <ProductCardMedia
@@ -159,9 +160,30 @@ const ProductCard = memo(({
                                     {product.compareAtPrice?.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
                                 </span>
                             )}
-                            {pricingInfo.hasDiscount && (
-                                <span className="ml-2 rounded bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">-{pricingInfo.discountPercentage}%</span>
-                            )}
+
+
+                        </div>
+                        {/* Rating */}
+                        {/* Preview Count */}
+                        <div className="flex items-center justify-between w-full gap-3">
+                            <div className="flex items-center gap-3 text-sm">
+                                <span className="flex items-center gap-1 text-primary">
+                                    <Eye className="w-4 h-4" />
+                                    {product.previewCount}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Icon
+                                            key={i}
+                                            name="Star"
+                                            // size="xs"
+                                            className={i < Math.floor(product.rating ?? 0) ? 'text-yellow-500 w-4 h-4' : 'text-muted w-4 h-4   '}
+                                        />
+                                    ))}
+                                    <span className="text-foreground font-medium">{product.rating ?? '--'}</span>
+                                </span>
+                                <span className="text-muted-foreground text-xs">({product.reviewCount ?? 0} تقييم)</span>
+                            </div>
                         </div>
                     </div>
                     {/* Actions */}

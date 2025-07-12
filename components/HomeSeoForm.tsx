@@ -48,7 +48,7 @@ export default function HomeSeoForm({ defaultValues, mode, onSubmit }: HomeSeoFo
     <>
       <div className="mb-4 flex justify-end">
         <a href="/dashboard/seo/pixels">
-          <button type="button" className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary/90 transition">
+          <button type="button" className="bg-primary text-primary-foreground px-4 py-2 rounded shadow hover:bg-primary/90 transition">
             إعدادات البيكسل والتحليلات
           </button>
         </a>
@@ -86,7 +86,7 @@ export default function HomeSeoForm({ defaultValues, mode, onSubmit }: HomeSeoFo
           </div>
         </div>
         {/* Add more fields as needed for homepage SEO */}
-        <button type="submit" className="bg-primary text-white px-4 py-2 rounded">
+        <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded">
           {mode === 'edit' ? 'Update SEO' : 'Create SEO'}
         </button>
       </form>

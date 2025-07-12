@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Drivers } from './Drivers';
 import { approveDriverToOrder } from '../actions/approveOrder-toDtiver';
 import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
 import { Icon } from '@/components/icons/Icon';
 
 interface driverProp {
@@ -30,11 +29,12 @@ function ConfirmDriver({ orderNo, driverList }: driverProp) {
 
   const handleDriverApproval = useCallback(async () => {
     if (!selectedDriverId) {
+      const Swal = (await import('sweetalert2')).default;
       Swal.fire({
         icon: 'warning',
-        title: 'تنبيه',
-        text: 'يرجى اختيار سائق أولاً',
-        confirmButtonText: 'موافق'
+        title: '\u062a\u0646\u0628\u064a\u0647',
+        text: '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u0633\u0627\u0626\u0642 \u0623\u0648\u0644\u0627\u064b',
+        confirmButtonText: '\u0645\u0648\u0627\u0641\u0642'
       });
       return;
     }
@@ -43,20 +43,22 @@ function ConfirmDriver({ orderNo, driverList }: driverProp) {
 
     try {
       const isDone = await approveDriverToOrder(orderNo, selectedDriverId);
+      const Swal = (await import('sweetalert2')).default;
       Swal.fire({
         icon: isDone.success ? 'success' : 'error',
-        title: 'إسناد طلبية للسائق',
+        title: '\u0625\u0633\u0646\u0627\u062f \u0637\u0644\u0628\u064a\u0629 \u0644\u0644\u0633\u0627\u0626\u0642',
         text: isDone.message,
-        confirmButtonText: 'موافق'
+        confirmButtonText: '\u0645\u0648\u0627\u0641\u0642'
       });
       if (isDone.success) router.push('/dashboard');
     } catch (error) {
       console.error('Failed to assign driver:', error);
+      const Swal = (await import('sweetalert2')).default;
       Swal.fire({
         icon: 'error',
-        title: 'خطأ',
-        text: 'حدث خطأ أثناء إسناد الطلبية للسائق',
-        confirmButtonText: 'موافق'
+        title: '\u062e\u0637\u0623',
+        text: '\u062d\u062f\u062b \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0625\u0633\u0646\u0627\u062f \u0627\u0644\u0637\u0644\u0628\u064a\u0629 \u0644\u0644\u0633\u0627\u0626\u0642',
+        confirmButtonText: '\u0645\u0648\u0627\u0641\u0642'
       });
     } finally {
       setIsLoading(false);

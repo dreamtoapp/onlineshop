@@ -1,0 +1,63 @@
+'use client';
+
+import { Icon } from '@/components/icons/Icon';
+import WishlistIconClient from './WishlistIconClient';
+import CartButtonWithBadge from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
+import Link from '@/components/link';
+
+export function SimpleMobileBottomNav({
+    whatsappNumber = '',
+    wishlistCount = 0,
+    isLoggedIn = false,
+    categoryCount = 0,
+}: {
+    whatsappNumber?: string;
+    wishlistCount?: number;
+    isLoggedIn?: boolean;
+    categoryCount?: number;
+}) {
+    return (
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg md:hidden overflow-hidden">
+            <div className="grid grid-cols-5 h-16 w-full">
+                {/* Best Sellers */}
+                <div className="flex items-center justify-center">
+                    <Link href="/bestsellers" className="flex flex-col items-center justify-center w-full h-full">
+                        <Icon name="FaFireFlameCurved" size="sm" className="text-feature-analytics" />
+                    </Link>
+                </div>
+                {/* Categories */}
+                <div className="flex items-center justify-center relative">
+                    <Link href="/categories" className="flex flex-col items-center justify-center w-full h-full">
+                        <Icon name="Tag" size="sm" className="text-feature-products" />
+                        {categoryCount > 0 && (
+                            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-feature-products text-white text-[10px] font-bold shadow ring-1 ring-white dark:ring-gray-900 border border-feature-products animate-in fade-in zoom-in">
+                                {categoryCount > 99 ? '99+' : categoryCount}
+                            </span>
+                        )}
+                    </Link>
+                </div>
+                {/* Cart */}
+                <div className="flex items-center justify-center">
+                    <CartButtonWithBadge />
+                </div>
+                {/* Wishlist */}
+                <div className="flex items-center justify-center">
+                    <WishlistIconClient isLoggedIn={isLoggedIn} />
+                </div>
+                {/* WhatsApp */}
+                <div className="flex items-center justify-center">
+                    <a
+                        href={`https://wa.me/${whatsappNumber?.replace(/\D/g, '')}?text=مرحباً، أحتاج مساعدة في التسوق`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-col items-center justify-center w-full h-full"
+                    >
+                        <Icon name="Whatsapp" size="sm" className="text-feature-suppliers" />
+                    </a>
+                </div>
+            </div>
+        </nav>
+    );
+}
+
+export default SimpleMobileBottomNav; 

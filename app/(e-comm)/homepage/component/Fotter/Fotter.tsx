@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import NewsletterClientWrapper from './NewsletterClientWrapper';
 import { Icon } from '@/components/icons/Icon';
+import CustomSvgIcon from './CustomSvgIcon';
 
 interface FooterProps {
   aboutus?: string;
@@ -32,7 +33,7 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
         </div>
         <div>
           <h2 className="text-xl font-bold text-foreground">{companyName || 'Dream To App'}</h2>
-          <p className="text-sm text-primary font-medium">شركة رائدة في التجارة الإلكترونية</p>
+          <p className="text-sm text-foreground font-medium">شركة رائدة في التجارة الإلكترونية</p>
         </div>
       </div>
 
@@ -47,7 +48,7 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
           <Icon name="Shield" className="h-3 w-3 ml-1" />
           آمن ومضمون
         </Badge>
-        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+        <Badge variant="secondary" className="bg-primary/10 text-foreground border-primary/20">
           <Icon name="Award" className="h-3 w-3 ml-1" />
           جودة مضمونة
         </Badge>
@@ -60,7 +61,7 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/50">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">{productCount ?? '...'}</div>
+          <div className="text-2xl font-bold text-foreground">{productCount ?? '...'}</div>
           <div className="text-xs text-muted-foreground">منتج</div>
         </div>
         <div className="text-center">
@@ -68,7 +69,7 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
           <div className="text-xs text-muted-foreground">عميل راضي</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-secondary">24/7</div>
+          <div className="text-2xl font-bold text-foreground">24/7</div>
           <div className="text-xs text-muted-foreground">دعم فني</div>
         </div>
       </div>
@@ -98,7 +99,7 @@ function ServicesSection() {
     <div className="grid md:grid-cols-2 gap-8">
       <div>
         <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Icon name="Globe" className="h-5 w-5 text-primary" />
+          <Icon name="Globe" className="h-5 w-5 text-foreground" />
           خدماتنا
         </h3>
         <ul className="space-y-3">
@@ -108,7 +109,7 @@ function ServicesSection() {
                 href={service.href}
                 className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
               >
-                <Icon name={service.iconName} className="h-4 w-4 text-primary group-hover:text-primary/80 transition-colors" />
+                <Icon name={service.iconName} className="h-4 w-4 text-foreground group-hover:text-foreground/80 transition-colors" />
                 <span className="text-sm">{service.name}</span>
               </Link>
             </li>
@@ -167,10 +168,10 @@ function EnhancedContact({
       <div className="space-y-4">
         {email && (
           <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center">
-              <Icon name="Mail" className="h-4 w-4 text-secondary" />
+            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <CustomSvgIcon name="mail" className="h-4 w-4 text-white" />
             </div>
-            <a href={`mailto:${email}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href={`mailto:${email}`} className="text-sm text-gray-300 hover:text-foreground transition-colors">
               {email}
             </a>
           </div>
@@ -178,10 +179,10 @@ function EnhancedContact({
 
         {phone && (
           <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center">
-              <Icon name="Phone" className="h-4 w-4 text-secondary" />
+            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <CustomSvgIcon name="phone" className="h-4 w-4 text-white" />
             </div>
-            <a href={`tel:${phone}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href={`tel:${phone}`} className="text-sm text-gray-300 hover:text-foreground transition-colors">
               {phone}
             </a>
           </div>
@@ -189,10 +190,10 @@ function EnhancedContact({
 
         {address && (
           <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center">
-              <Icon name="MapPin" className="h-4 w-4 text-secondary" />
+            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <CustomSvgIcon name="map-pin" className="h-4 w-4 text-white" />
             </div>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-gray-300">
               {address}
             </span>
           </div>
@@ -204,44 +205,48 @@ function EnhancedContact({
             <h4 className="text-sm font-medium text-foreground mb-3">تابعنا على</h4>
             <div className="flex gap-3">
               {facebook && (
-                <a
+                <Link
                   href={facebook}
+                  aria-label="فيسبوك"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
                 >
-                  <Icon name="Facebook" className="h-4 w-4 text-primary" />
-                </a>
+                  <CustomSvgIcon name="facebook" className="h-4 w-4 text-white" />
+                </Link>
               )}
               {instagram && (
-                <a
+                <Link
                   href={instagram}
+                  aria-label="انستغرام"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
                 >
-                  <Icon name="Instagram" className="h-4 w-4 text-primary" />
-                </a>
+                  <CustomSvgIcon name="instagram" className="h-4 w-4 text-white" />
+                </Link>
               )}
               {twitter && (
-                <a
+                <Link
                   href={twitter}
+                  aria-label="تويتر"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
                 >
-                  <Icon name="Twitter" className="h-4 w-4 text-primary" />
-                </a>
+                  <CustomSvgIcon name="twitter" className="h-4 w-4 text-white" />
+                </Link>
               )}
               {linkedin && (
-                <a
+                <Link
                   href={linkedin}
+                  aria-label="لينكدإن"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
                 >
-                  <Icon name="Linkedin" className="h-4 w-4 text-primary" />
-                </a>
+                  <CustomSvgIcon name="linkedin" className="h-4 w-4 text-white" />
+                </Link>
               )}
             </div>
           </div>
@@ -266,7 +271,7 @@ const Footer = ({
   clientCount,
 }: FooterProps) => {
   return (
-    <footer className="bg-background border-t border-border">
+    <footer className="bg-background border-t border-gray-700 text-foreground">
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -296,13 +301,13 @@ const Footer = ({
         </div>
       </div>
 
-      <Separator className="mx-4 sm:mx-6 lg:mx-8" />
+      <Separator className="mx-4 sm:mx-6 lg:mx-8 border-gray-700" />
 
       {/* Bottom Footer - Developer Area */}
       <div className="bg-muted/30 py-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-gray-400">
               © 2024 Dream To App. جميع الحقوق محفوظة.
             </div>
           </div>

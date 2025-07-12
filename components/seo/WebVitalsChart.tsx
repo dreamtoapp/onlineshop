@@ -1,50 +1,53 @@
 "use client";
-import { Line } from "react-chartjs-2";
+import { Card } from "@/components/ui/card";
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
   Tooltip,
   Legend,
-} from "chart.js";
-import { Card } from "@/components/ui/card";
-
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
+  ResponsiveContainer
+} from "recharts";
 
 export default function WebVitalsChart({ vitals }: { vitals: any[] }) {
   const metrics = ["LCP", "CLS", "INP", "FID", "TTFB"];
-  const datasets = metrics.map((name, i) => {
-    const data = vitals.filter((v) => v.name === name);
-    return {
-      label: name,
-      data: data.map((v) => v.value),
-      borderColor: ["#2563eb", "#f59e42", "#10b981", "#e11d48", "#6366f1"][i],
-      backgroundColor: "rgba(0,0,0,0.05)",
-      tension: 0.3,
-      fill: false,
-    };
+  // Prepare data: each metric is a line, x-axis is sample index
+  // Find the max length of any metric's data
+  const maxLen = Math.max(
+    ...metrics.map((name) => vitals.filter((v) => v.name === name).length)
+  );
+  // Build an array of objects: [{ sample: 1, LCP: ..., CLS: ..., ... }, ...]
+  const chartData = Array.from({ length: maxLen }, (_, i) => {
+    const entry: any = { sample: i + 1 };
+    metrics.forEach((name) => {
+      const data = vitals.filter((v) => v.name === name);
+      entry[name] = data[i]?.value ?? null;
+    });
+    return entry;
   });
-  const labels = Array.from({ length: Math.max(...datasets.map((d) => d.data.length)) }, (_, i) => i + 1);
+  const colors = ["#2563eb", "#f59e42", "#10b981", "#e11d48", "#6366f1"];
   return (
     <Card className="p-4">
-      <Line
-        data={{
-          labels,
-          datasets: datasets.filter((d) => d.data.length),
-        }}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { display: true, position: "top" },
-            tooltip: { enabled: true },
-          },
-          scales: {
-            y: { beginAtZero: true },
-          },
-        }}
-      />
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart data={chartData} margin={{ top: 16, right: 24, left: 8, bottom: 8 }}>
+          <XAxis dataKey="sample" tick={{ fontSize: 12 }} label={{ value: "Sample", position: "insideBottomRight", offset: -5 }} />
+          <YAxis tick={{ fontSize: 12 }} label={{ value: "Value", angle: -90, position: "insideLeft" }} />
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} />
+          {metrics.map((name, i) => (
+            <Line
+              key={name}
+              type="monotone"
+              dataKey={name}
+              stroke={colors[i]}
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
     </Card>
   );
 }

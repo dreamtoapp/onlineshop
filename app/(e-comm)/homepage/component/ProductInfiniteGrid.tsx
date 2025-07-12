@@ -61,20 +61,20 @@ export default function ProductInfiniteGrid({ initialProducts, filters }: Produc
     }, [inView, hasMore, loading, debouncedLoadMore]);
 
     return (
-        <div className="container mx-auto">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="grid" aria-label="قائمة المنتجات">
+        <div className="container mx-auto bg-transparent border-none shadow-none">
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 bg-transparent border-none shadow-none  " aria-label="قائمة المنتجات">
                 {products.map((product: any, index: number) => (
-                    <div key={product.id || index} className="product-card" role="gridcell" data-index={index} style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}>
+                    <li key={product.id || index} className="" data-index={index} style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}>
                         <ProductCardAdapter product={product} className="h-full w-full" index={index} priority={index < 8} />
-                    </div>
+                    </li>
                 ))}
                 {loading && Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={`skeleton_${i}`} />)}
-            </div>
+            </ul>
             <div ref={ref} className="mt-8 flex w-full flex-col items-center py-6" role="status" aria-live="polite">
                 {error && <div className="text-red-500 mb-4">فشل في تحميل المنتجات. يرجى المحاولة مرة أخرى.</div>}
                 {!loading && !hasMore && products.length === 0 && <div className="text-muted-foreground">لا توجد منتجات متاحة.</div>}
                 {hasMore && !loading && (
-                    <button onClick={() => setSize(size + 1)} className="mt-4 px-6 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90">تحميل المزيد</button>
+                    <button onClick={() => setSize(size + 1)} className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg shadow hover:bg-primary/90">تحميل المزيد</button>
                 )}
             </div>
         </div>

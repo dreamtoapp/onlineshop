@@ -164,7 +164,7 @@ const AddImage: React.FC<AddImageProps> = ({
             handleUpload();
           }}
           disabled={loading}
-          className="absolute bottom-2 right-2 bg-primary text-white text-xs px-3 py-1 rounded shadow hover:bg-primary/80"
+          className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded shadow hover:bg-primary/80"
         >
           {loading ? (
             <span className="flex items-center gap-2">

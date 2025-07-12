@@ -73,7 +73,7 @@ export default function UserMenuTrigger({ user, isMobile, alerts }: UserMenuTrig
             category: "social"
         },
         {
-            href: `/user/wishlist`,
+            href: `/user/wishlist/${user.id ?? ''}`,
             label: "قائمة المفضلة",
             icon: <Icon name="Heart" className="w-5 h-5" />,
             description: "المنتجات التي أعجبتك",
