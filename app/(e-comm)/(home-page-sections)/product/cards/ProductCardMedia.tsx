@@ -22,7 +22,7 @@ interface ProductCardMediaProps {
 }
 
 export default function ProductCardMedia({ product, inCart, isOutOfStock, lowStock, stockQuantity, priority }: ProductCardMediaProps) {
-
+    console.log({ isOutOfStock })
     const [imageError, setImageError] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
     const [open, setOpen] = useState(false);

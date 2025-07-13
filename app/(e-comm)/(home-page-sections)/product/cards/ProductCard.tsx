@@ -28,7 +28,6 @@ const ProductCard = memo(({
 }: ProductCardProps) => {
     const router = useRouter();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
-    console.log('product data', product);
 
     // Performance optimizations
     const {
@@ -52,7 +51,7 @@ const ProductCard = memo(({
 
     // Memoized calculations for performance
     const stockInfo = useMemo(() => {
-        const isOutOfStock = product.outOfStock || (product.manageInventory && (product.stockQuantity ?? 0) <= 0);
+        const isOutOfStock = product.outOfStock
         const lowStock = !isOutOfStock && product.manageInventory && (product.stockQuantity ?? 0) > 0 && (product.stockQuantity ?? 0) <= 3;
         return { isOutOfStock, lowStock };
     }, [product.outOfStock, product.manageInventory, product.stockQuantity]);
@@ -200,5 +199,5 @@ const ProductCard = memo(({
 
 ProductCard.displayName = 'ProductCard';
 
-export { ProductCard };
+
 export default ProductCard;

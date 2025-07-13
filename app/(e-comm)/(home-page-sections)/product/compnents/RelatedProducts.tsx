@@ -7,7 +7,7 @@ import {
 
 import { Product } from '@/types/databaseTypes';; // Import shared Product type
 
-import { ProductCardAdapter } from '@/app/(e-comm)/(home-page-sections)/product/cards';
+import ProductCardAdapter from '@/app/(e-comm)/(home-page-sections)/product/cards/ProductCardAdapter';
 
 interface RelatedProductsProps {
   currentProductId: string;

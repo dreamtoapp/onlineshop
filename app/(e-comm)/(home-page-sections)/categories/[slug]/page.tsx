@@ -6,7 +6,7 @@ import { getCategoryPageData } from '../action/actions';
 import { Separator } from '@/components/ui/separator';
 
 import { PageProps } from '@/types/commonTypes';
-import { ProductCardAdapter } from '@/app/(e-comm)/(home-page-sections)/product/cards';
+import ProductCardAdapter from '@/app/(e-comm)/(home-page-sections)/product/cards/ProductCardAdapter';
 
 export async function generateMetadata({ params }: PageProps<{ slug: string }>): Promise<Metadata> {
   const { slug } = await params;

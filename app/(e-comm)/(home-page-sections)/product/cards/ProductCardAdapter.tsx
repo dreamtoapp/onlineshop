@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductCard } from '@/app/(e-comm)/(home-page-sections)/product/cards';
+import ProductCard from '@/app/(e-comm)/(home-page-sections)/product/cards/ProductCard';
 import { Product } from '@/types/databaseTypes';
 import React from 'react';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';

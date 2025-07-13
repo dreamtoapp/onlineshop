@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { ShoppingCart } from 'lucide-react';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ProductCardAdapter } from '@/app/(e-comm)/(home-page-sections)/product/cards';
+import ProductCardAdapter from '@/app/(e-comm)/(home-page-sections)/product/cards/ProductCardAdapter';
 
 import { getOfferWithProducts } from '../actions/getOfferWithProducts';
 import { PageProps } from '@/types/commonTypes';
