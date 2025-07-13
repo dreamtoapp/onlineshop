@@ -3,7 +3,7 @@
 import { z } from 'zod';
 
 import db from '@/lib/prisma';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { CompanySchema } from '../helper/companyZodAndInputs';
 
@@ -28,20 +28,22 @@ export async function saveCompany(rawData: unknown) {
         where: { id: existingCompany.id },
         data: dataWithoutId,
       });
-      await revalidateTag('company');
+      revalidateTag('company');
 
       // 🚨 Optional cleanup (dev safety)
       await db.company.deleteMany({
         where: { id: { not: existingCompany.id } },
       });
-      await revalidateTag('company');
+      revalidateTag('company');
 
     } else {
       // 🆕 Create new singleton company
       company = await db.company.create({
         data: dataWithoutId,
       });
-      await revalidateTag('company');
+      revalidateTag('company');
+      revalidatePath('/dashboard/management/settings')
+      revalidatePath('/')
     }
 
     return { success: true, company };

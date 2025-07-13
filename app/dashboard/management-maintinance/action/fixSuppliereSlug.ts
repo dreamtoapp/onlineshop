@@ -21,7 +21,7 @@ export async function fixSupplierSlugs() {
           where: { id: supplier.id },
           data: { slug: newSlug },
         });
-        await revalidateTag('suppliers');
+        revalidateTag('suppliers');
       }
     }
     revalidatePath('/');

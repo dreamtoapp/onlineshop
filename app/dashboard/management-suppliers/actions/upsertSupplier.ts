@@ -65,7 +65,7 @@ async function createSupplier(data: SupplierFormData) {
       address: data.address,
     },
   });
-  await revalidateTag('suppliers');
+  revalidateTag('suppliers');
 
   return {
     ok: true,
@@ -98,7 +98,7 @@ async function updateSupplier(data: SupplierFormData) {
       address: data.address,
     },
   });
-  await revalidateTag('suppliers');
+  revalidateTag('suppliers');
 
   return {
     ok: true,

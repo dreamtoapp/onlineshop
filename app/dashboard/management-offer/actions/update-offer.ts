@@ -79,7 +79,7 @@ export async function updateOffer(_prevState: prevState, formData: FormData) {
         subheader,
       },
     });
-    await revalidateTag('offers');
+    revalidateTag('offers');
 
     // Update product assignments
     // First, delete existing assignments

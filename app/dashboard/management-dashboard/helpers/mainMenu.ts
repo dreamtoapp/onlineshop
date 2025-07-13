@@ -76,14 +76,14 @@ export const menuGroups = [
   {
     label: 'تحسين المحركات',
     items: [
-      { title: 'تحليل SEO', url: '/dashboard/seo', icon: 'SearchCheck' },
-      { title: 'الصفحة الرئيسية', url: '/dashboard/seo/home', icon: 'Home' },
-      { title: 'من نحن', url: '/dashboard/seo/about', icon: 'Info' },
-      { title: 'المدونة', url: '/dashboard/seo/blog', icon: 'Newspaper' },
-      { title: 'صفحات المنتجات', url: '/dashboard/seo/product', icon: 'Package' },
-      { title: 'الترويج', url: '/dashboard/seo/promotion', icon: 'Tag' },
-      { title: 'التصنيفات', url: '/dashboard/seo/category', icon: 'LayoutGrid' },
-      { title: 'الأداء', url: '/dashboard/seo/performance', icon: 'Gauge' },
+      { title: 'تحليل SEO', url: '/dashboard/management-seo', icon: 'SearchCheck' },
+      { title: 'الصفحة الرئيسية', url: '/dashboard/management-seo/home', icon: 'Home' },
+      { title: 'من نحن', url: '/dashboard/management-seo/about', icon: 'Info' },
+      { title: 'المدونة', url: '/dashboard/management-seo/blog', icon: 'Newspaper' },
+      { title: 'صفحات المنتجات', url: '/dashboard/management-seo/product', icon: 'Package' },
+      // { title: 'الترويج', url: '/dashboard/management-seo/promotion', icon: 'Tag' }, // No directory found
+      { title: 'التصنيفات', url: '/dashboard/management-seo/category', icon: 'LayoutGrid' },
+      { title: 'الأداء', url: '/dashboard/management-seo/performance', icon: 'Gauge' },
     ],
   },
 ];

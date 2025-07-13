@@ -63,7 +63,7 @@ export async function createProduct(data: CreateProductInput) {
       },
     });
 
-    await revalidateTag('products');
+    revalidateTag('products');
 
     // Link product to categories
     await db.categoryProduct.createMany({

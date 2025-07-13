@@ -66,7 +66,7 @@ export async function createOffer(_prevState: prevState, formData: FormData) {
       },
     });
 
-    await revalidateTag('offers');
+    revalidateTag('offers');
 
     // Create product assignments if any products were selected
     if (selectedProductIds.length > 0) {

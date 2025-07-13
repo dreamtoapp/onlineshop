@@ -23,7 +23,7 @@ export async function toggleOfferStatus(offerId: string) {
       },
     });
 
-    await revalidateTag('offers');
+    revalidateTag('offers');
 
     // Revalidate relevant paths
     revalidatePath('/dashboard/management-offer');

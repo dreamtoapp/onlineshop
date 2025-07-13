@@ -27,7 +27,7 @@ export async function deleteOffer(offerId: string) {
     await db.offer.delete({
       where: { id: offerId },
     });
-    await revalidateTag('offers');
+    revalidateTag('offers');
 
     // Revalidate relevant paths
     revalidatePath('/dashboard/management-offer');

@@ -28,7 +28,7 @@ export async function deleteCategory(categoryId: string) {
     await db.category.delete({
       where: { id: categoryId },
     });
-    await revalidateTag('categories');
+    revalidateTag('categories');
 
     revalidatePath('/dashboard/management-categories');
 

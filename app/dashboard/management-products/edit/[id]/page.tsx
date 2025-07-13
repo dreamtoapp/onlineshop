@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation';
-// import { Edit3 } from 'lucide-react';
 import { Icon } from '@/components/icons/Icon';
 import ProductUpsert from '../../new/components/ProductUpsert';
 import { getProductFormData } from '../../new/actions/getProductData';
-import BackButton from '@/components/BackButton';
 import db from '@/lib/prisma';
 
 interface EditProductPageProps {
@@ -76,7 +74,6 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
             {/* Header with BackButton and Title in same row */}
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                    <BackButton variant="default" />
                     <div className="flex items-center gap-3">
                         <Icon name="Edit3" className="h-6 w-6 text-feature-products icon-enhanced" />
                         <h1 className="text-2xl font-bold text-primary">تعديل المنتج</h1>

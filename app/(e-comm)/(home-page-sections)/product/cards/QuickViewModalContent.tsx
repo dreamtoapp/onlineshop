@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Icon } from '@/components/icons/Icon';
 import { Button } from '@/components/ui/button';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+
 import { toast } from 'sonner';
 import Link from '@/components/link';
 import { X } from 'lucide-react';
@@ -91,11 +91,11 @@ export default function QuickViewModalContent({
                         />
                     )}
                     {product.rating && (
-                        <div className="absolute top-4 left-4 flex items-center gap-1 bg-warning/80 px-2 py-1 rounded-full shadow text-warning-foreground text-xs font-semibold">
-                            <Icon name="Star" size="sm" className="fill-warning text-warning" />
+                        <div className="absolute bottom-8 left-8 flex items-center gap-1 bg-secondary/80 px-2 py-1 rounded-full shadow text-secondary-foreground text-xs font-semibold">
+                            <Icon name="Star" size="xs" className="fill-yellow-500/80 text-yellow-500" />
                             <span>{ratingFormatted}</span>
                             {product.reviewCount > 0 && (
-                                <Link href={`/product/${product.slug}#reviews`} className="text-primary hover:underline ml-1">({formatNum(product.reviewCount)} تقييم)</Link>
+                                <Link href={`/product/${product.slug}#reviews`} className=" text-secondary-foreground hover:underline ml-1">({formatNum(product.reviewCount)} تقييم)</Link>
                             )}
                         </div>
                     )}
@@ -134,40 +134,34 @@ export default function QuickViewModalContent({
                     )} */}
 
                     {/* Specs */}
-                    <Accordion type="single" collapsible>
-                        <AccordionItem value="specsD">
-                            <AccordionTrigger className="text-sm font-semibold">المواصفات التفصيلية</AccordionTrigger>
-                            <AccordionContent>
-                                <div className="flex flex-col gap-2 text-xs text-muted-foreground h-40 overflow-y-auto">
-                                    {product.brand && (
-                                        <div><span className="font-medium text-foreground">العلامة التجارية:</span> {product.brand}</div>
-                                    )}
-                                    {product.size && (
-                                        <div><span className="font-medium text-foreground">المقاس:</span> {product.size}</div>
-                                    )}
-                                    {product.details && (
-                                        <div><span className="font-medium text-foreground">تفاصيل إضافية:</span> {product.details}</div>
-                                    )}
-                                    {product.description && (
-                                        <div><span className="font-medium text-foreground">الوصف:</span> {product.description}</div>
-                                    )}
-                                    {product.features && product.features.length > 0 && (
-                                        <div>
-                                            <span className="font-medium text-foreground">المزايا:</span>
-                                            <ul className="list-disc pr-4 space-y-1">
-                                                {product.features.map((f: string, i: number) => (
-                                                    <li key={i}>{f}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                    {!(product.brand || product.size || product.details || product.description || (product.features && product.features.length > 0)) && (
-                                        <div className="text-center text-muted-foreground">لا توجد مواصفات متوفرة</div>
-                                    )}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                    <div className="flex flex-col gap-2 text-xs text-muted-foreground h-40 overflow-y-auto">
+                        {product.brand && (
+                            <div><span className="font-medium text-foreground">العلامة التجارية:</span> {product.brand}</div>
+                        )}
+                        {product.size && (
+                            <div><span className="font-medium text-foreground">المقاس:</span> {product.size}</div>
+                        )}
+                        {product.details && (
+                            <div><span className="font-medium text-foreground">تفاصيل إضافية:</span> {product.details}</div>
+                        )}
+                        {product.description && (
+                            <div><span className="font-medium text-foreground">الوصف:</span> {product.description}</div>
+                        )}
+                        {product.features && product.features.length > 0 && (
+                            <div>
+                                <span className="font-medium text-foreground">المزايا:</span>
+                                <ul className="list-disc pr-4 space-y-1">
+                                    {product.features.map((f: string, i: number) => (
+                                        <li key={i}>{f}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {!(product.brand || product.size || product.details || product.description || (product.features && product.features.length > 0)) && (
+                            <div className="text-center text-muted-foreground">لا توجد مواصفات متوفرة</div>
+                        )}
+                    </div>
+
 
                     {/* Actions */}
                     <div className="flex flex-row sm:flex-row gap-3 pt-4 mt-auto items-center justify-center">

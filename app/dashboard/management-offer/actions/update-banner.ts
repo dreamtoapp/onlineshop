@@ -27,7 +27,7 @@ export async function updateOfferBanner(offerId: string, bannerImageUrl: string)
     revalidatePath(`/dashboard/management-offer/edit/${offerId}`);
     revalidatePath(`/dashboard/management-offer/manage/${offerId}`);
     revalidatePath('/');
-    await revalidateTag('offers');
+    revalidateTag('offers');
 
     return { 
       success: true, 

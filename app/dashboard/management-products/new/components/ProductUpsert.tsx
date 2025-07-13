@@ -16,6 +16,7 @@ import { ProductFormData, ProductSchema } from '../helpers/productZodAndInputs';
 import { useRouter } from 'next/navigation';
 import { createProduct } from '../actions/create-product';
 import { updateProduct } from '../actions/update-product';
+import { Controller } from 'react-hook-form';
 
 interface ProductUpsertProps {
     mode: 'new' | 'update';
@@ -60,6 +61,7 @@ export default function ProductUpsert({
         setValue,
         reset,
         watch,
+        control,
     } = useForm<ProductFormData>({
         resolver: zodResolver(ProductSchema),
         mode: 'onChange',
@@ -420,10 +422,17 @@ export default function ProductUpsert({
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        {...register('published')}
-                                        id="published"
-                                        className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                    <Controller
+                                        name="published"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="published"
+                                                className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                            />
+                                        )}
                                     />
                                     <Label htmlFor="published" className="text-sm font-medium cursor-pointer">
                                         منشور للعملاء
@@ -431,10 +440,17 @@ export default function ProductUpsert({
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        {...register('requiresShipping')}
-                                        id="requiresShipping"
-                                        className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                    <Controller
+                                        name="requiresShipping"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="requiresShipping"
+                                                className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                            />
+                                        )}
                                     />
                                     <Label htmlFor="requiresShipping" className="text-sm font-medium cursor-pointer">
                                         يتطلب شحن
@@ -442,10 +458,17 @@ export default function ProductUpsert({
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        {...register('hasQualityGuarantee')}
-                                        id="hasQualityGuarantee"
-                                        className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                    <Controller
+                                        name="hasQualityGuarantee"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="hasQualityGuarantee"
+                                                className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                            />
+                                        )}
                                     />
                                     <Label htmlFor="hasQualityGuarantee" className="text-sm font-medium cursor-pointer">
                                         ضمان جودة
@@ -455,10 +478,17 @@ export default function ProductUpsert({
 
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        {...register('outOfStock')}
-                                        id="outOfStock"
-                                        className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                    <Controller
+                                        name="outOfStock"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="outOfStock"
+                                                className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                            />
+                                        )}
                                     />
                                     <Label htmlFor="outOfStock" className="text-sm font-medium cursor-pointer">
                                         نفد المخزون
@@ -466,10 +496,17 @@ export default function ProductUpsert({
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        {...register('manageInventory')}
-                                        id="manageInventory"
-                                        className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                    <Controller
+                                        name="manageInventory"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="manageInventory"
+                                                className="data-[state=checked]:bg-feature-settings data-[state=checked]:border-feature-settings"
+                                            />
+                                        )}
                                     />
                                     <Label htmlFor="manageInventory" className="text-sm font-medium cursor-pointer">
                                         تتبع المخزون

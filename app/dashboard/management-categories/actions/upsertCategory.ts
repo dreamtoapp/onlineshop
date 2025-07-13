@@ -62,7 +62,7 @@ async function createCategory(data: CategoryFormData) {
       description: data.description,
     },
   });
-  await revalidateTag('categories');
+  revalidateTag('categories');
 
   return {
     ok: true,
@@ -103,7 +103,7 @@ async function updateCategory(data: CategoryFormData) {
       description: data.description,
     },
   });
-  await revalidateTag('categories');
+  revalidateTag('categories');
 
   return {
     ok: true,

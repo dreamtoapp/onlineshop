@@ -19,7 +19,7 @@ export async function deleteSupplier(supplierId: string) {
       where: { id: supplierId },
     });
 
-    await revalidateTag('suppliers');
+    revalidateTag('suppliers');
     revalidatePath('/dashboard/suppliers');
     // Potentially revalidate other paths if supplier info is displayed elsewhere
 

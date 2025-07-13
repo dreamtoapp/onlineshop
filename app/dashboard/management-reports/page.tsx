@@ -20,19 +20,19 @@ const categorizedReportsList: ReportCategory[] = [
     reports: [
       {
         title: 'تقرير المبيعات',
-        url: '/dashboard/reports/sales',
+        url: '/dashboard/management-reports/sales',
         iconName: 'TrendingUp',
         description: 'تحليل شامل للمبيعات والإيرادات والفترات الزمنية.',
       },
       {
         title: 'التقارير المالية',
-        url: '/dashboard/reports/finance',
+        url: '/dashboard/management-reports/finance',
         iconName: 'DollarSign',
         description: 'نظرة عامة على التدفقات النقدية، الأرباح، والمؤشرات المالية.',
       },
       {
         title: 'أداء المنتجات',
-        url: '/dashboard/reports/product-performance',
+        url: '/dashboard/management-reports/product-performance',
         iconName: 'BarChart2',
         description: 'تقييم المنتجات الأكثر مبيعًا، الأقل مبيعًا، وهوامش الربح.',
       },
@@ -43,19 +43,19 @@ const categorizedReportsList: ReportCategory[] = [
     reports: [
       {
         title: 'تحليلات الطلبات',
-        url: '/dashboard/reports/orders',
+        url: '/dashboard/management-reports/orders',
         iconName: 'Activity',
         description: 'تحليل اتجاهات الطلبات، متوسط قيمة الطلب، وحالات الطلب.',
       },
       {
         title: 'تقرير المخزون',
-        url: '/dashboard/reports/inventory',
+        url: '/dashboard/management-reports/inventory',
         iconName: 'ClipboardList',
         description: 'مراقبة مستويات المخزون، المنتجات بطيئة الحركة، وتنبيهات إعادة الطلب.',
       },
       {
         title: 'تقرير السائقين والتوصيل',
-        url: '/dashboard/reports/drivers',
+        url: '/dashboard/management-reports/drivers',
         iconName: 'Truck',
         description: 'تحليل كفاءة التوصيل، أداء السائقين، ومناطق الخدمة.',
       },
@@ -66,19 +66,19 @@ const categorizedReportsList: ReportCategory[] = [
     reports: [
       {
         title: 'تقرير العملاء',
-        url: '/dashboard/reports/customers',
+        url: '/dashboard/management-reports/customers',
         iconName: 'UserCheck',
         description: 'فهم سلوك العملاء، التركيبة السكانية، وقيمة العميل.',
       },
       {
         title: 'تقرير العروض والتخفيضات',
-        url: '/dashboard/reports/promotions',
+        url: '/dashboard/management-reports/promotions',
         iconName: 'Gift',
         description: 'تقييم أداء الحملات الترويجية وتأثيرها على المبيعات.',
       },
       {
         title: 'تقرير التقييمات والمراجعات',
-        url: '/dashboard/reports/reviews',
+        url: '/dashboard/management-reports/reviews',
         iconName: 'Star',
         description: 'متابعة تقييمات العملاء للمنتجات والخدمة.',
       },
@@ -89,7 +89,7 @@ const categorizedReportsList: ReportCategory[] = [
     reports: [
       {
         title: 'الإنجازات والأرقام القياسية',
-        url: '/dashboard/reports/milestones',
+        url: '/dashboard/management-reports/milestones',
         iconName: 'Award',
         description: 'تتبع أهم إنجازات المتجر ومؤشرات النمو الرئيسية.',
       },

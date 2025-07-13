@@ -64,7 +64,7 @@ export async function updateProduct(data: UpdateProductInput) {
       where: { id },
       data: updateData,
     });
-    await revalidateTag('products');
+    revalidateTag('products');
 
     // If categoryIds are provided, update the relations
     if (categoryIds) {
@@ -82,6 +82,7 @@ export async function updateProduct(data: UpdateProductInput) {
     revalidatePath('/dashboard/management-products');
     revalidatePath('/dashboard/products');
     revalidatePath('/dashboard/products-control');
+    revalidatePath('/');
 
     return { success: true, message: 'تم تحديث المنتج بنجاح' };
   } catch (error: unknown) {

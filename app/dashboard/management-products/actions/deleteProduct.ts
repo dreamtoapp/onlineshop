@@ -21,7 +21,7 @@ export async function deleteProduct(productId: string) {
     }
 
     await db.product.delete({ where: { id: productId } });
-    await revalidateTag('products');
+    revalidateTag('products');
     revalidatePath('/dashboard/products-control');
     revalidatePath('/dashboard/products'); // Revalidate the supplier-specific product list page
     return { success: true };

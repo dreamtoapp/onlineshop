@@ -11,6 +11,6 @@ export const companyInfo = async () => {
       return await db.company.findFirst();
     },
     ['companyInfo'],
-    { revalidate: 3600, tags: ['company'] }
+    { revalidate: 1, tags: ['company'] }
   )();
 };

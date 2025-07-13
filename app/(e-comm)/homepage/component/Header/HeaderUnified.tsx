@@ -7,6 +7,7 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { UserRole } from '@/constant/enums';
 import Link from '@/components/link';
 import { ReactNode } from 'react';
+import { CarFront, Focus } from 'lucide-react';
 
 interface User {
     id: string;
@@ -46,7 +47,12 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
                 <span className="flex items-center">
                     <Logo logo={logo} logoAlt={logoAlt} />
                 </span>
+
+
                 <div className="flex items-center gap-4 md:gap-6 bg-secondary rounded-lg px-4">
+                    {user?.role === UserRole.ADMIN && <Link href="/dashboard" className="px-3 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><Focus /></Link>}
+                    {user?.role === UserRole.DRIVER && <Link href="/driver" className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><CarFront /></Link>}
+
                     <SearchBar />
                     {wishlistIcon}
                     <CartIconClient />
@@ -71,6 +77,8 @@ function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
                 <Logo logo={logo} logoAlt={logoAlt} />
             </div>
             <div className="flex items-center gap-2 bg-secondary rounded-lg px-4">
+                {user?.role === UserRole.ADMIN && <Link href="/dashboard" className="px-3 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><Focus /></Link>}
+                {user?.role === UserRole.DRIVER && <Link href="/driver" className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><CarFront /></Link>}
                 <SearchBar />
                 {notificationBell}
                 <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />

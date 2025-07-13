@@ -321,21 +321,37 @@ function SecurityCard({ register, errors, isSubmitting }: {
 }
 
 // Address Management Card Component
-function AddressManagementCard() {
+function AddressManagementCard({ hasDefaultAddress, defaultAddress }: { hasDefaultAddress: boolean, defaultAddress?: any }) {
   const router = useRouter();
 
   return (
-    <Card className="shadow-lg border-l-4 border-l-feature-suppliers card-hover-effect">
+    <Card className={`shadow-lg border-l-4 card-hover-effect ${!hasDefaultAddress ? 'border-l-red-500' : 'border-l-feature-suppliers'}`}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-xl">
-          <MapPin className="h-5 w-5 text-feature-suppliers icon-enhanced" />
+          <MapPin className={`h-5 w-5 icon-enhanced ${!hasDefaultAddress ? 'text-red-500' : 'text-feature-suppliers'}`} />
           إدارة العناوين
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {!hasDefaultAddress && (
+          <div className="mb-2 p-2 bg-red-100 text-red-700 rounded text-center text-sm font-semibold">
+            يجب إضافة عنوان افتراضي لإتمام التوصيل
+          </div>
+        )}
+        {hasDefaultAddress && defaultAddress && (
+          <div className="mb-2 p-2 bg-green-50 text-green-800 rounded text-center text-sm font-semibold border border-green-200">
+            <div>العنوان الافتراضي الحالي:</div>
+            <div className="font-normal text-xs mt-1">
+              {defaultAddress.label}، {defaultAddress.district}، {defaultAddress.street}، مبنى {defaultAddress.buildingNumber}
+              {defaultAddress.apartmentNumber ? `، شقة ${defaultAddress.apartmentNumber}` : ''}
+              {defaultAddress.floor ? `، طابق ${defaultAddress.floor}` : ''}
+              {defaultAddress.landmark ? `، معلم: ${defaultAddress.landmark}` : ''}
+            </div>
+          </div>
+        )}
         <div className="text-center space-y-3">
           <div className="bg-feature-suppliers/5 p-4 rounded-lg">
-            <MapPin className="h-8 w-8 text-feature-suppliers mx-auto mb-2" />
+            <MapPin className={`h-8 w-8 mx-auto mb-2 ${!hasDefaultAddress ? 'text-red-500' : 'text-feature-suppliers'}`} />
             <p className="text-sm text-muted-foreground mb-3">
               قم بإدارة عناوينك لتسهيل عملية التوصيل
             </p>
@@ -563,9 +579,13 @@ function calculateProfileCompletion(userData: UserFormData): number {
 export default function UserProfileForm({
   userData,
   isOtp,
+  hasDefaultAddress,
+  defaultAddress,
 }: {
   userData: UserFormData;
   isOtp: boolean;
+  hasDefaultAddress: boolean;
+  defaultAddress?: any;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -655,7 +675,7 @@ export default function UserProfileForm({
             </div>
 
             <div className="space-y-2 sm:space-y-3">
-              <AddressManagementCard />
+              <AddressManagementCard hasDefaultAddress={hasDefaultAddress} defaultAddress={defaultAddress} />
               <PreferencesCard />
             </div>
           </div>
