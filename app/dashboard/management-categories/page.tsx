@@ -23,7 +23,6 @@ export default async function CategoriesPage() {
           description="يرجى إدخال بيانات التصنيف"
           defaultValues={{
             name: '',
-            slug: '',
             description: '',
           }}
         />

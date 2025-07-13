@@ -7,6 +7,7 @@ import {
   CategoryFormData,
   CategorySchema,
 } from '../helper/categoryZodAndInputs';
+import { Slugify } from '@/utils/slug';
 
 // -------------------- ✅ Type-safe validation --------------------
 type ValidationResult =
@@ -44,7 +45,10 @@ async function isDuplicateSlug(slug: string, id?: string) {
 
 // -------------------- ✅ Create category --------------------
 async function createCategory(data: CategoryFormData) {
-  const duplicate = await isDuplicateSlug(data.slug);
+  // Auto-generate slug from name
+  const slug = Slugify(data.name);
+  
+  const duplicate = await isDuplicateSlug(slug);
   if (duplicate) {
     return {
       ok: false,
@@ -58,7 +62,7 @@ async function createCategory(data: CategoryFormData) {
   await db.category.create({
     data: {
       name: data.name,
-      slug: data.slug,
+      slug: slug,
       description: data.description,
     },
   });
@@ -84,7 +88,10 @@ async function updateCategory(data: CategoryFormData) {
     };
   }
 
-  const duplicate = await isDuplicateSlug(data.slug, data.id);
+  // Auto-generate new slug from updated name
+  const slug = Slugify(data.name);
+
+  const duplicate = await isDuplicateSlug(slug, data.id);
   if (duplicate) {
     return {
       ok: false,
@@ -99,7 +106,7 @@ async function updateCategory(data: CategoryFormData) {
     where: { id: data.id },
     data: {
       name: data.name,
-      slug: data.slug,
+      slug: slug,
       description: data.description,
     },
   });

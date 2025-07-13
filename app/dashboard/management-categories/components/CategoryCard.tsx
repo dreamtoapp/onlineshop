@@ -21,8 +21,7 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ category }: CategoryCardProps) {
-  const { id, name, slug, description, createdAt, imageUrl, productAssignments } = category;
-  console.log({ id, name, slug, description, createdAt, imageUrl, productAssignments })
+  const { id, name, description, createdAt, imageUrl, productAssignments } = category;
 
 
   const formatDate = (date: Date | string) =>
@@ -73,7 +72,6 @@ export default function CategoryCard({ category }: CategoryCardProps) {
           defaultValues={{
             id,
             name,
-            slug,
             description: description ?? undefined,
           }}
         />

@@ -46,7 +46,6 @@ export default function CategoryUpsert({
     defaultValues: {
       id: defaultValues.id,
       name: defaultValues.name,
-      slug: defaultValues.slug,
       description: defaultValues.description ?? undefined,
     },
   });

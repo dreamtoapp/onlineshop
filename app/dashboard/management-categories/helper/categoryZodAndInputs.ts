@@ -11,8 +11,6 @@ export const CategorySchema = z.object({
   id: z.string().trim().optional(),
   name: z.string().trim().nonempty('الاسم مطلوب'),
   description: z.string().trim().optional(),
-
-  slug: z.string(),
 });
 
 // 🧩 Inferred type from schema

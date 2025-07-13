@@ -56,9 +56,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps<{
   };
   const allCategories = data.allCategories;
 
-  // Get related categories (excluding current one)
+  // Get related categories (excluding current one) - FIXED
   const relatedCategories = allCategories
-    .filter((c: any) => c.slug !== slug)
+    .filter((c: any) => c.slug !== decodedSlug)  // Use decoded slug for comparison
     .slice(0, 4); // Limit to 4 related categories
 
   return (

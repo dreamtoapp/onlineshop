@@ -40,12 +40,16 @@ export async function getCategoryPageData(slug: string, page = 1, pageSize = 10)
       return { success: false, error: 'Category not found.' };
     }
 
-    // Fetch products for the category
+    // Fetch products for the category using the proper relationship
     const skip = (page - 1) * pageSize;
     const [products, totalProducts] = await db.$transaction([
       db.product.findMany({
         where: {
-          categorySlug: category.slug,
+          categoryAssignments: {
+            some: {
+              categoryId: category.id,
+            },
+          },
           published: true,
         },
         skip,
@@ -54,7 +58,11 @@ export async function getCategoryPageData(slug: string, page = 1, pageSize = 10)
       }),
       db.product.count({
         where: {
-          categorySlug: category.slug,
+          categoryAssignments: {
+            some: {
+              categoryId: category.id,
+            },
+          },
           published: true,
         },
       }),
