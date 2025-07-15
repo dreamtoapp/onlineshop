@@ -1,7 +1,6 @@
 // app/dashboard/orders-management/status/delivered/page.tsx
 import { Metadata } from 'next';
 import { Icon } from '@/components/icons/Icon';
-import BackButton from '@/components/BackButton';
 
 import { ORDER_STATUS } from '@/constant/order-status';
 
@@ -59,7 +58,6 @@ export default async function DeliveredOrdersPage({
         {/* Clean Header Card */}
         <div className="bg-muted/30 rounded-lg shadow-sm border-0 p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Left side - Title with BackButton */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="space-y-1">
@@ -80,8 +78,6 @@ export default async function DeliveredOrdersPage({
             </div>
           </div>
         </div>
-
-        <BackButton variant="default" />
 
         <DeliveredOrdersView
           orders={orders.orders}

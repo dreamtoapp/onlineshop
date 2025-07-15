@@ -1,7 +1,6 @@
 "use client";
 import { useState, Suspense } from "react";
 import { Heart } from 'lucide-react';
-import BackButton from '@/components/BackButton';
 import { Badge } from '@/components/ui/badge';
 import WishlistStatistics from './WishlistStatistics';
 import WishlistProductCard from './WishlistProductCard';
@@ -16,7 +15,6 @@ export default function ClientWishlistPage({ initialProducts }: { initialProduct
         <div className='container mx-auto max-w-7xl py-8 px-4'>
             {/* Enhanced Header */}
             <div className="mb-8">
-                <BackButton variant="default" className="mb-6" />
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
                         <div className="p-4 rounded-2xl bg-feature-products/10 border border-feature-products/20">

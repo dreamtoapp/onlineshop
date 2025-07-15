@@ -3,7 +3,6 @@ import MissionCard from './components/MissionCard';
 import WhyChooseUsSection from './components/WhyChooseUsSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import CallToActionSection from './components/CallToActionSection';
-import BackButton from '@/components/BackButton';
 import { getAboutPageContent } from './actions/getAboutPageContent';
 import FAQSection from './components/FAQSection';
 
@@ -38,9 +37,7 @@ const AboutPage = async () => {
           }),
         }}
       />
-      <nav className="mb-8" aria-label="عودة">
-        <BackButton variant="minimal" />
-      </nav>
+
       {/* Hero Section */}
       <section className="rounded-2xl bg-background/90 shadow-md mb-12" aria-labelledby="about-hero-title">
         <HeroSection

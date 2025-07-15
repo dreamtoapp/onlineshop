@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { UserPlus, AlertCircle, Phone, User, Lock, ShieldCheck } from 'lucide-react';
-import BackButton from '@/components/BackButton';
 import { registerUser } from '../actions/actions';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -146,7 +145,6 @@ export default function RegisterForm({ redirect = '/' }: RegisterFormProps) {
 
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-background px-4'>
-      <BackButton variant="minimal" className="mb-4 self-start" />
       <Card className="w-full max-w-sm shadow-lg border-l-4 border-feature-users card-hover-effect card-border-glow">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-xl">

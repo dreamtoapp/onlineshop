@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import BackButton from '@/components/BackButton';
 import Link from '@/components/link';
 
 import { getUserReviews } from '@/app/(e-comm)/(home-page-sections)/product/actions/rating';
@@ -286,7 +285,6 @@ export default async function UserRatingsPage() {
         <div className='container mx-auto max-w-6xl py-8 px-4'>
             {/* Enhanced Header */}
             <div className="mb-8">
-                <BackButton variant="default" className="mb-6" />
 
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">

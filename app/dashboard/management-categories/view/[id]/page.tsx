@@ -2,7 +2,6 @@ import { Info } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-import BackButton from '@/components/BackButton';
 import {
   Alert,
   AlertDescription,
@@ -28,7 +27,6 @@ export default async function CategoryDetails({ params }: PageProps<{ id: string
 
   return (
     <div dir="rtl" className="space-y-6 p-4">
-      <BackButton />
 
       {/* بطاقة التصنيف */}
       <Card className="p-6 rounded-2xl shadow-md flex flex-col sm:flex-row items-center sm:items-start gap-6">

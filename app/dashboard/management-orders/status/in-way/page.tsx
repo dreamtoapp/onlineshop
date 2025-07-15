@@ -1,7 +1,6 @@
 // app/dashboard/orders-management/status/in-way/page.tsx
 
 import { Metadata } from 'next';
-import BackButton from '@/components/BackButton';
 import { Icon } from '@/components/icons/Icon';
 
 import { ORDER_STATUS } from '@/constant/order-status';
@@ -68,7 +67,6 @@ interface PageLayoutProps {
 function PageLayout({ children }: PageLayoutProps) {
   return (
     <div className="font-cairo relative flex flex-col space-y-4 p-4 bg-background" dir="rtl">
-      <BackButton variant="default" />
       {children}
     </div>
   );
@@ -86,7 +84,6 @@ interface MainContentProps {
 function MainContent({ orders, analytics, currentPage, pageSize, driverId }: MainContentProps) {
   return (
     <>
-      <BackButton variant="default" />
       <PageHeader analytics={analytics} showActions={true} />
       <InWayOrdersView
         orders={orders}

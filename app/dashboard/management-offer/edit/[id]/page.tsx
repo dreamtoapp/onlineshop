@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, Edit3 } from 'lucide-react';
-import BackButton from '@/components/BackButton';
 import { OfferForm } from '../../components/OfferForm';
 import { getOfferById } from '../../actions';
 
@@ -33,7 +32,6 @@ export default async function EditOfferPage({ params }: EditOfferPageProps) {
             {/* Enhanced Header */}
             <header className="sticky top-0 z-10 border-b border-border bg-background p-4 shadow-sm md:p-6">
                 <div className="flex items-center gap-4">
-                    <BackButton variant="default" />
                     <div className="flex items-center gap-2">
                         <Edit3 className="h-6 w-6 text-feature-commerce" />
                         <h1 className="text-2xl font-bold text-foreground">تعديل المجموعة</h1>

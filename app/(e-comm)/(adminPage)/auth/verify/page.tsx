@@ -1,5 +1,4 @@
 import { auth } from '@/auth';
-import BackButton from '@/components/BackButton';
 import OtpForm from './component/OtpForm';
 import Background from '@/components/ui/Background';
 
@@ -31,7 +30,6 @@ export default async function VerifyPage() {
 
   return (
     <>
-      <BackButton variant="default" />
       <Background
         backgroundStyle="usersBlue"
         showRadial={true}

@@ -6,7 +6,6 @@ import MiniCartSummary from "./MiniCartSummary";
 import ShiftSelectorWrapper from "./ShiftSelectorWrapper";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import PlaceOrderButton from "./PlaceOrderButton";
-import BackButton from "@/components/BackButton";
 import { AddressWithDefault } from "./AddressBook";
 import { UserProfile } from "./UserInfoCard";
 import { CartData } from "./PlaceOrderButton";
@@ -29,7 +28,6 @@ export default function CheckoutClient({ user, cart, addresses }: CheckoutClient
     return (
         <div className="min-h-screen bg-background">
             <div className="max-w-7xl mx-auto px-4 py-6">
-                <BackButton variant="gradient" className="mb-6" />
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
                         {user && <UserInfoCard user={user} />}

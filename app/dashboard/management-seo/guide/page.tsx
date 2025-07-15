@@ -1,11 +1,8 @@
 
-import BackButton from '@/components/BackButton';
-
 export default function SeoGuidePage() {
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 text-right">
       <div className="mb-6 flex justify-start">
-        <BackButton />
       </div>
       <h1 className="text-2xl font-bold text-primary mb-4">دليل تحسين محركات البحث (SEO) لمتاجر التجارة الإلكترونية</h1>
       <p className="text-muted-foreground mb-6">هذا الدليل مخصص لمسؤولي المتجر ويوفر خطوات عملية لتحسين ظهور متجرك في نتائج البحث وزيادة الزيارات والمبيعات.</p>

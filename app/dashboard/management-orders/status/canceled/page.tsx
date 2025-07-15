@@ -6,7 +6,6 @@ import { ORDER_STATUS } from '@/constant/order-status';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/icons/Icon';
-import BackButton from '@/components/BackButton';
 
 import {
   fetchAnalytics,
@@ -75,7 +74,6 @@ export default async function CanceledOrdersPage({
 
     return (
       <div className="font-cairo space-y-6 p-6" dir="rtl">
-        <BackButton variant="default" />
         <PageHeader analytics={analytics} />
         <CanceledOrdersView
           orders={orders.orders}
@@ -91,7 +89,6 @@ export default async function CanceledOrdersPage({
 
     return (
       <div className="font-cairo space-y-6 p-6" dir="rtl">
-        <BackButton variant="default" />
         <PageHeader />
         <ErrorCard />
       </div>

@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'; // Added useEffect
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import BackButton from '@/components/BackButton'; // Import BackButton
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -126,7 +125,6 @@ export default function ProductPerformanceClient({
     <div className='space-y-8'>
       <div className="flex justify-between items-center mb-6">
         <h1 className='text-2xl font-bold text-foreground'>تقرير أداء المنتجات</h1>
-        <BackButton />
       </div>
 
       {/* Filter Panel */}

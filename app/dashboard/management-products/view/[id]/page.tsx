@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { PageProps } from '@/types/commonTypes';
-import BackButton from '@/components/BackButton';
 import { Icon } from '@/components/icons/Icon';
 import db from '@/lib/prisma';
 import ProductViewContent from './product-view-content';
@@ -57,7 +56,6 @@ export default async function ProductViewPage({ params }: PageProps<{ id: string
         {/* Header with BackButton and Title in same row */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <BackButton variant="default" />
             <div className="flex items-center gap-3">
               <Icon name="Eye" className="h-6 w-6 text-feature-analytics icon-enhanced" />
               <h1 className="text-2xl font-bold text-primary md:text-3xl">
@@ -78,7 +76,6 @@ export default async function ProductViewPage({ params }: PageProps<{ id: string
         {/* Header with BackButton and Title in same row - Error State */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <BackButton variant="default" />
             <div className="flex items-center gap-3">
               <Icon name="Eye" className="h-6 w-6 text-destructive icon-enhanced" />
               <h1 className="text-2xl font-bold text-destructive">خطأ في تحميل المنتج</h1>

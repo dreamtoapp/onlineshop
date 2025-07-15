@@ -4,7 +4,6 @@ import Link from '@/components/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import BackButton from '@/components/BackButton';
 import { Icon } from '@/components/icons/Icon';
 
 export default function NotFound() {
@@ -12,9 +11,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-gradient-to-br from-muted/30 to-muted/60 flex items-center justify-center p-4">
       <div className="container max-w-4xl">
         {/* Enhanced Back Button */}
-        <div className="mb-6">
-          <BackButton variant="default" />
-        </div>
+
 
         {/* Main 404 Card */}
         <Card className="shadow-xl border-l-8 border-l-feature-settings card-hover-effect card-border-glow overflow-hidden">

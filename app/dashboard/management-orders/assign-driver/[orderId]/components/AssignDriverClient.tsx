@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/icons/Icon';
 import { toast } from 'sonner';
 
-import BackButton from '@/components/BackButton';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -90,7 +89,6 @@ export default function AssignDriverClient({
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <BackButton variant="default" />
                             <div>
                                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
                                     <div className="p-2 rounded-lg bg-feature-users/10">

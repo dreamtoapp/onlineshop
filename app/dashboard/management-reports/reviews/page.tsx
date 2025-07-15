@@ -1,4 +1,3 @@
-import BackButton from '@/components/BackButton';
 import { PageProps } from '@/types/commonTypes';
 
 import { getReviewsReportData } from './action/getReviewsReportData';
@@ -19,7 +18,6 @@ export default async function ReviewsReportPage({ searchParams }: PageProps<Reco
       <div className='rtl mx-auto max-w-7xl px-4 py-10 text-right md:px-6'>
         <div className="flex justify-between items-center mb-8">
           <h1 className='text-3xl font-bold text-foreground'>تقرير التقييمات والمراجعات</h1>
-          <BackButton />
         </div>
         <ReviewsReportClient {...data} initialFrom={from} initialTo={to} />
       </div>
@@ -31,7 +29,6 @@ export default async function ReviewsReportPage({ searchParams }: PageProps<Reco
       <div className='rtl mx-auto max-w-7xl px-4 py-10 text-right md:px-6'>
         <div className="flex justify-between items-center mb-8">
           <h1 className='text-3xl font-bold text-foreground'>تقرير التقييمات والمراجعات</h1>
-          <BackButton />
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <h3 className="text-xl font-semibold text-red-700 mb-2">

@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import BackButton from '@/components/BackButton';
 import { Icon } from '@/components/icons/Icon';
 import ProductGalleryManager from './components/ProductGalleryManager';
 import GalleryManagerSkeleton from './components/GalleryManagerSkeleton';
@@ -27,7 +26,6 @@ export default async function ProductGalleryPage({ params }: PageProps) {
             return (
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center gap-4 mb-6">
-                        <BackButton variant="default" />
                         <div>
                             <h1 className="text-2xl font-bold text-destructive">المنتج غير موجود</h1>
                             <p className="text-muted-foreground">لم يتم العثور على المنتج المطلوب</p>
@@ -41,7 +39,6 @@ export default async function ProductGalleryPage({ params }: PageProps) {
             <div className="container mx-auto px-4 py-6">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
-                    <BackButton variant="default" />
                     <div>
                         <h1 className="text-2xl font-bold flex items-center gap-2">
                             <Icon name="Images" className="h-6 w-6 text-feature-products icon-enhanced" />
@@ -62,7 +59,6 @@ export default async function ProductGalleryPage({ params }: PageProps) {
         return (
             <div className="container mx-auto px-4 py-6">
                 <div className="flex items-center gap-4 mb-6">
-                    <BackButton variant="default" />
                     <div>
                         <h1 className="text-2xl font-bold text-destructive">خطأ في تحميل المنتج</h1>
                         <p className="text-muted-foreground">حدث خطأ أثناء تحميل بيانات المنتج</p>

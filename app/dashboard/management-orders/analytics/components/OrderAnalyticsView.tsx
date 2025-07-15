@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp } from 'lucide-react';
-import BackButton from '@/components/BackButton';
 
 import OrderAnalyticsDashboard from '../../components/OrderAnalyticsDashboard';
 import type { GetOrderAnalyticsResult } from '../../actions/get-order-analytics';
@@ -14,7 +13,6 @@ export default function OrderAnalyticsView({
 }: OrderAnalyticsViewProps) {
     return (
         <div className="container mx-auto py-8 space-y-6">
-            <BackButton variant="default" />
 
             <div className="flex items-center gap-3 mb-6">
                 <div className="h-8 w-1 bg-feature-analytics rounded-full"></div>

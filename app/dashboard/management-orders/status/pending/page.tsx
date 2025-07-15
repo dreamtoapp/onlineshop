@@ -6,7 +6,6 @@ import { OrderStatus } from '@prisma/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TabsContent } from '@/components/ui/tabs';
-import BackButton from '@/components/BackButton';
 
 import {
   fetchAnalytics,
@@ -65,7 +64,6 @@ export default async function PendingOrdersPage({
         {/* Enhanced Header Section */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BackButton variant="default" />
             <div className="flex items-center gap-3">
               <div className="h-8 w-1 bg-yellow-500 rounded-full"></div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -240,7 +238,15 @@ export default async function PendingOrdersPage({
     console.error('Error in pending orders page:', error);
     return (
       <div className="container mx-auto py-4 space-y-4" dir="rtl">
-        <BackButton variant="minimal" />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-1 bg-yellow-500 rounded-full"></div>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Icon name="MousePointerBan" className="h-6 w-6 text-yellow-500" />
+              خطأ في تحميل الطلبات
+            </h1>
+          </div>
+        </div>
 
         {/* Enhanced Error Card */}
         <Card className="shadow-lg border-l-4 border-l-red-500">

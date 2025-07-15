@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 
-import BackButton from '@/components/BackButton';
 import { Card, CardContent } from '@/components/ui/card';
 
 import { getOrderDetails } from './actions/get-order-details';
@@ -55,7 +54,6 @@ export default async function AssignDriverPage({
             return (
                 <div className="font-cairo p-4 bg-background min-h-screen" dir="rtl">
                     <div className="max-w-4xl mx-auto space-y-4">
-                        <BackButton variant="default" />
                         <Card className="shadow-lg border-l-4 border-l-status-canceled card-hover-effect">
                             <CardContent className="p-6 text-center">
                                 <h2 className="text-xl font-bold text-status-canceled mb-2">طلب غير موجود</h2>
@@ -83,8 +81,6 @@ export default async function AssignDriverPage({
         return (
             <div className="font-cairo p-4 bg-background min-h-screen" dir="rtl">
                 <div className="max-w-4xl mx-auto space-y-4">
-                    <BackButton variant="default" />
-
                     <Card className="shadow-lg border-l-4 border-l-status-urgent card-hover-effect">
                         <CardContent className="p-6 text-center">
                             <h2 className="text-xl font-bold text-status-urgent mb-2">حدث خطأ</h2>

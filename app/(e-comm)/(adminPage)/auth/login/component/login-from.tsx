@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { log } from '@/utils/logger';
 import { userLogin } from '../action/userLogin';
-import BackButton from '@/components/BackButton';
 
 interface LoginFormProps {
   redirect?: string;
@@ -152,7 +151,7 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-8">
         {/* Back Button */}
-        <BackButton variant="minimal" />
+
 
         {/* Login Form */}
         <div className="space-y-8">

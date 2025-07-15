@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, Plus, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
 import Link from '@/components/link';
 import { buttonVariants } from '@/components/ui/button';
-import BackButton from '@/components/BackButton';
 import { getOffers } from './actions/get-offers';
 import OfferCard from './components/OfferCard';
 
@@ -18,7 +17,6 @@ export default async function ManagementOfferPage() {
             <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm p-4 shadow-lg md:p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <BackButton variant="gradient" />
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-feature-commerce/10 rounded-lg">

@@ -2,7 +2,6 @@
 import ClientAnalyticsDashboard from './components/ClientAnalyticsDashboard';
 import { getProductAnalytics } from './actions/getAnalytics';
 import ProductNotFound from './components/ProductNotFound';
-import BackButton from '@/components/BackButton';
 
 // Removed Icon import: import { Icon } from '@/components/icons';
 
@@ -34,7 +33,6 @@ export default async function ProductAnalyticsPage({
 
   return (
     <div className='container mx-auto py-8' dir='rtl'>
-      <BackButton customText='رجوع للمنتجات' />
       <ClientAnalyticsDashboard
         analytics={{ ...analytics, product: { ...analytics.product, size: analytics.product.size ?? null, details: analytics.product.details ?? null, productCode: analytics.product.productCode ?? null, gtin: analytics.product.gtin ?? null, material: analytics.product.material ?? null, brand: analytics.product.brand ?? null, color: analytics.product.color ?? null } }}
         id={id}

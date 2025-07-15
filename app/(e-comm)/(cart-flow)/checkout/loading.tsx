@@ -1,7 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, ArrowRight } from "lucide-react";
-import BackButton from "@/components/BackButton";
 
 export default function Loading() {
     return (
@@ -10,7 +9,6 @@ export default function Loading() {
                 {/* Header */}
                 <div className="mb-6">
                     <div className="flex items-center gap-4 mb-4">
-                        <BackButton variant="minimal" />
                         <div>
                             <Skeleton className="h-8 w-40 mb-2" />
                             <Skeleton className="h-4 w-64" />

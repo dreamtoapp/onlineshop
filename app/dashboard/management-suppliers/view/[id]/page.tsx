@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import BackButton from "@/components/BackButton";
 
 const getSupplier = async (supplierId: string) => {
   return await db.supplier.findUnique({
@@ -23,7 +22,6 @@ export default async function SupplierDetails({ params }: PageProps<{ id: string
 
   return (
     <div dir="rtl" className="space-y-6 p-4">
-      <BackButton />
 
       {/* بطاقة المورّد */}
       <Card className="p-6 rounded-2xl shadow-md flex flex-col sm:flex-row items-center sm:items-start gap-6">

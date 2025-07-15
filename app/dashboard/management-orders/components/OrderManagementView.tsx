@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/icons/Icon';
-import BackButton from '@/components/BackButton';
 import Link from '@/components/link';
 import { Button } from '@/components/ui/button';
 
@@ -38,7 +37,6 @@ export default function OrderManagementView({
             {/* Compact Header Section */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <BackButton variant="minimal" />
                     <div className="flex items-center gap-3">
                         <div className="h-8 w-1 bg-feature-commerce rounded-full"></div>
                         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">

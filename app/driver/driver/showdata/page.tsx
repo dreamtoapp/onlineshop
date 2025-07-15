@@ -2,7 +2,6 @@ import {
   ORDER_STATUS,
   OrderStatus,
 } from '@/constant/order-status';
-import BackButton from '../../../../components/BackButton';
 import {
   Card,
   CardContent,
@@ -61,7 +60,6 @@ async function page({
         <h1 className='text-center font-bold'>
           {title}({orders?.ordersToShip?.length || 0})
         </h1>
-        <BackButton />
       </div>
 
       {Array.isArray(orders?.ordersToShip) && orders.ordersToShip.length > 0 ? (

@@ -1,4 +1,3 @@
-import BackButton from '@/components/BackButton';
 import InfoTooltip from '@/components/InfoTooltip';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icons/Icon';
@@ -47,7 +46,6 @@ export default async function SeoDashboardPage() {
   return (
     <div>
       <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-center mb-4">
-        <BackButton />
         <div className="flex gap-2 flex-wrap justify-end">
           <a href="/dashboard/seo/guide" target="_blank" rel="noopener noreferrer">
             <Button variant="outline">دليل تحسين محركات البحث (SEO)</Button>

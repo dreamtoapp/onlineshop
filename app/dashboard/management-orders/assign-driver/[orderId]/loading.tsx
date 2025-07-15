@@ -1,6 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import BackButton from '@/components/BackButton';
 
 export default function AssignDriverLoading() {
     return (
@@ -9,7 +8,6 @@ export default function AssignDriverLoading() {
 
                 {/* Header */}
                 <div className="flex flex-col gap-4">
-                    <BackButton variant="default" />
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="space-y-2">

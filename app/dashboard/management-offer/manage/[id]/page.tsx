@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Package, Settings } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import BackButton from '@/components/BackButton';
 import { getOfferById, getAllProducts } from '../../actions';
 import { AssignedProducts } from '../../components/AssignedProducts';
 import { ProductSelector } from '../../components/ProductSelector';
@@ -35,7 +34,6 @@ export default async function ManageOfferPage({ params }: ManageOfferPageProps) 
             {/* Enhanced Header */}
             <header className="sticky top-0 z-10 border-b border-border bg-background p-4 shadow-sm md:p-6">
                 <div className="flex items-center gap-4">
-                    <BackButton variant="default" />
                     <div className="flex items-center gap-2">
                         <Settings className="h-6 w-6 text-feature-products" />
                         <div>

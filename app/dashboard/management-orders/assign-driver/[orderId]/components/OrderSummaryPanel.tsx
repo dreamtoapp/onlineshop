@@ -7,7 +7,6 @@ import Link from '@/components/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import BackButton from '@/components/BackButton';
 import Image from 'next/image';
 
 import { OrderDetails } from '../actions/get-order-details';
@@ -291,10 +290,18 @@ export default function OrderSummaryPanel({ order }: OrderSummaryPanelProps) {
                         </Link>
 
                         {/* Back Button */}
-                        <BackButton
-                            variant="default"
-                            className="w-full btn-professional"
-                        />
+                        <Link
+                            href="/dashboard/management-orders"
+                            className="block"
+                        >
+                            <Button
+                                variant="default"
+                                className="w-full btn-professional"
+                            >
+                                <Icon name="ArrowLeft" className="h-4 w-4 mr-2 icon-enhanced" />
+                                رجوع
+                            </Button>
+                        </Link>
                     </div>
                 </CardContent>
             </div>

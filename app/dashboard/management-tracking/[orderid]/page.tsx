@@ -1,4 +1,3 @@
-import BackButton from '@/components/BackButton';
 import { fetchTrackInfo } from '../actions/fetchTrackInfo';
 import GoogleMapsButton from '../components/GoogleMapsButton';
 import RefreshButton from '../components/RefreshButton';
@@ -23,7 +22,7 @@ export default async function Page({ params }: { params: Promise<{ orderid: stri
         return (
             <div className="min-h-screen w-full bg-background p-4 md:p-6">
                 <div className="mx-auto max-w-lg w-full">
-                    <BackButton variant="floating" className="mb-6" />
+                    {/* Removed: <BackButton variant="floating" className="mb-6" /> */}
 
                     <Card className="shadow-xl border-l-4 border-l-feature-commerce card-hover-effect">
                         <CardHeader className="text-center pb-4">
@@ -59,7 +58,7 @@ export default async function Page({ params }: { params: Promise<{ orderid: stri
             <div className="mx-auto max-w-4xl space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <BackButton variant="gradient" />
+                    {/* Removed: <BackButton variant="gradient" /> */}
                     <div className="flex items-center gap-3">
                         <Badge
                             variant={isActive ? "default" : "secondary"}

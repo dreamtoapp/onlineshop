@@ -1,4 +1,3 @@
-import BackButton from '@/components/BackButton';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ export default function ManagementTrackingPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <BackButton variant="gradient" />
                         <div>
                             <h1 className="text-2xl font-bold">إدارة التتبع</h1>
                             <p className="text-muted-foreground">تتبع ومراقبة الطلبات في الوقت الفعلي</p>

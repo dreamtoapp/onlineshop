@@ -1,4 +1,3 @@
-import BackButton from '@/components/BackButton';
 import { Icon } from '@/components/icons/Icon';
 import { getProductFormData, type DataFetchResult } from './actions/getProductData';
 import ProductUpsert from './components/ProductUpsert';
@@ -42,7 +41,6 @@ export default async function NewProductPage() {
         {/* Header with BackButton and Title in same row */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <BackButton variant="default" />
             <div className="flex items-center gap-3">
               <Icon name="Plus" className="h-6 w-6 text-feature-products icon-enhanced" />
               <h1 className="text-2xl font-bold text-foreground">إضافة منتج جديد</h1>
@@ -65,7 +63,6 @@ export default async function NewProductPage() {
       {/* Header with BackButton and Title in same row */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <BackButton variant="default" />
           <div className="flex items-center gap-3">
             <Icon name="Plus" className="h-6 w-6 text-feature-products icon-enhanced" />
             <h1 className="text-2xl font-bold text-foreground">إضافة منتج جديد</h1>

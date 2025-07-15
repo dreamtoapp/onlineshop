@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import BackButton from '@/components/BackButton'; // Import BackButton
 import {
   Table,
   TableBody,
@@ -115,7 +114,6 @@ export default function CustomerReportClient({
     <div className='space-y-8'>
       <div className="flex justify-between items-center mb-6">
         <h1 className='text-2xl font-bold text-foreground'>تقرير العملاء</h1> {/* Added text-foreground for consistency */}
-        <BackButton />
       </div>
 
       {/* Filter Panel */}

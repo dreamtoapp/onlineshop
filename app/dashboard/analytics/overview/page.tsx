@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 
-import BackButton from '@/components/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // app/dashboard/analytics/page.tsx
@@ -30,7 +29,6 @@ export default async function Page({
           <h1 className="text-2xl font-bold text-primary md:text-3xl text-center flex-grow">
             لوحة تحكم التحليلات العامة
           </h1>
-          <BackButton />
         </div>
         <Suspense fallback={<DashboardSkeleton />}>
           <OverallAnalyticsDashboard initialData={analyticsData} />

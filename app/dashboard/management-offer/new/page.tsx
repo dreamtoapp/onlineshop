@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, Plus } from 'lucide-react';
-import BackButton from '@/components/BackButton';
 import { OfferForm } from '../components/OfferForm';
 
 export default function NewOfferPage() {
@@ -9,7 +8,6 @@ export default function NewOfferPage() {
             {/* Enhanced Header */}
             <header className="sticky top-0 z-10 border-b border-border bg-background p-4 shadow-sm md:p-6">
                 <div className="flex items-center gap-4">
-                    <BackButton variant="default" />
                     <div className="flex items-center gap-2">
                         <Plus className="h-6 w-6 text-feature-commerce" />
                         <h1 className="text-2xl font-bold text-foreground">إضافة مجموعة جديدة</h1>

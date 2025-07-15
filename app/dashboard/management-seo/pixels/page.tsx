@@ -4,7 +4,6 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import BackButton from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -39,7 +38,6 @@ export default function PixelsAndAnalyticsPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <BackButton />
       <h1 className="text-2xl font-bold mb-4 text-primary">
         إعداد وربط البيكسل والتحليلات
       </h1>

@@ -7,7 +7,6 @@ import {
   useState,
 } from 'react'; // Added useEffect
 
-import BackButton from '@/components/BackButton'; // Import BackButton
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -122,16 +121,16 @@ export default function SalesReportClient({
     : `من ${from.replace(/-/g, '/')} إلى ${to.replace(/-/g, '/')}`;
 
   // Print handler
-   
+
 
   return (
     <form method='GET' className='mx-auto max-w-7xl space-y-8 px-4 py-10' dir='rtl'>
       <div className="flex justify-between items-center mb-8">
         <h1 className='text-3xl font-bold text-foreground'>تقرير المبيعات</h1>
-        <BackButton />
+
       </div>
 
-     
+
 
       <div ref={printRef} className='print:rounded print:bg-card print:p-8 print:shadow-none'>
         {/* Filter Panel */}

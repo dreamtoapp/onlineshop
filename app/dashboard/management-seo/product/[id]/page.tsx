@@ -2,8 +2,6 @@
 // Route: /dashboard/seo/product/[id]
 import { notFound } from 'next/navigation';
 
-import BackButton from '@/components/BackButton';
-
 import { getProductById } from '../actions/get-product-by-id';
 import { getProductSeoByLocale } from '../actions/get-product-seo-by-locale';
 import ProductSeoForm from '../components/ProductSeoForm';
@@ -20,7 +18,6 @@ export default async function ProductSeoEditPage(props: { params: Promise<{ id: 
 
   return (
     <div>
-      <BackButton className="mb-4" />
       <h1 className="text-2xl font-bold mb-4">تعديل SEO للمنتج: {product.name}</h1>
       <ProductSeoForm
         productId={product.id}
