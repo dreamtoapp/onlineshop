@@ -30,7 +30,7 @@ export default function PaymentMethodSelector({ selectedPaymentMethod, onSelectP
                             </div>
                             <div>
                                 <h3 className="font-semibold text-green-700">الدفع عند الاستلام</h3>
-                                <p className="text-sm text-green-600">طريقة الدفع الأكثر أمانًا</p>
+                                <p className="text-sm text-green-600"> طريقة الدفع الأكثر أمانًا <span className="text-xs text-primary mr-2">  ( كاش او شبكة )</span>  </p>
                             </div>
                         </div>
                         {selectedPaymentMethod === 'CASH' && <CheckCircle className="h-5 w-5 text-green-600" />}
