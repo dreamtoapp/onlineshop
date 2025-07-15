@@ -8,7 +8,6 @@ export const getFromLocalStorage = <T>(key: string): T | null => {
     const item = localStorage.getItem(key);
     return item ? (JSON.parse(item) as T) : null;
   } catch (error) {
-    console.error(`Error getting ${key} from localStorage:`, error);
     return null;
   }
 };
@@ -21,7 +20,6 @@ export const setToLocalStorage = <T>(key: string, value: T): void => {
     const serialized = JSON.stringify(value);
     localStorage.setItem(key, serialized);
   } catch (error) {
-    console.error(`Error setting ${key} to localStorage:`, error);
   }
 };
 

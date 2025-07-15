@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { MapPin, AlertTriangle } from "lucide-react";
 import { extractCoordinatesFromUrl, isValidSharedLocationLink } from '@/utils/extract-latAndLog-fromWhatsAppLink';
 
-console.log("LocationLinkExtractor RENDERED");
-
 interface LocationLinkExtractorProps {
     onExtract: (coords: { latitude: string; longitude: string }) => void;
 }
@@ -33,7 +31,6 @@ export default function LocationLinkExtractor({ onExtract }: LocationLinkExtract
 
     return (
         <div className="space-y-2">
-            khalid
             <label className="block text-sm font-medium">الصق رابط الموقع من واتساب أو Google Maps</label>
             <div className="flex gap-2">
                 <Input

@@ -40,7 +40,6 @@ export async function getOrderCount(driverId: string) {
       },
     };
   } catch (error) {
-    console.error('Database error:', error);
     return { error: 'فشل في جلب البيانات. حاول مرة أخرى.' };
   }
 }

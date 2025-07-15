@@ -4,7 +4,6 @@ import db from '@/lib/prisma';
 
 // Helper function to fetch active offers (replacing promotions)
 async function fetchOffers() {
-  console.log('Fetching offers from DB...');
   try {
     const offers = await db.offer.findMany({
       where: {
@@ -37,7 +36,6 @@ async function fetchOffers() {
       };
     });
   } catch (error) {
-    console.error('Error fetching offers:', error);
     throw new Error('Failed to fetch offers');
   }
 }

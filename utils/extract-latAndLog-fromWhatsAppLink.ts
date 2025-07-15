@@ -52,7 +52,6 @@ export function extractCoordinatesFromUrl(url: string): CoordinateResult | null 
 
     return null;
   } catch (error) {
-    console.error('Failed to extract coordinates:', error);
     return null;
   }
 }

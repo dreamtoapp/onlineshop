@@ -30,7 +30,6 @@ export class OrderNumberGenerator {
       const paddedNumber = counter.counter.toString().padStart(config.padding, '0');
       return `${config.prefix}${config.separator}${paddedNumber}`;
     } catch (error) {
-      console.error('Order number generation failed:', error);
       // Fallback to timestamp-based if counter fails
       const timestamp = Date.now();
       return `${config.prefix}${config.separator}${timestamp}`;

@@ -22,9 +22,6 @@ export async function fetchProductsPage({
   pageSize = 8,
   slug
 }: FetchProductsParams) {
-  console.log('========================================');
-  console.log('🛒 FETCHING PRODUCTS PAGE FROM DB! 🛒');
-  console.log('========================================');
   const where: any = { published: true };
   if (typeof search === 'string' && search.trim() !== '') {
     where.name = { contains: search.trim(), mode: 'insensitive' };

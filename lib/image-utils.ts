@@ -28,7 +28,6 @@ export async function generateImageMetadata(imagePath: string): Promise<ImageMet
       blurDataURL
     };
   } catch (error) {
-    console.error('Error generating image metadata:', error);
     throw error;
   }
 }

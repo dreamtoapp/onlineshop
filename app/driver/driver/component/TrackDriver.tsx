@@ -58,7 +58,7 @@ export default function DriverTracker({
 
       setTimeLeft(intervalSeconds.current);
     } catch (error) {
-      console.error('Error updating location:', error);
+      // console.error('Error updating location:', error);
     } finally {
       setIsUpdating(false);
     }

@@ -32,7 +32,6 @@ export const updateDriverLocation = async (data: {
 
     return { success: true, data: updatedOrder };
   } catch (error) {
-    console.error('Failed to update driver location:', error);
     return { success: false, error: 'Failed to update location' };
   }
 };

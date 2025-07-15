@@ -75,7 +75,6 @@ async function seedUsers(count: number) {
       user = await db.user.create({ data: { name: faker.person.fullName(), phone: `05010010${i-7}`, password: 'customer123', role: UserRole.CUSTOMER, email: `customer${i-7}@example.com` } });
     }
     users.push(user);
-    console.log(`👤 User created: ${user.name} (${user.role}) [${user.id}]`);
     logProgress(i, count, 'Users', '👤');
   }
   logDone('Users', users.length);
@@ -101,11 +100,10 @@ async function seedAddresses(users: User[]): Promise<Address[]> {
       },
     });
     addresses.push(address);
-    console.log(`🏠 Address created for user ${user.name} [${address.id}]`);
     logProgress(i, customers.length, 'Addresses', '🏠');
   }
   if (addresses.length === 0) {
-    console.warn('⚠️  No addresses were seeded!');
+    // Removed console.warn('⚠️  No addresses were seeded!');
   }
   logDone('Addresses', addresses.length);
   return addresses;
@@ -119,7 +117,6 @@ async function seedMineralWaterSuppliersDynamic(): Promise<Supplier[]> {
     const supplierData = suppliersData[i];
     const supplier = await db.supplier.create({ data: supplierData });
     suppliers.push(supplier);
-    console.log(`🏢 Supplier created: ${supplier.name} [${supplier.id}]`);
     logProgress(i, suppliersData.length, 'Suppliers', '🏢');
   }
   logDone('Suppliers', suppliers.length);
@@ -134,7 +131,6 @@ async function seedMineralWaterCategoriesDynamic(): Promise<Category[]> {
     const categoryData = categoriesData[i];
     const category = await db.category.create({ data: categoryData });
     categories.push(category);
-    console.log(`🏷️  Category created: ${category.name} [${category.id}]`);
     logProgress(i, categoriesData.length, 'Categories', '🏷️');
   }
   logDone('Categories', categories.length);
@@ -185,7 +181,6 @@ async function seedMineralWaterOffersDynamic(products: Product[]): Promise<void>
     for (const product of offerProducts) {
       await db.offerProduct.create({ data: { offerId: offer.id, productId: product.id } });
     }
-    console.log(`💸 Offer created: ${offer.name} [${offer.id}]`);
     logProgress(i, offersData.length, 'Offers', '💸');
   }
   logDone('Offers', offersData.length);

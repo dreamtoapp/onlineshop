@@ -14,9 +14,8 @@ export const cachedAdd = cacheData(
 
 // Usage example (can be run in a script or test)
 async function test() {
-  const result1 = await cachedAdd(2, 3);
-  const result2 = await cachedAdd(2, 3);
-  console.log('Result:', result1, result2); // Should both be 5, and the second call should be cached
+  await cachedAdd(2, 3);
+  await cachedAdd(2, 3);
 }
 
 test(); 

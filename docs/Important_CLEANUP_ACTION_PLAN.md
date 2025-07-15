@@ -273,6 +273,7 @@
 - Never update global/config files without confirmation.
 - Always test after each change.
 - Follow folder structure and cleanup rules (see `foldercleanup.md`, `old-cursor-mdc/cleanup.mdc`, `old-cursor-mdc/safety.mdc`).
+- Remove all `console.log`, `console.warn`, `console.error`, and any other `console.*` statements (except in seed/data scripts where explicitly needed).
 - Remove all `console.log`, `TODO`, `FIXME`, and unused variables.
 
 ---

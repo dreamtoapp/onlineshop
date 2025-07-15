@@ -54,11 +54,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       if (!throttle || !onClick) return onClick
       // Use debounce as throttle (immediate: true)
       return debounce((...args: [React.MouseEvent<HTMLButtonElement>]) => {
-        console.log('Button throttled onClick fired');
         onClick(...args);
       }, throttle, { immediate: true })
     }, [onClick, throttle])
-    // console.log('Button rendered', { throttle, hasOnClick: !!onClick });
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}

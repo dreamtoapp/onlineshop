@@ -45,7 +45,7 @@ export default async function AdminPage() {
       {/* Driver List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {admins.length > 0 ? (
-          admins.map((admin) => <UserCard key={admin.id} driver={{
+          admins.map((admin) => <UserCard key={admin.id} user={{
             ...admin,
             name: admin.name || '',
           }} />)

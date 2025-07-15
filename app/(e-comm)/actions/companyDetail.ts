@@ -7,8 +7,8 @@ import db from '@/lib/prisma';
 export const companyInfo = async () => {
   return await cacheData(
     async () => {
-      console.log('🏢 FETCHING COMPANY INFO FROM DB! 🏢');
-      return await db.company.findFirst();
+      const company = await db.company.findFirst();
+      return company;
     },
     ['companyInfo'],
     { revalidate: 1, tags: ['company'] }

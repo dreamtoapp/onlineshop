@@ -152,7 +152,7 @@ const displayLocation = async () => {
   const result = await getLocation();
 
   if (result.error) {
-    console.error('Error:', result.error);
+    console.warn('Error:', result.error);
     return;
   }
 
@@ -185,7 +185,7 @@ const compareWithGPSNet = async () => {
         : null,
     });
   } catch (error) {
-    console.error('Comparison failed:', error);
+    console.warn('Comparison failed:', error);
   }
 };
 

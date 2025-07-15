@@ -96,7 +96,6 @@ export default function ExportAnalyticsPdfButton({
 
       toast.success('تم تصدير البيانات بنجاح');
     } catch (error) {
-      console.error('Error exporting data:', error);
       toast.error('حدث خطأ أثناء تصدير البيانات');
     }
   }, [data, fileName]);

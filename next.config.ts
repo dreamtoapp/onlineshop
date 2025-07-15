@@ -1,5 +1,12 @@
 import type { NextConfig } from 'next';
 import createMDX from '@next/mdx'; // Import createMDX
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development', // Only enable in production
+  // You can add runtimeCaching or custom swSrc if needed
+});
 
 // Enable bundle analyzer
 // Use dynamic import for bundle analyzer in ESM
@@ -122,4 +129,4 @@ const withMDX = createMDX({
 
 // Export the combined config
 // Temporarily removing withBundleAnalyzer to isolate withMDX
-module.exports = withBundleAnalyzer(withMDX(nextConfig));
+module.exports = withBundleAnalyzer(withPWA(withMDX(nextConfig)));

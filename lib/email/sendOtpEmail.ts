@@ -71,7 +71,6 @@ export const sendOtpEmail = async (to: string, otp: string, recipientName?: stri
     });
     return { success: true, message: 'Verification email sent' };
   } catch (error) {
-    console.error('Error sending OTP email:', error);
     return { success: false, message: 'Failed to send verification email' };
   }
 }; 

@@ -61,10 +61,6 @@ export const ImageToCloudinary = async (
           // Ignore if reading text also fails, errorDetails will have status info
         }
       }
-      console.error('[Cloudinary Upload Error Details]:', errorDetails);
-      // The formatErrorMessage might not be designed to take a second argument for details.
-      // We'll return the detailed message directly, or adapt formatErrorMessage if it can handle it.
-      // For now, returning a more detailed error string directly.
       return { error: `فشل رفع الصورة: ${errorDetails}` }; // More detailed error
     }
 
@@ -86,7 +82,6 @@ export const ImageToCloudinary = async (
       message = String(error);
     }
 
-    console.error('[Cloudinary Service Error]:', error);
     return { error: formatErrorMessage(message) };
   }
 };

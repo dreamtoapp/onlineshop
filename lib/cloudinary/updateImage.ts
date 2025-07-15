@@ -25,7 +25,6 @@ export async function updateImage({
 
     return { success: true };
   } catch (error) {
-    console.error('[updateImage]', error);
     return { success: false, error: 'Failed to update image' };
   }
 }

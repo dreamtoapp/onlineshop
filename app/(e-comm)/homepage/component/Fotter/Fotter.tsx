@@ -20,6 +20,7 @@ interface FooterProps {
   linkedin?: string;
   productCount?: number | string;
   clientCount?: number | string;
+  userId?: string;
 }
 
 // Company Information Component (65 lines)
@@ -79,23 +80,19 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
 }
 
 // Services Section Component (45 lines)
-function ServicesSection() {
+function ServicesSection({ userId }: { userId?: string }) {
   const services = [
     { name: 'المتجر الإلكتروني', href: '/', iconName: 'ShoppingBag' },
     { name: 'من نحن', href: '/about', iconName: 'Users' },
     { name: 'تواصل معنا', href: '/contact', iconName: 'Phone' },
-    { name: 'المفضلة', href: '/user/wishlist', iconName: 'Heart' },
+    { name: 'المفضلة', href: userId ? `/user/wishlist/${userId}` : '/auth/login?redirect=/user/wishlist', iconName: 'Heart' },
     { name: 'التقييمات', href: '/user/ratings', iconName: 'Star' },
-    { name: 'الطلبات', href: '/user/purchase-history', iconName: 'CreditCard' },
+    { name: 'الطلبات', href: '/user/purchase-history', iconName: 'Package' },
   ];
-
   const customerService = [
-    { name: 'الدعم الفني', href: '/support', iconName: 'Headphones' },
-    { name: 'شروط الاستخدام', href: '/terms', iconName: 'Shield' },
-    { name: 'سياسة الخصوصية', href: '/privacy', iconName: 'CheckCircle' },
-    { name: 'سياسة الإرجاع', href: '/returns', iconName: 'Truck' },
+    { name: 'الدعم الفني', href: '/contact', iconName: 'Headset' },
+    { name: 'شروط الاستخدام وسياسة الإرجاع', href: '/privacy', iconName: 'CheckCircle2' },
   ];
-
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div>
@@ -117,7 +114,6 @@ function ServicesSection() {
           ))}
         </ul>
       </div>
-
       <div>
         <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <Icon name="Headphones" className="h-5 w-5 text-accent" />
@@ -270,6 +266,7 @@ const Footer = ({
   companyName,
   productCount,
   clientCount,
+  userId
 }: FooterProps) => {
   return (
     <footer className="bg-background border-t border-gray-700 text-foreground pb-24">
@@ -283,7 +280,7 @@ const Footer = ({
 
           {/* Services - Takes up more space */}
           <div className="lg:col-span-5">
-            <ServicesSection />
+            <ServicesSection userId={userId} />
           </div>
 
           {/* Contact & Newsletter */}

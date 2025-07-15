@@ -61,7 +61,6 @@ export async function sendMessage(
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
     if (!accessToken || !phoneNumberId) {
-      console.error('Missing environment variables');
       return { success: false, error: 'Server configuration error' };
     }
 
@@ -92,19 +91,16 @@ export async function sendMessage(
     const data: unknown = await response.json();
 
     if (!isWhatsAppApiResponse(data)) {
-      console.error('Unexpected API response structure:', data);
       return { success: false, error: 'Unexpected API response format' };
     }
 
     if ('error' in data) {
-      console.error('WhatsApp API Error:', data.error.message);
       return { success: false, error: data.error.message };
     }
 
     return { success: true, data };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('Unexpected error:', errorMessage);
     return { success: false, error: errorMessage };
   }
 }

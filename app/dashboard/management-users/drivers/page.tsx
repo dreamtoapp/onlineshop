@@ -55,7 +55,7 @@ export default async function DriversPage() {
       {/* Driver List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {drivers.length > 0 ? (
-          drivers.map((driver) => <UserCard key={driver.id} driver={{
+          drivers.map((driver) => <UserCard key={driver.id} user={{
             ...driver,
             name: driver.name || '',
           }} />)

@@ -112,7 +112,6 @@ const AddImage: React.FC<AddImageProps> = ({
         }
       } catch (err: any) {
         setError(err.message || 'Upload error');
-        console.error('Upload error:', err);
       }
     };
 

@@ -1,4 +1,4 @@
-import Fotter from './homepage/component/Fotter/Fotter';
+import Footer from './homepage/component/Fotter/Fotter';
 import HeaderUnified from './homepage/component/Header/HeaderUnified.server';
 import CustomMobileBottomNav from './homepage/component/Header/CustomMobileBottomNav';
 import { fetchEcommLayoutData } from './helpers/layoutData';
@@ -36,7 +36,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
             {children}
           </div>
         </main>
-        <Fotter
+        <Footer
           companyName={typedCompanyData?.fullName}
           aboutus={typedCompanyData?.bio}
           email={typedCompanyData?.email}
@@ -48,6 +48,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           linkedin={typedCompanyData?.linkedin}
           productCount={productCount}
           clientCount={clientCount}
+          userId={userSummary?.id}
         />
       </div>
     );

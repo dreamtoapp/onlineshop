@@ -5,7 +5,6 @@ import db from "@/lib/prisma";
  * ملاحظة: هذه الدالة لم تعد مطلوبة بعد إزالة حقول العنوان من جدول User
  */
 export async function migrateExistingUsers() {
-  console.log('Migration function is deprecated - User address fields have been removed');
   return {
     processed: 0,
     created: 0,

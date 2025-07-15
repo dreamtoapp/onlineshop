@@ -47,7 +47,6 @@ export const startTrip = async (
 
     return { success: true, data: record };
   } catch (error) {
-    console.error('Database error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'فشل بدء الرحلة'
@@ -73,7 +72,6 @@ export const updateCoordinates = async (
 
     return { success: true, data: updated };
   } catch (error) {
-    console.error('Update error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Update failed'

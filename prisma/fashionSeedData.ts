@@ -87,7 +87,6 @@ async function seedUsers(count: number) {
       user = await db.user.create({ data: { name: faker.person.fullName(), phone: `05010010${i-7}`, password: 'customer123', role: UserRole.CUSTOMER, email: `customer${i-7}@example.com` } });
     }
     users.push(user);
-    console.log(`👤 User created: ${user.name} (${user.role}) [${user.id}]`);
     logProgress(i, count, 'Users', '👤');
   }
   logDone('Users', users.length);
@@ -113,7 +112,6 @@ async function seedAddresses(users: User[]): Promise<Address[]> {
       },
     });
     addresses.push(address);
-    console.log(`🏠 Address created for user ${user.name} [${address.id}]`);
     logProgress(i, customers.length, 'Addresses', '🏠');
   }
   if (addresses.length === 0) {
@@ -149,7 +147,6 @@ async function seedFashionSuppliers(count: number): Promise<Supplier[]> {
       },
     });
     suppliers.push(supplier);
-    console.log(`🏢 Supplier created: ${supplier.name} [${supplier.id}]`);
     logProgress(i, count, 'Suppliers', '🏢');
   }
   logDone('Suppliers', suppliers.length);
@@ -173,7 +170,6 @@ async function seedFashionCategories(count: number): Promise<Category[]> {
       },
     });
     categories.push(category);
-    console.log(`🏷️  Category created: ${category.name} [${category.id}]`);
     logProgress(i, selected.length, 'Categories', '🏷️');
   }
   logDone('Categories', categories.length);
@@ -285,7 +281,6 @@ async function seedFashionOffers(products: Product[], offerCount: number): Promi
     for (const product of offerProducts) {
       await db.offerProduct.create({ data: { offerId: offer.id, productId: product.id } });
     }
-    console.log(`💸 Offer created: ${offer.name} [${offer.id}]`);
     logProgress(i, selected.length, 'Offers', '💸');
   }
   logDone('Offers', selected.length);
@@ -336,7 +331,6 @@ async function seedOrders(users: User[], addresses: Address[], shifts: Shift[], 
       });
     }
     orders.push(order);
-    console.log(`📝 Order created: ${order.orderNumber} [${order.id}]`);
     logProgress(i, count, 'Orders', '📝');
   }
   logDone('Orders', orders.length);
@@ -355,7 +349,7 @@ async function seedReviews(users: User[], products: Product[], reviewCount: numb
     const count = faker.number.int({ min: 0, max: reviewCount });
     for (let i = 0; i < count; i++) {
       const user = faker.helpers.arrayElement(users);
-      const review = await db.review.create({
+      await db.review.create({
         data: {
           productId: product.id,
           userId: user.id,
@@ -366,7 +360,6 @@ async function seedReviews(users: User[], products: Product[], reviewCount: numb
         },
       });
       totalReviews++;
-      console.log(`⭐ Review created for product ${product.name} by user ${user.name} [${review.id}]`);
       logProgress(totalReviews - 1, products.length * reviewCount, 'Reviews', '⭐');
     }
   }
@@ -391,14 +384,13 @@ async function seedWishlistItems(users: User[], products: Product[]): Promise<vo
     const items = faker.helpers.arrayElements(products, faker.number.int({ min: 0, max: 5 }));
     for (let i = 0; i < items.length; i++) {
       const product = items[i];
-      const wish = await db.wishlistItem.create({
+      await db.wishlistItem.create({
         data: {
           userId: user.id,
           productId: product.id,
         },
       });
       count++;
-      console.log(`💜 Wishlist item: user ${user.name} -> product ${product.name} [${wish.id}]`);
       logProgress(count - 1, users.length * 5, 'Wishlist', '💜');
     }
   }
@@ -410,7 +402,7 @@ async function seedNotifications(users: User[]): Promise<void> {
   let count = 0;
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
-    const notif = await db.userNotification.create({
+    await db.userNotification.create({
       data: {
         userId: user.id,
         type: NotificationType.INFO,
@@ -420,7 +412,6 @@ async function seedNotifications(users: User[]): Promise<void> {
       },
     });
     count++;
-    console.log(`🔔 Notification created for user ${user.name} [${notif.id}]`);
     logProgress(i, users.length, 'Notifications', '🔔');
   }
   logDone('Notifications', count);
@@ -439,7 +430,7 @@ async function seedCarts(users: User[], products: Product[]): Promise<void> {
     const items = faker.helpers.arrayElements(products, faker.number.int({ min: 0, max: 3 }));
     for (let i = 0; i < items.length; i++) {
       const product = items[i];
-      const cartItem = await db.cartItem.create({
+      await db.cartItem.create({
         data: {
           cartId: cart.id,
           productId: product.id,
@@ -447,7 +438,6 @@ async function seedCarts(users: User[], products: Product[]): Promise<void> {
         },
       });
       count++;
-      console.log(`🛒 Cart item: user ${user.name} -> product ${product.name} [${cartItem.id}]`);
       logProgress(count - 1, users.length * 3, 'Cart items', '🛒');
     }
   }

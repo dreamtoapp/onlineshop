@@ -7,7 +7,7 @@ async function main() {
   await prisma.aboutPageContent.deleteMany({ where: { brandId: 'brand1' } });
 
   // Create AboutPageContent
-  const aboutPage = await prisma.aboutPageContent.create({
+  await prisma.aboutPageContent.create({
     data: {
       brandId: 'brand1',
       heroTitle: 'اكتشف قصتنا',
@@ -86,8 +86,6 @@ async function main() {
       faq: true,
     },
   });
-
-  console.log('Seeded AboutPageContent:', aboutPage.id);
 }
 
 main()

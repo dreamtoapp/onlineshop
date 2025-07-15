@@ -15,10 +15,6 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    // console.error(error); // Default logging
-    // You can replace this with a call to Sentry, LogRocket, etc.
-    // Example: Sentry.captureException(error);
   }, [error]);
 
   return (

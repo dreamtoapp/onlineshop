@@ -1,5 +1,3 @@
-import React from 'react';
-// @ts-ignore
 import pkg from '../../../../package.json';
 
 const APP_VERSION = pkg?.version || 'v1.0.0';

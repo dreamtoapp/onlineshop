@@ -45,7 +45,7 @@ export default async function MarketerPage() {
       {/* Driver List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {marketers.length > 0 ? (
-          marketers.map((marketer) => <UserCard key={marketer.id} driver={{
+          marketers.map((marketer) => <UserCard key={marketer.id} user={{
             ...marketer,
             name: marketer.name || '',
           }} />)

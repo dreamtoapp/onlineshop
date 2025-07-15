@@ -57,7 +57,6 @@ export async function getOrderByStatus(driverId: string, status: OrderStatus) {
     });
     return { ordersToShip };
   } catch (error) {
-    console.error('Database error:', error);
     return { error: 'فشل في جلب البيانات. حاول مرة أخرى.' };
   }
 }

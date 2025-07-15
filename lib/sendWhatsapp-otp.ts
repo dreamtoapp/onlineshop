@@ -6,7 +6,6 @@ export async function sendWhatsAppMessage(message: string): Promise<boolean> {
   const encodedMessage = encodeURIComponent(message);
 
   if (!apiKey || !phone) {
-    console.error('Missing WhatsApp API credentials.');
     return false; // Return failure instead of crashing
   }
 
@@ -16,13 +15,11 @@ export async function sendWhatsAppMessage(message: string): Promise<boolean> {
     );
 
     if (!response.ok) {
-      console.error(`Failed to send WhatsApp message. Status: ${response.status}`);
       return false;
     }
 
     return true; // Indicate success
   } catch (error) {
-    console.error('Error sending WhatsApp message:', error);
     return false; // Prevent app crash by returning false
   }
 }

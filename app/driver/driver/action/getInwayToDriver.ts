@@ -14,7 +14,6 @@ export async function getInwayToDriver(driverId: string,) {
     });
     return { ordersToShip };
   } catch (error) {
-    console.error('Database error:', error);
     return { error: 'فشل في جلب البيانات. حاول مرة أخرى.' };
   }
 }
