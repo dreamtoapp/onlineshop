@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import NewsletterClientWrapper from './NewsletterClientWrapper';
 import { Icon } from '@/components/icons/Icon';
 import CustomSvgIcon from './CustomSvgIcon';
+import AppVersion from '../AppVersion';
 
 interface FooterProps {
   aboutus?: string;
@@ -271,7 +272,7 @@ const Footer = ({
   clientCount,
 }: FooterProps) => {
   return (
-    <footer className="bg-background border-t border-gray-700 text-foreground">
+    <footer className="bg-background border-t border-gray-700 text-foreground pb-24">
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -307,6 +308,7 @@ const Footer = ({
       <div className="bg-muted/30 py-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
+            <AppVersion />
             <div className="text-sm text-gray-400">
               © 2024 Dream To App. جميع الحقوق محفوظة.
             </div>
