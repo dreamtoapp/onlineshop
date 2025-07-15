@@ -43,7 +43,43 @@ export default function NotFound() {
             </CardTitle>
           </CardHeader>
 
+          <CardContent className="space-y-8">
+            {/* Error Description */}
 
+
+            {/* Action Buttons */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Primary Actions */}
+              <Card className="shadow-md border-l-4 border-l-feature-analytics card-hover-effect">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Icon name="Home" className="h-5 w-5 text-feature-analytics icon-enhanced" />
+                    العودة للرئيسية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Link href="/">
+                    <Button className="btn-professional w-full bg-feature-analytics hover:bg-feature-analytics/90">
+                      <Icon name="Home" className="h-4 w-4 ml-2" />
+                      العودة إلى المتجر
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              {/* Secondary Actions */}
+
+            </div>
+
+            {/* Quick Links */}
+            <div className="text-center pt-2 text-sm text-muted-foreground">
+              أو استكشف <Link href="/">الصفحة الرئيسية</Link> أو <Link href="/categories">الأقسام</Link> للعثور على ما تحتاجه.
+            </div>
+
+            {/* Technical Actions */}
+            {/* Removed technical language to keep the tone friendly */}
+
+          </CardContent>
         </Card>
 
         {/* Footer Help Text with CTA */}
