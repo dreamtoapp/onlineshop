@@ -15,8 +15,8 @@ import { UserRole } from '@prisma/client';
 import DeleteDriverAlert from './DeleteUser';
 import AddUser from './UserUpsert';
 
-type DriverCardProps = {
-  driver: {
+type UserCardProps = {
+  user: {
     id: string;
     name: string;
     email: string | null;
@@ -31,20 +31,35 @@ type DriverCardProps = {
   };
 };
 
-export default function UserCard({ driver }: DriverCardProps) {
-  const safeDriver = {
-    ...driver,
-    name: driver.name || 'No Name',
-    email: driver.email || '',
+export default function UserCard({ user }: UserCardProps) {
+  const safeUser = {
+    ...user,
+    name: user.name || 'No Name',
+    email: user.email || '',
     password: undefined,
-    imageUrl: driver.image || undefined,
+    imageUrl: user.image || undefined,
   };
+
+  // Dynamic title/description based on role
+  let title = 'تعديل مستخدم';
+  let description = 'يرجى إدخال بيانات المستخدم';
+  if (user.role === 'DRIVER') {
+    title = 'تعديل سائق';
+    description = 'يرجى إدخال بيانات السائق';
+  } else if (user.role === 'ADMIN') {
+    title = 'تعديل مشرف';
+    description = 'يرجى إدخال بيانات المشرف';
+  } else if (user.role === 'CUSTOMER') {
+    title = 'تعديل عميل';
+    description = 'يرجى إدخال بيانات العميل';
+  }
+
   return (
     <Card className='overflow-hidden rounded-lg border border-border bg-background text-foreground shadow-md transition-shadow hover:shadow-lg'>
       {/* Card Header */}
       <CardHeader className='border-b border-border bg-muted/50 p-4'>
         <CardTitle className='line-clamp-1 text-lg font-semibold text-primary'>
-          {safeDriver.name}
+          {safeUser.name}
         </CardTitle>
       </CardHeader>
 
@@ -53,52 +68,45 @@ export default function UserCard({ driver }: DriverCardProps) {
         {/* Image */}
         <div className="relative h-48 w-full overflow-hidden rounded-lg bg-muted/20">
           <AddImage
-            url={safeDriver.imageUrl}
-            alt={`${safeDriver.name}'s profile`}
-            recordId={safeDriver.id}
+            url={safeUser.imageUrl}
+            alt={`${safeUser.name}'s profile`}
+            recordId={safeUser.id}
             table="user"
             tableField='image'
             onUploadComplete={() => toast.success("تم رفع الصورة بنجاح")}
           />
         </div>
 
-
         {/* Details */}
         <div className='space-y-2'>
           <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <strong className='font-medium'>Email:</strong> {safeDriver.email || 'No Email'}
+            <strong className='font-medium'>Email:</strong> {safeUser.email || 'No Email'}
           </p>
           <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <strong className='font-medium'>Phone:</strong> {safeDriver.phone || 'No Phone'}
+            <strong className='font-medium'>Phone:</strong> {safeUser.phone || 'No Phone'}
           </p>
         </div>
       </CardContent>
 
       {/* Card Footer */}
       <CardFooter className='flex justify-between border-t border-border bg-muted/50 p-4'>
-
-
-
-
         <AddUser
-          role={driver.role}
+          role={user.role}
           mode='update'
-          title={"تعديل سائق"}
-          description={"يرجى إدخال بيانات السائق"}
+          title={title}
+          description={description}
           defaultValues={{
-            name: driver.name,
-            email: driver.email || '',
-            phone: driver.phone || '',
-            address: driver.address || '',
-            password: driver.password || '',
-            sharedLocationLink: driver.sharedLocationLink || '',
-            latitude: driver.latitude || '',
-            longitude: driver.longitude || '',
+            name: user.name,
+            email: user.email || '',
+            phone: user.phone || '',
+            address: user.address || '',
+            password: user.password || '',
+            sharedLocationLink: user.sharedLocationLink || '',
+            latitude: user.latitude || '',
+            longitude: user.longitude || '',
           }} />
-
-
         {/* Delete Driver Alert */}
-        <DeleteDriverAlert driverId={safeDriver.id}>
+        <DeleteDriverAlert driverId={safeUser.id}>
           <button className='flex items-center gap-1 text-destructive hover:underline'>
             <Icon name="Trash2" size="xs" />
           </button>

@@ -45,7 +45,7 @@ export default async function CustomerPage() {
       {/* Driver List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {customers.length > 0 ? (
-          customers.map((customer) => <UserCard key={customer.id} driver={{
+          customers.map((customer) => <UserCard key={customer.id} user={{
             ...customer,
             name: customer.name || '',
           }} />)
