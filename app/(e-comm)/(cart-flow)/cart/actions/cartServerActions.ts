@@ -121,9 +121,9 @@ const quantitySchema = z.number().int().min(1).max(99);
 export async function addItem(productId: string, quantity: number = 1): Promise<void> {
   console.log('[addItem] called with:', { productId, quantity });
   const user = await checkIsLogin();
+  console.log('[addItem] user from checkIsLogin:', user);
   let cart: CartWithItems | null = null;
   let cartId: string | undefined = await getCartIdFromCookie();
-  console.log('[addItem] user:', user);
   console.log('[addItem] cartId before:', cartId);
 
   if (user) {

@@ -40,16 +40,20 @@ const CartItemQuantityControls = function CartItemQuantityControls({
         if (newQuantity < 1 || newQuantity > 99) return;
         startTransition(async () => {
             updateOptimisticQuantity(newQuantity);
+            let rollbackNeeded = false;
             try {
+                updateLocalQuantity(productId, newQuantity - currentQuantity);
+                rollbackNeeded = true;
                 if (isServerItem && itemId) {
                     await updateItemQuantity(itemId, newQuantity);
-                } else {
-                    await updateLocalQuantity(productId, newQuantity - currentQuantity, false);
                 }
                 toast.success(`تم تحديث كمية ${productName}`, { duration: 2000 });
             } catch (error) {
                 updateOptimisticQuantity(currentQuantity);
-                toast.error("فشل في تحديث الكمية، حاول مرة أخرى");
+                if (rollbackNeeded) {
+                    updateLocalQuantity(productId, currentQuantity - newQuantity);
+                }
+                toast.error("فشل في تحديث الكمية، تم التراجع عن التغيير");
             }
         });
     };
@@ -57,12 +61,13 @@ const CartItemQuantityControls = function CartItemQuantityControls({
     const handleRemove = () => {
         setIsRemoving(true);
         startTransition(async () => {
+            let rollbackNeeded = false;
             try {
+                removeLocalItem(productId);
+                rollbackNeeded = true;
                 if (isServerItem && itemId) {
                     await removeItem(itemId);
                     if (onRemoved) onRemoved();
-                } else {
-                    await removeLocalItem(productId, false);
                 }
                 toast.success(`تم حذف ${productName} من السلة`, {
                     duration: 3000,
@@ -73,7 +78,11 @@ const CartItemQuantityControls = function CartItemQuantityControls({
                 });
             } catch (error) {
                 setIsRemoving(false);
-                toast.error("فشل في حذف المنتج، حاول مرة أخرى");
+                if (rollbackNeeded) {
+                    // Optionally re-add the item to local cart if needed
+                    // (requires product info, not available here)
+                }
+                toast.error("فشل في حذف المنتج، تم التراجع عن التغيير");
             }
         });
     };

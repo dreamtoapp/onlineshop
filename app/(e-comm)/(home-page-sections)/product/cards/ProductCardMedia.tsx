@@ -22,7 +22,6 @@ interface ProductCardMediaProps {
 }
 
 export default function ProductCardMedia({ product, inCart, isOutOfStock, lowStock, stockQuantity, priority }: ProductCardMediaProps) {
-    console.log({ isOutOfStock })
     const [imageError, setImageError] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
     const [open, setOpen] = useState(false);
@@ -57,7 +56,6 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
                         e.stopPropagation();
                         setOpen(true);
                         // Debug: confirm which product opens the modal
-                        console.log('QuickView opened for:', product.name, product.id);
                     }}
                 >
                     <Eye className="w-4 h-4" />

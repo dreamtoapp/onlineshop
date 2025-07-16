@@ -38,7 +38,7 @@ export default function OrderConfirmation() {
   }, [orderId, router]);
 
   const handleClearCart = () => {
-    clearCart(isAuthenticated);
+    clearCart();
     setShowClearCartDialog(false);
     router.push('/');
   };

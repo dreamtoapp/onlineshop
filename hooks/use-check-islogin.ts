@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { checkIsLogin } from '@/lib/check-is-login';
 import { User } from '@/types/databaseTypes';
-import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
+// import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
 // Custom type definitions
 
@@ -15,7 +15,8 @@ export const useCheckIsLogin = () => {
   const [session, setSession] = useState<User | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [error, setError] = useState<string | null>(null);
-  const { mergeWithServerCart, fetchServerCart, lastSyncTime } = useCartStore();
+  // Remove cart store methods that no longer exist
+  // const { mergeWithServerCart, fetchServerCart, lastSyncTime } = useCartStore();
   const prevStatusRef = useState<AuthStatus>('loading');
 
   useEffect(() => {
@@ -35,29 +36,16 @@ export const useCheckIsLogin = () => {
         setStatus('unauthenticated');
       }
     };
-
     fetchSession();
   }, []);
 
-  useEffect(() => {
-    // On login, merge local cart with server cart (only on transition)
-    if (prevStatusRef[0] === 'unauthenticated' && status === 'authenticated') {
-      mergeWithServerCart();
-    }
-    prevStatusRef[0] = status;
-  }, [status, mergeWithServerCart]);
-
-  useEffect(() => {
-    // Always fetch latest server cart for authenticated users after login/refresh
-    // Only fetch if not recently synced (avoid redundant fetches)
-    if (status === 'authenticated') {
-      const now = Date.now();
-      // 5s threshold to avoid excessive fetches on fast navigation
-      if (!lastSyncTime || now - lastSyncTime > 5000) {
-        fetchServerCart();
-      }
-    }
-  }, [status, fetchServerCart, lastSyncTime]);
+  // Optionally: add a new effect to sync cart after login if needed
+  // useEffect(() => {
+  //   if (prevStatusRef[0] === 'unauthenticated' && status === 'authenticated') {
+  //     // Fetch server cart and update Zustand store with setCart
+  //   }
+  //   prevStatusRef[0] = status;
+  // }, [status]);
 
   return {
     session,

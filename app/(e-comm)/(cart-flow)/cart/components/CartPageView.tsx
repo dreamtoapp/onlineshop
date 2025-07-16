@@ -95,7 +95,7 @@ function CartPageSkeleton() {
 
 export default function CartPageView() {
     const { isAuthenticated, isLoading } = useCheckIsLogin();
-    const { cart, fetchServerCart } = useCartStore();
+    const { cart } = useCartStore();
     const [serverCart, setServerCart] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -122,7 +122,6 @@ export default function CartPageView() {
         setLoading(true);
         const data = await getCart();
         setServerCart(data);
-        await fetchServerCart();
         setLoading(false);
     };
 

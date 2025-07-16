@@ -6,8 +6,8 @@ import { Product } from '@/types/databaseTypes';
 import ProductCardMedia from './ProductCardMedia';
 import ProductCardActions from './ProductCardActions';
 import { useRouter } from 'next/navigation';
-import { useProductCardOptimizations } from '@/lib/hooks/useProductCardOptimizations';
-import { Eye } from 'lucide-react';
+import { Eye, MessageCircle, Star } from 'lucide-react';
+import Link from '@/components/link';
 
 
 interface ProductCardProps {
@@ -28,26 +28,6 @@ const ProductCard = memo(({
 }: ProductCardProps) => {
     const router = useRouter();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
-
-    // Performance optimizations
-    const {
-        cardRef,
-        handleMouseEnter: optimizedMouseEnter,
-        handleMouseLeave: optimizedMouseLeave,
-        preloadImages
-    } = useProductCardOptimizations({
-        productId: product.id,
-        onVisible: () => {
-            // Preload images when card becomes visible
-            if (product.imageUrl) {
-                preloadImages([product.imageUrl]);
-            }
-        },
-        onHover: () => {
-            // Additional hover logic if needed
-        },
-        trackAnalytics: true
-    });
 
     // Memoized calculations for performance
     const stockInfo = useMemo(() => {
@@ -112,8 +92,6 @@ const ProductCard = memo(({
         }
     }), [product, stockInfo.isOutOfStock]);
 
-    console.log('product', product);
-
     return (
         <>
             {/* Structured Data for SEO */}
@@ -123,12 +101,9 @@ const ProductCard = memo(({
             />
 
             <Card
-                ref={cardRef}
-                className={`group  relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[220px] sm:min-h-[320px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow  || ''}`}
+                className={`group  relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[220px] sm:min-h-[320px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow`}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
-                onMouseEnter={optimizedMouseEnter}
-                onMouseLeave={optimizedMouseLeave}
             >
                 {/* Media Section */}
                 <ProductCardMedia
@@ -144,7 +119,6 @@ const ProductCard = memo(({
                     {/* Product Name & Type */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <Icon name="Package" className="h-4 w-4 text-feature-products mt-1 flex-shrink-0 icon-enhanced" />
                             <h3 className="font-semibold text-sm leading-tight text-foreground group-hover:text-feature-products transition-colors duration-200 line-clamp-2" title={product.name}>
                                 {product.name}
                             </h3>
@@ -159,30 +133,6 @@ const ProductCard = memo(({
                                     {product.compareAtPrice?.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
                                 </span>
                             )}
-
-
-                        </div>
-                        {/* Rating */}
-                        {/* Preview Count */}
-                        <div className="flex items-center justify-between w-full gap-3">
-                            <div className="flex items-center gap-3 text-sm">
-                                <span className="flex items-center gap-1 text-primary">
-                                    <Eye className="w-4 h-4" />
-                                    {product.previewCount}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Icon
-                                            key={i}
-                                            name="Star"
-                                            // size="xs"
-                                            className={i < Math.floor(product.rating ?? 0) ? 'text-yellow-500 w-4 h-4' : 'text-muted w-4 h-4   '}
-                                        />
-                                    ))}
-                                    <span className="text-foreground font-medium">{product.rating ?? '--'}</span>
-                                </span>
-                                <span className="text-muted-foreground text-xs">({product.reviewCount ?? 0} تقييم)</span>
-                            </div>
                         </div>
                     </div>
                     {/* Actions */}
@@ -191,6 +141,35 @@ const ProductCard = memo(({
                         quantity={quantity}
                         isOutOfStock={stockInfo.isOutOfStock}
                     />
+                    {/* Footer: Compact, expert UI/UX */}
+                    <div className="pt-2 text-center">
+                        <div className="flex items-center justify-center gap-4 text-sm">
+                            {/* Rating: show only if exists */}
+                            {typeof product.rating === 'number' && product.rating > 0 && (
+                                <span className="flex items-center gap-1 text-yellow-500">
+                                    <Star className="w-4 h-4 fill-current" fill="currentColor" />
+                                    <span className="text-foreground font-medium">{product.rating}</span>
+                                </span>
+                            )}
+                            {/* Comments: only if reviewCount > 0 */}
+                            {product.reviewCount > 0 && (
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                    <MessageCircle className="w-4 h-4" />
+                                    {product.reviewCount}
+                                </span>
+                            )}
+                            {/* Preview count */}
+                            <span className="flex items-center gap-1 text-primary">
+                                <Eye className="w-4 h-4" />
+                                {product.previewCount}
+                            </span>
+                            {/* Details link as button with icon */}
+                            <Link href={`/product/${product.slug}`} className="inline-flex items-center gap-1 rounded-md border border-primary text-primary px-3 py-1 text-xs font-semibold shadow-sm bg-transparent hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none">
+                                <Icon name="Package" className="w-4 h-4 text-green-600" />
+                                <span>صفحة المنتج</span>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </Card>
         </>
@@ -198,6 +177,5 @@ const ProductCard = memo(({
 });
 
 ProductCard.displayName = 'ProductCard';
-
 
 export default ProductCard;

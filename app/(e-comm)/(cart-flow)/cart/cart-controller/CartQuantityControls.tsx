@@ -25,8 +25,19 @@ const CartQuantityControls: React.FC<CartQuantityControlsProps> = ({ productId, 
     const handleInc = async () => {
         if (isLoading) return;
         setIsLoading(true);
+        let rollbackNeeded = false;
         try {
-            await updateQuantity(productId, 1, isAuthenticated);
+            updateQuantity(productId, 1);
+            rollbackNeeded = true;
+            if (isAuthenticated) {
+                const { updateItemQuantityByProduct } = await import('@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions');
+                await updateItemQuantityByProduct(productId, 1);
+            }
+        } catch (error) {
+            if (rollbackNeeded) {
+                updateQuantity(productId, -1);
+            }
+            // Optionally show error toast here
         } finally {
             setIsLoading(false);
         }
@@ -35,8 +46,19 @@ const CartQuantityControls: React.FC<CartQuantityControlsProps> = ({ productId, 
     const handleDec = async () => {
         if (isLoading) return;
         setIsLoading(true);
+        let rollbackNeeded = false;
         try {
-            await updateQuantity(productId, -1, isAuthenticated);
+            updateQuantity(productId, -1);
+            rollbackNeeded = true;
+            if (isAuthenticated) {
+                const { updateItemQuantityByProduct } = await import('@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions');
+                await updateItemQuantityByProduct(productId, -1);
+            }
+        } catch (error) {
+            if (rollbackNeeded) {
+                updateQuantity(productId, 1);
+            }
+            // Optionally show error toast here
         } finally {
             setIsLoading(false);
         }
