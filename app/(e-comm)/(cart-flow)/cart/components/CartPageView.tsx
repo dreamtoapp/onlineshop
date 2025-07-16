@@ -13,6 +13,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import CartQuantityControls from '../cart-controller/CartQuantityControls';
 
 // Add type for cart items (server and guest)
 type GuestCartItem = { product: any; quantity: number };
@@ -98,25 +100,42 @@ export default function CartPageView() {
     const { cart } = useCartStore();
     const [serverCart, setServerCart] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [mergeToastShown, setMergeToastShown] = useState(false);
     const router = useRouter();
     const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+    // Always use Zustand cart for items and summary
+    const items = Object.values(cart);
+    const subtotal = items.reduce((sum, item) => sum + ((item.product?.price || 0) * (item.quantity || 1)), 0);
+    const shipping = subtotal > 200 ? 0 : 25;
+    const tax = subtotal * 0.15;
+    const total = subtotal + shipping + tax;
 
     useEffect(() => {
         if (isAuthenticated) {
             setLoading(true);
-            getCart().then((data) => {
-                setServerCart(data);
-                setLoading(false);
-            });
+            getCart()
+                .then((data) => {
+                    setServerCart(data);
+                    setLoading(false);
+                    // Show merge toast if guest cart was merged (detect by checking if localCartId cookie existed and now is gone)
+                    if (!mergeToastShown && typeof window !== 'undefined') {
+                        if (!document.cookie.includes('localCartId=')) {
+                            toast.success('تم دمج سلة التسوق الخاصة بك مع حسابك بنجاح.');
+                            setMergeToastShown(true);
+                        }
+                    }
+                    // Error: If data is null for authenticated user, show error toast
+                    if (!data) {
+                        toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
+                    }
+                })
+                .catch(() => {
+                    setLoading(false);
+                    toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
+                });
         }
     }, [isAuthenticated]);
-
-    // Guest: use Zustand cart
-    const items: (ServerCartItem | GuestCartItem)[] = isAuthenticated ? (serverCart?.items || []) : Object.values(cart);
-    const subtotal = items.reduce((sum: number, item: ServerCartItem | GuestCartItem) => sum + ((item.product?.price || 0) * (item.quantity || 1)), 0);
-    const shipping = subtotal > 200 ? 0 : 25;
-    const tax = subtotal * 0.15;
-    const total = subtotal + shipping + tax;
 
     const handleRemoved = async () => {
         setLoading(true);
@@ -225,13 +244,9 @@ export default function CartPageView() {
 
                                         {/* Controls */}
                                         <div className="flex justify-end sm:justify-center sm:items-start">
-                                            <CartItemQuantityControls
-                                                itemId={isServerItem(item) ? item.id : item.product?.id}
+                                            <CartQuantityControls
                                                 productId={item.product?.id}
-                                                isServerItem={isServerItem(item)}
-                                                currentQuantity={item.quantity}
-                                                productName={item.product?.name}
-                                                onRemoved={isAuthenticated ? handleRemoved : undefined}
+                                                size="sm"
                                             />
                                         </div>
                                     </div>

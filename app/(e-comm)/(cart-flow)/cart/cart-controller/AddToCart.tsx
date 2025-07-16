@@ -43,9 +43,8 @@ export default function AddToCart({
             setIsLoading(true);
             addItemLocal(product as any, qty);
             rollbackNeeded = true;
-            if (isAuthenticated) {
-                await addItem(product.id, qty);
-            }
+            // Always call backend, for both guests and authenticated users
+            await addItem(product.id, qty);
             if (typeof window !== "undefined") {
                 window.dispatchEvent(new Event("cart-changed"));
                 localStorage.setItem("cart-updated", Date.now().toString());

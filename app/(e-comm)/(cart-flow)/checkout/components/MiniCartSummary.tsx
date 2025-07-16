@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '../../../../../lib/formatCurrency';
 import CartItemsToggle from './client/CartItemsToggle';
+import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
 interface CartItem {
   id: string;
@@ -31,7 +32,9 @@ interface MiniCartSummaryProps {
 }
 
 export default function MiniCartSummary({ cart }: MiniCartSummaryProps) {
-  const items = cart?.items || [];
+  // Use Zustand cart for live updates
+  const { cart: zustandCart } = useCartStore();
+  const items = Object.values(zustandCart);
   const subtotal = items.reduce((sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1), 0);
   const deliveryFee = subtotal >= 200 ? 0 : 25; // Free delivery over 200 SAR
   const taxRate = 0.15;

@@ -288,7 +288,7 @@ export default async function ProductPage({ params }: PageProps<{ slug: string }
   const { slug } = await params;
   const session = await auth();
   const product = await getProductBySlug(slug);
-  if (!product) notFound();
+  if (!product) return notFound();
   const reviews = await getProductReviews(product.id);
   const formattedPrice = new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(product.price);
   const discountPercentage = 0;

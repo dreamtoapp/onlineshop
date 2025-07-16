@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import CheckoutClient from "./components/CheckoutClient";
 import { getUser } from "./actions/getUser";
-import { getCart } from "./actions/getCart";
+import { mergeCartOnCheckout } from "./actions/mergeCartOnCheckout";
 import { getAddresses } from "./actions/getAddresses";
 
 export default async function CheckoutPage() {
@@ -13,7 +13,7 @@ export default async function CheckoutPage() {
 
   const [user, cart, addresses] = await Promise.all([
     getUser(session.user.id),
-    getCart(session.user.id),
+    mergeCartOnCheckout(),
     getAddresses(session.user.id)
   ]);
 

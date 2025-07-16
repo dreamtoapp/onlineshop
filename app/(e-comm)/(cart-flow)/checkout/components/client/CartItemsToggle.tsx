@@ -49,9 +49,9 @@ export default function CartItemsToggle({ items }: CartItemsToggleProps) {
                     transition={{ duration: 0.2 }}
                     className="space-y-3 pt-2"
                 >
-                    {items.map((item) => (
+                    {items.map((item, idx) => (
                         <div
-                            key={item.id}
+                            key={item.id || item.product?.id || idx}
                             className="flex items-center justify-between p-3 bg-muted/20 rounded-lg"
                         >
                             <div className="flex items-center gap-3">

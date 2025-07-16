@@ -141,6 +141,80 @@ Use this checklist to ensure all technical and UX steps are covered when impleme
 
 ---
 
+### 4.a.ii. Next.js Cookie Best Practices
+
+Follow these official Next.js best practices for all cart cookie operations:
+
+#### 1. Use the `cookies` Helper from `next/headers`
+- Always import and use `cookies()` in server actions, route handlers, or server components (for reading only).
+- In Next.js 15+, `cookies` is async and should be awaited.
+
+#### 2. Setting Cookies (Server-Side Only)
+- Only set cookies in server actions or route handlers (not in server components or client components).
+- Example:
+  ```js
+  'use server'
+  import { cookies } from 'next/headers';
+
+  export async function setCartIdCookie(cartId) {
+    const cookieStore = await cookies();
+    cookieStore.set('localCartId', cartId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30 // 30 days
+    });
+  }
+  ```
+
+#### 3. Reading Cookies
+- In server actions, route handlers, or server components:
+  ```js
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get('localCartId')?.value;
+  ```
+- In middleware, use `request.cookies.get('name')`.
+
+#### 4. Deleting Cookies
+- In server actions or route handlers:
+  ```js
+  (await cookies()).delete('localCartId');
+  ```
+- Or set with `maxAge: 0` or an expired date.
+
+#### 5. Security Attributes
+- Always set:
+  - `httpOnly: true` (prevents JS access)
+  - `secure: true` (only over HTTPS, in production)
+  - `sameSite: 'lax'` (CSRF protection)
+  - `path: '/'` (default, covers all routes)
+  - `maxAge` or `expires` (for persistence)
+
+#### 6. Race Condition Prevention
+- After setting a cookie in a server action, avoid immediate redirects from the client. If you must redirect, add a short delay or check for the cookie before redirecting to ensure it’s set.
+
+#### 7. Client-Side Access
+- Only use client-side cookies (e.g., with `js-cookie`) for non-sensitive data (like UI preferences).
+- Never store sensitive or authentication data in client-accessible cookies.
+
+#### 8. Cookie Size
+- Keep cookie values small (ideally <4KB per cookie).
+
+#### 9. Testing
+- Test cookie behavior in both development and production (especially with HTTPS and secure flag).
+
+#### 10. Important Notes
+- Do not set cookies in Server Components (only read).
+- Setting cookies must be done before streaming starts.
+- Using `cookies()` in a layout or page opts the route into dynamic rendering.
+- `.delete` only works if called from the same domain/protocol as `.set`.
+
+**Reference:**
+- [Next.js cookies API Reference](https://nextjs.org/docs/app/api-reference/functions/cookies)
+
+---
+
 ## 4.b. Cart Merge Study Cases & Scenarios
 
 This section covers all possible user flows and edge cases for cart merging, ensuring robust handling for every scenario.
