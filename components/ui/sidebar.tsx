@@ -8,7 +8,7 @@ import { Icon } from '@/components/icons/Icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -198,6 +198,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
+            <SheetDescription>قائمة جانبية للتنقل.</SheetDescription>
             <div className='flex h-full w-full flex-col'>{children}</div>
           </SheetContent>
         </Sheet>

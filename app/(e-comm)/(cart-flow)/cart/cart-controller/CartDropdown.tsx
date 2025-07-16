@@ -18,7 +18,6 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
-import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 
 interface CartPreviewProps {
     closePopover?: () => void;
@@ -28,7 +27,6 @@ interface CartPreviewProps {
 // Cart preview using Zustand store for instant updates
 export default function CartPreview({ closePopover, hideHeader = false }: CartPreviewProps) {
     const { cart, getTotalPrice, updateQuantity, removeItem, clearCart } = useCartStore();
-    const { isAuthenticated } = useCheckIsLogin();
     const items = Object.values(cart);
     const total = getTotalPrice();
     const isEmpty = items.length === 0;
@@ -63,7 +61,7 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => clearCart(isAuthenticated)} className="bg-destructive text-white hover:bg-destructive/90">افراغ السلة</AlertDialogAction>
+                                    <AlertDialogAction onClick={() => clearCart()} className="bg-destructive text-white hover:bg-destructive/90">افراغ السلة</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
@@ -126,7 +124,7 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                                                         variant="outline"
                                                         size="sm"
                                                         className="h-7 w-7 p-0"
-                                                        onClick={() => updateQuantity(item.product.id, -1, isAuthenticated)}
+                                                        onClick={() => updateQuantity(item.product.id, -1)}
                                                         disabled={item.quantity <= 1}
                                                     >
                                                         <Icon name="Minus" className="h-3 w-3" />
@@ -138,7 +136,7 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                                                         variant="outline"
                                                         size="sm"
                                                         className="h-7 w-7 p-0"
-                                                        onClick={() => updateQuantity(item.product.id, 1, isAuthenticated)}
+                                                        onClick={() => updateQuantity(item.product.id, 1)}
                                                     >
                                                         <Icon name="Plus" className="h-3 w-3" />
                                                     </Button>
@@ -147,7 +145,7 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-7 w-7 text-muted-foreground hover:text-destructive btn-delete"
-                                                    onClick={() => removeItem(item.product.id, isAuthenticated)}
+                                                    onClick={() => removeItem(item.product.id)}
                                                     aria-label="حذف المنتج من السلة"
                                                 >
                                                     <Icon name="Trash2" className="h-4 w-4" />

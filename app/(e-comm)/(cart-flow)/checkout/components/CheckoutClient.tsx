@@ -65,7 +65,7 @@ export default function CheckoutClient({ user, cart, addresses }: CheckoutClient
                         />
                     </div>
                     <div className="space-y-6">
-                        <MiniCartSummary cart={cart} />
+                        <MiniCartSummary />
                     </div>
                 </div>
             </div>

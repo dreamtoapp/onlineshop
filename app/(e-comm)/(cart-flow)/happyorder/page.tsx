@@ -10,12 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RatingType } from '@/constant/enums';
 import { useCartStore } from '../cart/cart-controller/cartStore';
-import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 
 export default function OrderConfirmation() {
   const router = useRouter();
   const { clearCart } = useCartStore();
-  const { isAuthenticated } = useCheckIsLogin();
   const [showClearCartDialog, setShowClearCartDialog] = useState(true);
   const [isClient, setIsClient] = useState(false); // State to track client-side rendering
   const { width, height } = useWindowSize(); // Get window size for responsive confetti

@@ -233,6 +233,7 @@ export default function UserMenuTrigger({ user, isMobile, alerts }: UserMenuTrig
                         side={isMobile ? "bottom" : "right"}
                         className={`overflow-y-auto border-0 shadow-2xl ${isMobile ? 'h-[90vh] rounded-t-2xl' : 'w-[400px]'}`}
                     >
+                        <SheetDescription>قائمة المستخدم الجانبية.</SheetDescription>
                         {/* Enhanced Header with Gradient */}
                         <div className={`relative p-6 mb-6 ${isMobile ? 'bg-gradient-to-br from-feature-users via-feature-users/90 to-feature-analytics text-white rounded-t-2xl' : 'bg-gradient-to-br from-feature-users/5 via-feature-users/10 to-feature-analytics/5 border-b border-border/50'} overflow-hidden`}>
                             {/* Background Pattern */}
@@ -350,6 +351,7 @@ export default function UserMenuTrigger({ user, isMobile, alerts }: UserMenuTrig
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="max-w-md">
+                                    <AlertDialogDescription>تنبيه هام للمستخدم.</AlertDialogDescription>
                                     <AlertDialogHeader>
                                         <AlertDialogTitle className="text-right flex items-center gap-2">
                                             <Icon name="LogOut" className="w-5 h-5 text-destructive" />

@@ -28,8 +28,6 @@ import {
 } from '../actions/actions';
 import ProductQuantity from '../compnents/ProductQuantity';
 import { PageProps } from '@/types/commonTypes';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useMemo } from 'react';
 
 // --- Small Components ---
 

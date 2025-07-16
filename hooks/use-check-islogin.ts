@@ -17,7 +17,6 @@ export const useCheckIsLogin = () => {
   const [error, setError] = useState<string | null>(null);
   // Remove cart store methods that no longer exist
   // const { mergeWithServerCart, fetchServerCart, lastSyncTime } = useCartStore();
-  const prevStatusRef = useState<AuthStatus>('loading');
 
   useEffect(() => {
     const fetchSession = async () => {

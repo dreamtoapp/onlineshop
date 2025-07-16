@@ -9,7 +9,8 @@ import {
   DrawerTrigger,
   DrawerContent,
   DrawerTitle,
-  DrawerClose
+  DrawerClose,
+  DrawerDescription
 } from '@/components/ui/drawer';
 import { Icon } from '@/components/icons/Icon';
 
@@ -123,6 +124,7 @@ export default function SearchDrawer() {
         </Button>
       </DrawerTrigger>
       <DrawerContent className="max-w-xl mx-auto p-4">
+        <DrawerDescription>اكتب للبحث عن المنتجات أو التصنيفات.</DrawerDescription>
         <DrawerTitle className="sr-only">بحث المنتجات</DrawerTitle>
         <SearchForm />
       </DrawerContent>

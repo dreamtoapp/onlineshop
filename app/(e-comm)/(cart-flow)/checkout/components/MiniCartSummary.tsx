@@ -12,26 +12,7 @@ import { formatCurrency } from '../../../../../lib/formatCurrency';
 import CartItemsToggle from './client/CartItemsToggle';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
-interface CartItem {
-  id: string;
-  quantity: number;
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    image?: string;
-  } | null;
-}
-
-interface CartData {
-  items: CartItem[];
-}
-
-interface MiniCartSummaryProps {
-  cart: CartData;
-}
-
-export default function MiniCartSummary({ cart }: MiniCartSummaryProps) {
+export default function MiniCartSummary() {
   // Use Zustand cart for live updates
   const { cart: zustandCart } = useCartStore();
   const items = Object.values(zustandCart);
@@ -159,7 +140,7 @@ export default function MiniCartSummary({ cart }: MiniCartSummaryProps) {
         <Separator />
 
         {/* Client-side Cart Items Toggle */}
-        <CartItemsToggle items={items} />
+        <CartItemsToggle items={items.map(item => ({ ...item, id: item.product.id }))} />
 
         {/* Security Notice */}
         <div className="text-xs text-muted-foreground text-center p-3 bg-muted/20 rounded-lg border">

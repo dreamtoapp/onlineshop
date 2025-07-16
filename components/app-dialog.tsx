@@ -63,6 +63,7 @@ const AppDialog: React.FC<AppDialogProps> = memo(({
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto ${className}`}>
+        <DialogDescription>مربع حوار تفاعلي.</DialogDescription>
         {header}
         <div className="flex-1 overflow-y-auto px-1">
           {children}

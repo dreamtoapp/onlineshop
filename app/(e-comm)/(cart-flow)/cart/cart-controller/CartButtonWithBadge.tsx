@@ -1,6 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import CartPreview from './CartDropdown';
 import { useState, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -14,7 +14,7 @@ export default function CartButtonWithBadge() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [mounted, setMounted] = useState(false);
-    const { getTotalUniqueItems, isSyncing } = useCartStore();
+    const { getTotalUniqueItems } = useCartStore();
     const totalItems = getTotalUniqueItems();
 
     useEffect(() => {
@@ -28,7 +28,6 @@ export default function CartButtonWithBadge() {
             aria-label="عرض السلة"
             variant="ghost"
             className="relative flex items-center justify-center gap-2 rounded-full bg-feature-commerce-soft card-hover-effect transition-all duration-300 hover:scale-105 hover:bg-feature-commerce/20 w-12 h-12 shadow-lg"
-            disabled={isSyncing}
         >
             <span className="absolute inset-0 rounded-full bg-feature-commerce/30 blur-md opacity-70 pointer-events-none animate-pulse" />
             <Icon
@@ -51,11 +50,6 @@ export default function CartButtonWithBadge() {
                     </motion.span>
                 )}
             </AnimatePresence>
-            {isSyncing && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                </div>
-            )}
         </Button>
     );
 
@@ -67,6 +61,7 @@ export default function CartButtonWithBadge() {
                     {cartIcon}
                 </DrawerTrigger>
                 <DrawerContent className={isMobile ? 'w-full max-w-[95vw] h-[85vh] rounded-t-xl p-0 flex flex-col' : 'max-w-[480px] w-full p-0 flex flex-col'}>
+                    <DrawerDescription>عرض وإدارة عناصر السلة الخاصة بك.</DrawerDescription>
                     <DrawerHeader className="p-4 border-b flex items-center justify-between">
                         <DrawerTitle>
                             <span className="text-lg font-semibold text-primary">عربة التسوق</span>

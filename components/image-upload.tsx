@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   cn,
@@ -606,6 +607,7 @@ const ImageUpload = ({
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className='max-w-2xl'>
+          <DialogDescription>معاينة الصورة بحجم أكبر</DialogDescription>
           <DialogTitle>{i18n.previewTitle}</DialogTitle>
           {activePreviewIndex !== null && previews[activePreviewIndex] && (
             <div className='relative h-96 w-full'>

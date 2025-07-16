@@ -51,7 +51,12 @@ export default function CartItemsToggle({ items }: CartItemsToggleProps) {
                 >
                     {items.map((item, idx) => (
                         <div
-                            key={item.id || item.product?.id || idx}
+                            // Prefer a composite key for uniqueness
+                            key={
+                                item.id && item.product?.id
+                                    ? `${item.id}-${item.product.id}`
+                                    : item.id || item.product?.id || idx
+                            }
                             className="flex items-center justify-between p-3 bg-muted/20 rounded-lg"
                         >
                             <div className="flex items-center gap-3">

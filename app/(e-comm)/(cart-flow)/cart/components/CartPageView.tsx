@@ -4,7 +4,6 @@ import { getCart } from "@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActio
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft } from "lucide-react";
-import CartItemQuantityControls from "./CartItemQuantityControls";
 import Link from '@/components/link';
 import Image from "next/image";
 import { useCheckIsLogin } from '@/hooks/use-check-islogin';
@@ -98,7 +97,6 @@ function CartPageSkeleton() {
 export default function CartPageView() {
     const { isAuthenticated, isLoading } = useCheckIsLogin();
     const { cart } = useCartStore();
-    const [serverCart, setServerCart] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [mergeToastShown, setMergeToastShown] = useState(false);
     const router = useRouter();
@@ -116,7 +114,6 @@ export default function CartPageView() {
             setLoading(true);
             getCart()
                 .then((data) => {
-                    setServerCart(data);
                     setLoading(false);
                     // Show merge toast if guest cart was merged (detect by checking if localCartId cookie existed and now is gone)
                     if (!mergeToastShown && typeof window !== 'undefined') {
@@ -135,14 +132,7 @@ export default function CartPageView() {
                     toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
                 });
         }
-    }, [isAuthenticated]);
-
-    const handleRemoved = async () => {
-        setLoading(true);
-        const data = await getCart();
-        setServerCart(data);
-        setLoading(false);
-    };
+    }, [isAuthenticated, mergeToastShown]);
 
     if (isLoading || loading) {
         return <CartPageSkeleton />;

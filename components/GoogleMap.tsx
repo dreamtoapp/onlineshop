@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -54,6 +55,7 @@ const GoogleMap = ({ latitude, longitude, }: MapProps) => {
 
         {/* Dialog Content */}
         <DialogContent className='sm:max-w-[800px]'>
+          <DialogDescription>خريطة تفاعلية لتحديد الموقع.</DialogDescription>
           <DialogHeader>
             <DialogTitle>عرض الموقع</DialogTitle>
           </DialogHeader>
