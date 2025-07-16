@@ -44,12 +44,12 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
     }, []);
 
     return (
-        <div className="relative h-36 sm:h-48 w-full overflow-hidden rounded-t-2xl bg-white p-1 shadow-lg border border-gray-100 flex items-center justify-center">
+        <div className="relative h-36 sm:h-48 w-full overflow-hidden rounded-t-2xl p-1 shadow-lg border  flex items-center justify-center">
             {/* Icon actions: wishlist and quick view, top-right */}
-            <div className="absolute top-2 right-2 z-30 flex flex-col gap-2 backdrop-blur-sm rounded-xl p-1 shadow-md">
+            <div className="absolute top-2 right-2 z-30 flex flex-col gap-2  rounded-xl p-1 ">
                 {/* <WishlistButton productId={product.id} /> */}
                 <Button
-                    variant="outline"
+                    variant="secondary"
                     size="icon"
                     aria-label={`معاينة سريعة لـ ${product.name}`}
                     onClick={e => {
@@ -57,8 +57,9 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
                         setOpen(true);
                         // Debug: confirm which product opens the modal
                     }}
+
                 >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4 text-primary     hover:text-primary/80 transition-colors duration-300" />
                 </Button>
             </div>
             {/* Loading state */}
@@ -71,7 +72,7 @@ export default function ProductCardMedia({ product, inCart, isOutOfStock, lowSto
                 src={imgSrc()}
                 alt={product.name}
                 fill
-                className={`object-contain w-full h-full rounded-t-2xl transition-all duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                className={`object-cover w-full h-full rounded-t-2xl transition-all duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 loading={priority ? 'eager' : 'lazy'}
                 placeholder="blur"

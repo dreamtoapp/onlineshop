@@ -8,6 +8,7 @@ import { UserRole } from '@/constant/enums';
 import Link from '@/components/link';
 import { ReactNode } from 'react';
 import { CarFront, Focus } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 
 interface User {
     id: string;
@@ -29,7 +30,7 @@ function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User
     return isLoggedIn ? (
         <UserMenuTrigger user={user} />
     ) : (
-        <Link href="/auth/login" className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">تسجيل الدخول</Link>
+        <Link href="/auth/login" className={buttonVariants({ variant: "default", size: "sm" })}>تسجيل الدخول</Link>
     );
 }
 

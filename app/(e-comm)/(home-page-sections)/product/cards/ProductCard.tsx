@@ -135,14 +135,9 @@ const ProductCard = memo(({
                             )}
                         </div>
                     </div>
-                    {/* Actions */}
-                    <ProductCardActions
-                        product={product}
-                        quantity={quantity}
-                        isOutOfStock={stockInfo.isOutOfStock}
-                    />
+
                     {/* Footer: Compact, expert UI/UX */}
-                    <div className="pt-2 text-center">
+                    <div className="pt-2 text-center flex flex-row justify-between items-center">
                         <div className="flex items-center justify-center gap-4 text-sm">
                             {/* Rating: show only if exists */}
                             {typeof product.rating === 'number' && product.rating > 0 && (
@@ -164,12 +159,19 @@ const ProductCard = memo(({
                                 {product.previewCount}
                             </span>
                             {/* Details link as button with icon */}
-                            <Link href={`/product/${product.slug}`} className="inline-flex items-center gap-1 rounded-md border border-primary text-primary px-3 py-1 text-xs font-semibold shadow-sm bg-transparent hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none">
-                                <Icon name="Package" className="w-4 h-4 text-green-600" />
-                                <span>صفحة المنتج</span>
-                            </Link>
+
                         </div>
+                        <Link href={`/product/${product.slug}`} className="inline-flex items-center gap-1 rounded-md border border-primary text-primary px-3 py-1 text-xs font-semibold shadow-sm bg-transparent hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none">
+                            <Icon name="Package" className="w-4 h-4 text-green-600" />
+                            <span>صفحة المنتج</span>
+                        </Link>
                     </div>
+                    {/* Actions */}
+                    <ProductCardActions
+                        product={product}
+                        quantity={quantity}
+                        isOutOfStock={stockInfo.isOutOfStock}
+                    />
                 </div>
             </Card>
         </>

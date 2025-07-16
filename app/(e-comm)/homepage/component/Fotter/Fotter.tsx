@@ -46,10 +46,7 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
 
       {/* Trust Badges */}
       <div className="flex flex-wrap gap-2">
-        <Badge variant="secondary" className="bg-secondary text-secondary-foreground border-secondary">
-          <Icon name="Shield" className="h-3 w-3 ml-1" />
-          آمن ومضمون
-        </Badge>
+
         <Badge variant="secondary" className="bg-primary/10 text-foreground border-primary/20">
           <Icon name="Award" className="h-3 w-3 ml-1" />
           جودة مضمونة
