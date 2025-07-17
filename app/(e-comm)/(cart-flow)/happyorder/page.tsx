@@ -57,7 +57,7 @@ export default function OrderConfirmation() {
           orderId,
           rating,
           comment,
-          type: RatingType.PURCHASE,
+          type: RatingType.APP,
         }),
       });
       const data = await res.json();
