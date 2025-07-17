@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,31 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-
-// Mockup delivered orders for Phase 1
-const MOCKUP_DELIVERED_ORDERS = [
-    {
-        id: 'ORD-2024-004',
-        driverName: 'محمد علي',
-        deliveryDate: '2024-01-20',
-        orderTotal: 320.50,
-        deliveredAt: 'منذ يومين'
-    },
-    {
-        id: 'ORD-2024-005',
-        driverName: 'سعد أحمد',
-        deliveryDate: '2024-01-18',
-        orderTotal: 185.00,
-        deliveredAt: 'منذ 4 أيام'
-    },
-    {
-        id: 'ORD-2024-006',
-        driverName: 'عبدالرحمن محمد',
-        deliveryDate: '2024-01-15',
-        orderTotal: 95.75,
-        deliveredAt: 'منذ أسبوع'
-    }
-];
+import { getUserDeliveredOrders, submitDriverRating, type DeliveredOrder } from '../actions/ratingActions';
 
 interface DriverRatingDialogProps {
     isOpen: boolean;
@@ -52,6 +28,28 @@ export default function DriverRatingDialog({ isOpen, onClose }: DriverRatingDial
     const [comment, setComment] = useState<string>('');
     const [hoverRating, setHoverRating] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [orders, setOrders] = useState<DeliveredOrder[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Load orders when dialog opens
+    useEffect(() => {
+        if (isOpen) {
+            loadOrders();
+        }
+    }, [isOpen]);
+
+    const loadOrders = async () => {
+        setIsLoading(true);
+        try {
+            const deliveredOrders = await getUserDeliveredOrders();
+            setOrders(deliveredOrders);
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            toast.error('حدث خطأ في تحميل الطلبات');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,13 +72,25 @@ export default function DriverRatingDialog({ isOpen, onClose }: DriverRatingDial
         setIsSubmitting(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('تم إرسال التقييم بنجاح!');
-            setSelectedOrder('');
-            setRating(0);
-            setComment('');
-            onClose();
+            const result = await submitDriverRating({
+                orderId: selectedOrder,
+                rating,
+                comment,
+            });
+
+            if (result.success) {
+                toast.success(result.message);
+                setSelectedOrder('');
+                setRating(0);
+                setComment('');
+                onClose();
+                // Refresh the page to show new rating
+                window.location.reload();
+            } else {
+                toast.error(result.message);
+            }
         } catch (error) {
+            console.error('Error submitting rating:', error);
             toast.error('حدث خطأ أثناء الإرسال');
         } finally {
             setIsSubmitting(false);
@@ -109,16 +119,22 @@ export default function DriverRatingDialog({ isOpen, onClose }: DriverRatingDial
                 <form onSubmit={handleSubmit} className='space-y-4'>
                     {/* Order Selection */}
                     <div className='space-y-2'>
-                        <Select value={selectedOrder} onValueChange={setSelectedOrder}>
+                        <Select value={selectedOrder} onValueChange={setSelectedOrder} disabled={isLoading}>
                             <SelectTrigger>
-                                <SelectValue placeholder="اختر طلباً تم توصيله" />
+                                <SelectValue placeholder={isLoading ? "جاري التحميل..." : "اختر طلباً تم توصيله"} />
                             </SelectTrigger>
                             <SelectContent>
-                                {MOCKUP_DELIVERED_ORDERS.map((order) => (
-                                    <SelectItem key={order.id} value={order.id}>
-                                        {order.id} - {order.driverName}
+                                {orders.length === 0 && !isLoading ? (
+                                    <SelectItem value="no-orders" disabled>
+                                        لا توجد طلبات متاحة للتقييم
                                     </SelectItem>
-                                ))}
+                                ) : (
+                                    orders.map((order) => (
+                                        <SelectItem key={order.id} value={order.id}>
+                                            {order.id} - {order.driverName}
+                                        </SelectItem>
+                                    ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
@@ -184,7 +200,7 @@ export default function DriverRatingDialog({ isOpen, onClose }: DriverRatingDial
                         </Button>
                         <Button
                             type='submit'
-                            disabled={isSubmitting || rating === 0 || !selectedOrder}
+                            disabled={isSubmitting || rating === 0 || !selectedOrder || orders.length === 0}
                             className="btn-add"
                         >
                             {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}

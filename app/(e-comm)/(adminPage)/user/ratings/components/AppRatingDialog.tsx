@@ -15,6 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { submitAppRating } from '../actions/ratingActions';
 
 // App features for rating
 const APP_FEATURES = [
@@ -54,13 +55,25 @@ export default function AppRatingDialog({ isOpen, onClose }: AppRatingDialogProp
         setIsSubmitting(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('تم إرسال التقييم بنجاح!');
-            setSelectedFeature('overall');
-            setRating(0);
-            setComment('');
-            onClose();
+            const result = await submitAppRating({
+                feature: selectedFeature,
+                rating,
+                comment,
+            });
+
+            if (result.success) {
+                toast.success(result.message);
+                setSelectedFeature('overall');
+                setRating(0);
+                setComment('');
+                onClose();
+                // Refresh the page to show new rating
+                window.location.reload();
+            } else {
+                toast.error(result.message);
+            }
         } catch (error) {
+            console.error('Error submitting rating:', error);
             toast.error('حدث خطأ أثناء الإرسال');
         } finally {
             setIsSubmitting(false);

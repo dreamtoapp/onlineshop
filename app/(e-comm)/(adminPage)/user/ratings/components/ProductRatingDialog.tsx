@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Package } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,31 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-
-// Mockup products for Phase 1
-const MOCKUP_PRODUCTS = [
-    {
-        id: '1',
-        name: 'تي شيرت قطني أزرق',
-        price: 89.99,
-        imageUrl: '/fallback/product-fallback.avif',
-        purchaseDate: '2024-01-15'
-    },
-    {
-        id: '2',
-        name: 'سماعات لاسلكية',
-        price: 199.99,
-        imageUrl: '/fallback/product-fallback.avif',
-        purchaseDate: '2024-01-10'
-    },
-    {
-        id: '3',
-        name: 'حقيبة ظهر رياضية',
-        price: 149.50,
-        imageUrl: '/fallback/product-fallback.avif',
-        purchaseDate: '2024-01-08'
-    }
-];
+import { getUserRateableProducts, submitProductRating, type RateableProduct } from '../actions/ratingActions';
 
 interface ProductRatingDialogProps {
     isOpen: boolean;
@@ -52,6 +28,28 @@ export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDi
     const [comment, setComment] = useState<string>('');
     const [hoverRating, setHoverRating] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [products, setProducts] = useState<RateableProduct[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Load products when dialog opens
+    useEffect(() => {
+        if (isOpen) {
+            loadProducts();
+        }
+    }, [isOpen]);
+
+    const loadProducts = async () => {
+        setIsLoading(true);
+        try {
+            const rateableProducts = await getUserRateableProducts();
+            setProducts(rateableProducts);
+        } catch (error) {
+            console.error('Error loading products:', error);
+            toast.error('حدث خطأ في تحميل المنتجات');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,13 +72,25 @@ export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDi
         setIsSubmitting(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('تم إرسال التقييم بنجاح!');
-            setSelectedProduct('');
-            setRating(0);
-            setComment('');
-            onClose();
+            const result = await submitProductRating({
+                productId: selectedProduct,
+                rating,
+                comment,
+            });
+
+            if (result.success) {
+                toast.success(result.message);
+                setSelectedProduct('');
+                setRating(0);
+                setComment('');
+                onClose();
+                // Refresh the page to show new rating
+                window.location.reload();
+            } else {
+                toast.error(result.message);
+            }
         } catch (error) {
+            console.error('Error submitting rating:', error);
             toast.error('حدث خطأ أثناء الإرسال');
         } finally {
             setIsSubmitting(false);
@@ -109,16 +119,22 @@ export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDi
                 <form onSubmit={handleSubmit} className='space-y-4'>
                     {/* Product Selection */}
                     <div className='space-y-2'>
-                        <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+                        <Select value={selectedProduct} onValueChange={setSelectedProduct} disabled={isLoading}>
                             <SelectTrigger>
-                                <SelectValue placeholder="اختر منتجاً للتقييم" />
+                                <SelectValue placeholder={isLoading ? "جاري التحميل..." : "اختر منتجاً للتقييم"} />
                             </SelectTrigger>
                             <SelectContent>
-                                {MOCKUP_PRODUCTS.map((product) => (
-                                    <SelectItem key={product.id} value={product.id}>
-                                        {product.name} - {product.price} ر.س
+                                {products.length === 0 && !isLoading ? (
+                                    <SelectItem value="no-products" disabled>
+                                        لا توجد منتجات متاحة للتقييم
                                     </SelectItem>
-                                ))}
+                                ) : (
+                                    products.map((product) => (
+                                        <SelectItem key={product.id} value={product.id}>
+                                            {product.name} - {product.price} ر.س
+                                        </SelectItem>
+                                    ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
@@ -184,7 +200,7 @@ export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDi
                         </Button>
                         <Button
                             type='submit'
-                            disabled={isSubmitting || rating === 0 || !selectedProduct}
+                            disabled={isSubmitting || rating === 0 || !selectedProduct || products.length === 0}
                             className="btn-add"
                         >
                             {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}
