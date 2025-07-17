@@ -44,7 +44,7 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
     wishlistIcon?: ReactNode;
 }) {
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-lg transition-all duration-300">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-sm transition-all duration-300">
             <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                 {/* Left side: Logo + Burger Menu */}
                 <div className="flex items-center gap-4">
@@ -53,7 +53,7 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
                 </div>
 
                 {/* Right side: Actions */}
-                <div className="flex items-center gap-3 bg-secondary/50 rounded-xl px-3 py-2">
+                <div className="flex items-center gap-2 bg-muted/20 rounded-xl px-3 py-2 border border-border/20">
                     {user?.role === UserRole.ADMIN && (
                         <Link href="/dashboard" className="p-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors">
                             <Focus size={16} />
@@ -84,7 +84,7 @@ function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
     notificationBell?: ReactNode;
 }) {
     return (
-        <header className="fixed top-0 left-0 right-0 w-full z-50 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-lg">
+        <header className="fixed top-0 left-0 right-0 w-full z-50 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-sm">
             <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
                 {/* Left side: Logo + Burger Menu */}
                 <div className="flex items-center gap-3">
@@ -93,7 +93,7 @@ function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
                 </div>
 
                 {/* Right side: Actions */}
-                <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-2 py-1">
+                <div className="flex items-center gap-1.5 bg-muted/20 rounded-lg px-2 py-1.5 border border-border/20">
                     {user?.role === UserRole.ADMIN && (
                         <Link href="/dashboard" className="p-1.5 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors">
                             <Focus size={14} />
