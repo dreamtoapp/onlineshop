@@ -27,8 +27,8 @@ async function setCartIdCookie(cartId: string) {
   });
 }
 
-// Helper: clear cart ID cookie
-async function clearCartIdCookie() {
+// Helper: clear cart ID cookie - Server Action
+export async function clearCartIdCookie() {
   const cookieStore = await cookies();
   cookieStore.set('localCartId', '', { maxAge: -1 });
 }
@@ -97,7 +97,7 @@ export async function getCart(): Promise<CartWithItems | null> {
           where: { userId: user.id },
           include: { items: { include: { product: true } } },
         });
-        await clearCartIdCookie();
+        // Note: Cookie will be cleared by client-side action after successful merge
       }
     }
     const result = userCart;

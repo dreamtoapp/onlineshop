@@ -44,7 +44,7 @@ async function fetchOffers() {
 export const getPromotions = async (...args: Parameters<typeof fetchOffers>) => {
   return await cacheData(
     fetchOffers,
-    ['getOffers'],
+    ['getOffers', 'promotions'],
     { revalidate: 3600 }
   )(...args);
 };

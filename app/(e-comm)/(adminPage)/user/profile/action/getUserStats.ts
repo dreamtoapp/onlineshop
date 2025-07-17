@@ -1,5 +1,6 @@
 import db from '@/lib/prisma';
 import { checkIsLogin } from '@/lib/check-is-login';
+import { unstable_cache } from 'next/cache';
 
 export interface UserStats {
   totalOrders: number;
@@ -10,24 +11,17 @@ export interface UserStats {
   reviewsCount: number;
 }
 
-export async function getUserStats(): Promise<UserStats | null> {
-  const user = await checkIsLogin();
-  console.log('getUserStats: user', user);
-  if (!user) {
-    console.error('getUserStats: No user session found');
-    return null;
-  }
-
+async function fetchUserStatsFromDB(userId: string): Promise<UserStats | null> {
   try {
     const [orderAgg, wishlistCount, reviewsCount, userInfo] = await Promise.all([
       db.order.aggregate({
-        where: { customerId: user.id },
+        where: { customerId: userId },
         _count: { _all: true },
         _sum: { amount: true },
       }),
-      db.wishlistItem.count({ where: { userId: user.id } }),
-      db.review.count({ where: { userId: user.id } }),
-      db.user.findUnique({ where: { id: user.id }, select: { createdAt: true } }),
+      db.wishlistItem.count({ where: { userId: userId } }),
+      db.review.count({ where: { userId: userId } }),
+      db.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
     ]);
     console.log('getUserStats: orderAgg', orderAgg);
     console.log('getUserStats: wishlistCount', wishlistCount);
@@ -57,4 +51,25 @@ export async function getUserStats(): Promise<UserStats | null> {
     console.error('getUserStats: Error fetching stats', error);
     return null;
   }
+}
+
+export async function getUserStats(): Promise<UserStats | null> {
+  const user = await checkIsLogin();
+  console.log('getUserStats: user', user);
+  if (!user) {
+    console.error('getUserStats: No user session found');
+    return null;
+  }
+
+  // Create cached version with user-specific cache key and revalidation tag
+  const getCachedUserStats = unstable_cache(
+    () => fetchUserStatsFromDB(user.id),
+    [`userStats-${user.id}`],
+    { 
+      tags: ['userStats', `user-${user.id}`],
+      revalidate: 3600 // Cache for 1 hour, but can be invalidated with tags
+    }
+  );
+
+  return getCachedUserStats();
 } 

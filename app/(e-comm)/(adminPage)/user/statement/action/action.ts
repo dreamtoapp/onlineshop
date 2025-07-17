@@ -11,8 +11,41 @@ export async function getUserStatement(userId: string) {
       include: {
         customerOrders: {
           include: {
-            items: true,
+            items: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    imageUrl: true,
+                    images: true,
+                  }
+                }
+              }
+            },
+            address: {
+              select: {
+                district: true,
+                street: true,
+                buildingNumber: true,
+                floor: true,
+                apartmentNumber: true,
+                landmark: true,
+                deliveryInstructions: true,
+              }
+            },
+            shift: {
+              select: {
+                name: true,
+                startTime: true,
+                endTime: true,
+              }
+            }
           },
+          orderBy: {
+            createdAt: 'desc'
+          }
         },
       },
     });

@@ -35,6 +35,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     const [userStats, setUserStats] = useState<UserStats | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [hasFetched, setHasFetched] = useState(false); // Simple caching
     const name = user?.name;
     const image = user?.image;
 
@@ -61,7 +62,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
             badge: userStats?.wishlistCount && userStats?.wishlistCount > 0 ? userStats.wishlistCount.toString() : undefined
         },
         {
-            href: `/user/statement?id=${user.id ?? ''}`,
+            href: `/user/statement/${user.id ?? ''}`,
             label: "الحركات المالية",
             icon: "CreditCard",
             description: "تاريخ المعاملات"
@@ -95,12 +96,14 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     };
 
     const loadUserStats = async () => {
-        if (!userStats && !isLoading) {
+        // Simple caching: only fetch once
+        if (!userStats && !isLoading && !hasFetched) {
             setIsLoading(true);
             try {
                 const res = await fetch('/api/user/stats');
                 const data = await res.json();
                 setUserStats(data);
+                setHasFetched(true); // Mark as fetched
             } catch (error) {
                 console.error('Error loading user stats:', error);
             } finally {

@@ -1,12 +1,13 @@
 'use server';
 
 import db from '@/lib/prisma';
+import { unstable_cache } from 'next/cache';
 
 type FetchProductsParams = {
   search?: string;
   priceMin?: number;
   priceMax?: number;
-  sortBy?: 'mostSale' | 'priceAsc' | 'priceDesc';
+  sortBy?: string;
   page?: number;
   pageSize?: number;
   slug?: string;
@@ -87,6 +88,16 @@ export async function fetchProductsPage({
 
 // Cached version for use in homepage
 export async function getCachedProductsPage(params: FetchProductsParams) {
-  'use cache';
-  return fetchProductsPage(params);
+  const cacheKey = `products-${JSON.stringify(params)}`;
+  
+  const cachedFetch = unstable_cache(
+    () => fetchProductsPage(params),
+    [cacheKey],
+    {
+      tags: ['products'],
+      revalidate: 3600 // 1 hour
+    }
+  );
+  
+  return cachedFetch();
 }

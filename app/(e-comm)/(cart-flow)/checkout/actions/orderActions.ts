@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { pusherServer } from '@/lib/pusherServer';
 import { OrderNumberGenerator } from "@/helpers/orderNumberGenerator";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 // Updated validation schema for AddressBook system
 const checkoutSchema = z.object({
@@ -173,6 +174,18 @@ export async function createDraftOrder(formData: FormData) {
         userId: user.id,
       },
     });
+
+    // Revalidate home page and user stats data
+    revalidatePath('/');
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/management-dashboard');
+    revalidatePath('/dashboard/management-orders');
+    revalidateTag('analyticsData');
+    revalidateTag('fetchOrders');
+    revalidateTag('userStats');
+    revalidateTag(`user-${user.id}`); // Revalidate specific user's cached data
+    revalidateTag('products');
+    revalidateTag('promotions');
 
     // Instead of redirect, return orderId
     return order.orderNumber;
