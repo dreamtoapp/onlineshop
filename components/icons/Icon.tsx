@@ -8,7 +8,7 @@ import {
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, Menu, LocateFixed, Tag, Share2, Flame, Star, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
-    ShoppingCart
+    ShoppingCart, ShoppingBag, CreditCard, LogOut, Grid3X3, Shield
 } from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)
@@ -55,7 +55,7 @@ const iconMap = {
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, LocateFixed, Tag, Menu, Star, Share2, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
-    ShoppingCart
+    ShoppingCart, ShoppingBag, CreditCard, LogOut, Grid3X3, Shield
 };
 
 // Types for size and variant based on iconVariants
@@ -84,6 +84,7 @@ export function Icon({ name, size = 'md', variant = 'default', animation = 'none
     const nameMap: Record<string, string> = {
         Whatsapp: 'MessageCircle',
         Tools: 'Wrench',
+        Grid3x3: 'Grid3X3', // Map Grid3x3 to the correct Lucide name
     };
     const mappedName = nameMap[name] || name;
     const IconComponent = iconMap[mappedName as keyof typeof iconMap] as React.ComponentType<any> | undefined;
