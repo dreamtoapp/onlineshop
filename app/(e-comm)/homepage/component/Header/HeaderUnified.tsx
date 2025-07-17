@@ -2,6 +2,7 @@
 import Logo from './Logo';
 import SearchBar from './SearchBar';
 import UserMenuTrigger from './UserMenuTrigger';
+import UniversalBurgerMenu from './UniversalBurgerMenu';
 import CartIconClient from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { UserRole } from '@/constant/enums';
@@ -43,16 +44,26 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
     wishlistIcon?: ReactNode;
 }) {
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/60 shadow-2xl shadow-black/20 dark:shadow-white/10 transition-all duration-300">
-            <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-                <span className="flex items-center">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-lg transition-all duration-300">
+            <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+                {/* Left side: Logo + Burger Menu */}
+                <div className="flex items-center gap-4">
                     <Logo logo={logo} logoAlt={logoAlt} />
-                </span>
+                    <UniversalBurgerMenu />
+                </div>
 
-
-                <div className="flex items-center gap-4 md:gap-6 bg-secondary rounded-lg px-4">
-                    {user?.role === UserRole.ADMIN && <Link href="/dashboard" className="px-3 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><Focus /></Link>}
-                    {user?.role === UserRole.DRIVER && <Link href="/driver" className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><CarFront /></Link>}
+                {/* Right side: Actions */}
+                <div className="flex items-center gap-3 bg-secondary/50 rounded-xl px-3 py-2">
+                    {user?.role === UserRole.ADMIN && (
+                        <Link href="/dashboard" className="p-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors">
+                            <Focus size={16} />
+                        </Link>
+                    )}
+                    {user?.role === UserRole.DRIVER && (
+                        <Link href="/driver" className="p-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                            <CarFront size={16} />
+                        </Link>
+                    )}
 
                     <SearchBar />
                     {wishlistIcon}
@@ -73,17 +84,31 @@ function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
     notificationBell?: ReactNode;
 }) {
     return (
-        <header className="fixed top-0 left-0 right-0 z-40 flex h-14 md:h-20 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-md sm:px-6 shadow-2xl shadow-black/20 dark:shadow-white/10 ">
-            <div className=" flex justify-center">
-                <Logo logo={logo} logoAlt={logoAlt} />
-            </div>
-            <div className="flex items-center gap-2 bg-secondary rounded-lg px-4">
-                {user?.role === UserRole.ADMIN && <Link href="/dashboard" className="px-3 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><Focus /></Link>}
-                {user?.role === UserRole.DRIVER && <Link href="/driver" className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"><CarFront /></Link>}
-                <SearchBar />
-                {notificationBell}
-                <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
-            </div>
+        <header className="fixed top-0 left-0 right-0 w-full z-50 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-lg">
+            <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
+                {/* Left side: Logo + Burger Menu */}
+                <div className="flex items-center gap-3">
+                    <Logo logo={logo} logoAlt={logoAlt} />
+                    <UniversalBurgerMenu />
+                </div>
+
+                {/* Right side: Actions */}
+                <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-2 py-1">
+                    {user?.role === UserRole.ADMIN && (
+                        <Link href="/dashboard" className="p-1.5 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors">
+                            <Focus size={14} />
+                        </Link>
+                    )}
+                    {user?.role === UserRole.DRIVER && (
+                        <Link href="/driver" className="p-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                            <CarFront size={14} />
+                        </Link>
+                    )}
+                    <SearchBar />
+                    {notificationBell}
+                    <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
+                </div>
+            </nav>
         </header>
     );
 }

@@ -32,7 +32,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
         <FilterAlert />
         <CustomMobileBottomNav />
         <main className='flex-grow'>
-          <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-[80px] sm:py-[100px] '>
+          <div className='container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-18 md:pt-20 pb-8'>
             {children}
           </div>
         </main>
