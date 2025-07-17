@@ -1,5 +1,4 @@
-// 'use client'; // REMOVE THIS LINE to make the component a server component
-
+// Server Component - Following Next.js 15+ best practices
 import Link from '@/components/link';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -23,52 +22,74 @@ interface FooterProps {
   userId?: string;
 }
 
-// Company Information Component (65 lines)
-function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { aboutus?: string; companyName?: string; productCount?: number | string; clientCount?: number | string }) {
-  // console.log(productCount, clientCount); // Commented out to prevent unnecessary output
+// Company Information Component with enhanced mobile layout
+function CompanyInfo({
+  aboutus,
+  companyName,
+  productCount,
+  clientCount
+}: {
+  aboutus?: string;
+  companyName?: string;
+  productCount?: number | string;
+  clientCount?: number | string;
+}) {
   return (
-    <div className="space-y-6">
-      {/* Logo and Company Name */}
+    <div className="space-y-4 md:space-y-6">
+      {/* Logo and Company Name - Enhanced mobile layout */}
       <div className="flex items-center gap-3">
-        <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
-          <Icon name="Building2" className="h-6 w-6 text-white" />
+        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+          <Icon name="Building2" className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-foreground">{companyName || 'Dream To App'}</h2>
-          <p className="text-sm text-foreground font-medium">شركة رائدة في التجارة الإلكترونية</p>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground leading-tight truncate">
+            {companyName || 'Dream To App'}
+          </h2>
+          <p className="text-xs md:text-sm text-muted-foreground font-medium leading-tight">
+            فرعنا الالكتروني لتوفير المنتجات المميزة لعملائنا الكرام
+          </p>
         </div>
       </div>
 
-      {/* Company Description */}
-      <p className="text-muted-foreground leading-relaxed">
+      {/* Company Description - Better mobile typography */}
+      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
         {aboutus || 'نحن شركة متخصصة في تقديم أفضل المنتجات والخدمات لعملائنا الكرام، مع التزامنا بأعلى معايير الجودة والتميز في خدمة العملاء.'}
       </p>
 
-      {/* Trust Badges */}
+      {/* Trust Badges - Responsive layout */}
       <div className="flex flex-wrap gap-2">
-
-        <Badge variant="secondary" className="bg-primary/10 text-foreground border-primary/20">
-          <Icon name="Award" className="h-3 w-3 ml-1" />
-          جودة مضمونة
+        <Badge
+          variant="secondary"
+          className="bg-success-soft-background text-success-foreground border-success-foreground/20 hover:bg-success-soft-background/80 transition-colors duration-200 text-xs"
+        >
+          <Icon name="Award" className="h-3 w-3 ml-1 shrink-0" />
+          <span className="whitespace-nowrap">جودة مضمونة</span>
         </Badge>
-        <Badge variant="secondary" className="bg-accent/10 text-accent border-accent/20">
-          <Icon name="Truck" className="h-3 w-3 ml-1" />
-          توصيل سريع
+        <Badge
+          variant="secondary"
+          className="bg-info-soft-background text-info-foreground border-info-foreground/20 hover:bg-info-soft-background/80 transition-colors duration-200 text-xs"
+        >
+          <Icon name="Truck" className="h-3 w-3 ml-1 shrink-0" />
+          <span className="whitespace-nowrap">توصيل سريع</span>
         </Badge>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/50">
+      {/* Stats - Enhanced mobile grid */}
+      <div className="grid grid-cols-3 gap-3 md:gap-4 pt-4 border-t border-border">
         <div className="text-center">
-          <div className="text-2xl font-bold text-foreground">{productCount ?? '...'}</div>
+          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">
+            {productCount ?? '...'}
+          </div>
           <div className="text-xs text-muted-foreground">منتج</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-accent">{clientCount ?? '...'}</div>
+          <div className="text-xl md:text-2xl font-bold text-feature-users tabular-nums">
+            {clientCount ?? '...'}
+          </div>
           <div className="text-xs text-muted-foreground">عميل راضي</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-foreground">24/7</div>
+          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">24/7</div>
           <div className="text-xs text-muted-foreground">دعم فني</div>
         </div>
       </div>
@@ -76,65 +97,101 @@ function CompanyInfo({ aboutus, companyName, productCount, clientCount }: { abou
   );
 }
 
-// Services Section Component (45 lines)
+// Services Section with enhanced accessibility and mobile UX
 function ServicesSection({ userId }: { userId?: string }) {
   const services = [
-    { name: 'المتجر الإلكتروني', href: '/', iconName: 'ShoppingBag' },
-    { name: 'من نحن', href: '/about', iconName: 'Users' },
-    { name: 'تواصل معنا', href: '/contact', iconName: 'Phone' },
-    { name: 'المفضلة', href: userId ? `/user/wishlist/${userId}` : '/auth/login?redirect=/user/wishlist', iconName: 'Heart' },
-    { name: 'التقييمات', href: '/user/ratings', iconName: 'Star' },
-    { name: 'الطلبات', href: '/user/purchase-history', iconName: 'Package' },
+    { name: 'المتجر الإلكتروني', href: '/', iconName: 'ShoppingBag', description: 'تصفح منتجاتنا المميزة' },
+    { name: 'من نحن', href: '/about', iconName: 'Users', description: 'تعرف على قصتنا' },
+    { name: 'تواصل معنا', href: '/contact', iconName: 'Phone', description: 'نحن هنا لمساعدتك' },
+    {
+      name: 'المفضلة',
+      href: userId ? `/user/wishlist/${userId}` : '/auth/login?redirect=/user/wishlist',
+      iconName: 'Heart',
+      description: 'قائمة منتجاتك المفضلة'
+    },
+    { name: 'التقييمات', href: '/user/ratings', iconName: 'Star', description: 'شاركنا رأيك' },
+    { name: 'الطلبات', href: '/user/purchase-history', iconName: 'Package', description: 'تتبع طلباتك' },
   ];
+
   const customerService = [
-    { name: 'الدعم الفني', href: '/contact', iconName: 'Headset' },
-    { name: 'شروط الاستخدام وسياسة الإرجاع', href: '/privacy', iconName: 'CheckCircle2' },
+    {
+      name: 'الدعم الفني',
+      href: '/contact',
+      iconName: 'Headset',
+      description: 'مساعدة فورية على مدار الساعة'
+    },
+    {
+      name: 'شروط الاستخدام وسياسة الإرجاع',
+      href: '/privacy',
+      iconName: 'CheckCircle2',
+      description: 'تعرف على حقوقك وواجباتك'
+    },
   ];
+
   return (
-    <div className="grid md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+      {/* Main Services */}
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Icon name="Globe" className="h-5 w-5 text-foreground" />
-          خدماتنا
+        <h3 className="text-base md:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Icon name="Globe" className="h-4 w-4 md:h-5 md:w-5 text-feature-commerce shrink-0" />
+          <span>خدماتنا</span>
         </h3>
-        <ul className="space-y-3">
-          {services.map((service) => (
-            <li key={service.name}>
-              <Link
-                href={service.href}
-                className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
-              >
-                <Icon name={service.iconName} className="h-4 w-4 text-foreground group-hover:text-foreground/80 transition-colors" />
-                <span className="text-sm">{service.name}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <nav aria-label="خدمات الموقع" role="navigation">
+          <ul className="space-y-3" role="list">
+            {services.map((service) => (
+              <li key={service.name}>
+                <Link
+                  href={service.href}
+                  className="group flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1 -m-1"
+                  aria-label={`${service.name} - ${service.description}`}
+                >
+                  <Icon
+                    name={service.iconName}
+                    className="h-4 w-4 text-primary group-hover:text-primary/80 group-hover:scale-110 transition-all duration-200 shrink-0"
+                  />
+                  <span className="group-hover:font-medium transition-all duration-200">
+                    {service.name}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
+
+      {/* Customer Service */}
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Icon name="Headphones" className="h-5 w-5 text-accent" />
-          خدمة العملاء
+        <h3 className="text-base md:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Icon name="Headphones" className="h-4 w-4 md:h-5 md:w-5 text-feature-users shrink-0" />
+          <span>خدمة العملاء</span>
         </h3>
-        <ul className="space-y-3">
-          {customerService.map((service) => (
-            <li key={service.name}>
-              <Link
-                href={service.href}
-                className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
-              >
-                <Icon name={service.iconName} className="h-4 w-4 text-accent group-hover:text-accent/80 transition-colors" />
-                <span className="text-sm">{service.name}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <nav aria-label="خدمة العملاء" role="navigation">
+          <ul className="space-y-3" role="list">
+            {customerService.map((service) => (
+              <li key={service.name}>
+                <Link
+                  href={service.href}
+                  className="group flex items-start gap-3 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1 -m-1"
+                  aria-label={`${service.name} - ${service.description}`}
+                >
+                  <Icon
+                    name={service.iconName}
+                    className="h-4 w-4 text-feature-users group-hover:text-feature-users/80 group-hover:scale-110 transition-all duration-200 shrink-0 mt-0.5"
+                  />
+                  <span className="group-hover:font-medium transition-all duration-200 leading-relaxed">
+                    {service.name}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </div>
   );
 }
 
-// Enhanced Contact Component (50 lines)
+// Enhanced Contact Component with better mobile UX
 function EnhancedContact({
   email,
   phone,
@@ -153,104 +210,112 @@ function EnhancedContact({
   linkedin?: string;
 }) {
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="MapPin" className="h-5 w-5 text-secondary" />
-        تواصل معنا
+    <div className="space-y-4 md:space-y-6">
+      <h3 className="text-base md:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+        <Icon name="MapPin" className="h-4 w-4 md:h-5 md:w-5 text-feature-suppliers shrink-0" />
+        <span>تواصل معنا</span>
       </h3>
 
-      <div className="space-y-4">
+      <address className="not-italic space-y-4">
         {email && (
-          <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <CustomSvgIcon name="mail" className="h-4 w-4 text-white" />
+          <div className="group flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-200 shrink-0">
+              <CustomSvgIcon name="mail" className="h-4 w-4 text-primary" />
             </div>
-            <a href={`mailto:${email}`} className="text-sm text-gray-300 hover:text-foreground transition-colors">
+            <a
+              href={`mailto:${email}`}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md truncate"
+              aria-label={`إرسال بريد إلكتروني إلى ${email}`}
+            >
               {email}
             </a>
           </div>
         )}
 
         {phone && (
-          <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <CustomSvgIcon name="phone" className="h-4 w-4 text-white" />
+          <div className="group flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-200 shrink-0">
+              <CustomSvgIcon name="phone" className="h-4 w-4 text-primary" />
             </div>
-            <a href={`tel:${phone}`} className="text-sm text-gray-300 hover:text-foreground transition-colors">
+            <a
+              href={`tel:${phone}`}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+              aria-label={`الاتصال بالرقم ${phone}`}
+            >
               {phone}
             </a>
           </div>
         )}
 
         {address && (
-          <div className="flex items-center gap-3 group">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <CustomSvgIcon name="map-pin" className="h-4 w-4 text-white" />
+          <div className="group flex items-start gap-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <CustomSvgIcon name="map-pin" className="h-4 w-4 text-primary" />
             </div>
-            <span className="text-sm text-gray-300">
+            <span className="text-sm text-muted-foreground leading-relaxed">
               {address}
             </span>
           </div>
         )}
 
-        {/* Social Media Links */}
+        {/* Social Media Links - Enhanced mobile layout */}
         {(facebook || instagram || twitter || linkedin) && (
-          <div className="pt-4 border-t border-border/50">
+          <div className="pt-4 border-t border-border">
             <h4 className="text-sm font-medium text-foreground mb-3">تابعنا على</h4>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {facebook && (
                 <Link
                   href={facebook}
-                  aria-label="فيسبوك"
+                  aria-label="تابعنا على فيسبوك (يفتح في نافذة جديدة)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
+                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <CustomSvgIcon name="facebook" className="h-4 w-4 text-white" />
+                  <CustomSvgIcon name="facebook" className="h-5 w-5 text-primary" />
                 </Link>
               )}
               {instagram && (
                 <Link
                   href={instagram}
-                  aria-label="انستغرام"
+                  aria-label="تابعنا على انستغرام (يفتح في نافذة جديدة)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
+                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <CustomSvgIcon name="instagram" className="h-4 w-4 text-white" />
+                  <CustomSvgIcon name="instagram" className="h-5 w-5 text-primary" />
                 </Link>
               )}
               {twitter && (
                 <Link
                   href={twitter}
-                  aria-label="تويتر"
+                  aria-label="تابعنا على تويتر (يفتح في نافذة جديدة)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
+                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <CustomSvgIcon name="twitter" className="h-4 w-4 text-white" />
+                  <CustomSvgIcon name="twitter" className="h-5 w-5 text-primary" />
                 </Link>
               )}
               {linkedin && (
                 <Link
                   href={linkedin}
-                  aria-label="لينكدإن"
+                  aria-label="تابعنا على لينكدإن (يفتح في نافذة جديدة)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/40 transition-colors"
+                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <CustomSvgIcon name="linkedin" className="h-4 w-4 text-white" />
+                  <CustomSvgIcon name="linkedin" className="h-5 w-5 text-primary" />
                 </Link>
               )}
             </div>
           </div>
         )}
-      </div>
+      </address>
     </div>
   );
 }
 
-// Main Footer Component (60 lines)
+// Main Footer Component - Server Component following Next.js 15+ best practices
 const Footer = ({
   aboutus,
   email,
@@ -266,22 +331,39 @@ const Footer = ({
   userId
 }: FooterProps) => {
   return (
-    <footer className="bg-background border-t border-gray-700 text-foreground pb-24">
+    <footer
+      className="bg-background border-t border-border text-foreground pb-20 md:pb-6"
+      role="contentinfo"
+      aria-label="معلومات الموقع والتواصل"
+    >
+      {/* Skip link for accessibility */}
+      <a
+        href="#footer-main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-primary-foreground"
+      >
+        الانتقال إلى معلومات الموقع
+      </a>
+
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Company Info - Takes up more space */}
-          <div className="lg:col-span-4">
-            <CompanyInfo aboutus={aboutus} companyName={companyName} productCount={productCount} clientCount={clientCount} />
+      <div id="footer-main" className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Company Info - Enhanced responsive layout */}
+          <div className="md:col-span-2 lg:col-span-4">
+            <CompanyInfo
+              aboutus={aboutus}
+              companyName={companyName}
+              productCount={productCount}
+              clientCount={clientCount}
+            />
           </div>
 
-          {/* Services - Takes up more space */}
-          <div className="lg:col-span-5">
+          {/* Services - Better mobile stacking */}
+          <div className="md:col-span-2 lg:col-span-5">
             <ServicesSection userId={userId} />
           </div>
 
-          {/* Contact & Newsletter */}
-          <div className="lg:col-span-3 space-y-8">
+          {/* Contact & Newsletter - Improved mobile layout */}
+          <div className="md:col-span-2 lg:col-span-3 space-y-8">
             <EnhancedContact
               email={email}
               phone={phone}
@@ -296,15 +378,30 @@ const Footer = ({
         </div>
       </div>
 
-      <Separator className="mx-4 sm:mx-6 lg:mx-8 border-gray-700" />
+      <Separator className="mx-4 sm:mx-6 lg:mx-8 border-border" />
 
-      {/* Bottom Footer - Developer Area */}
-      <div className="bg-muted/30 py-6">
+      {/* Bottom Footer - Enhanced design */}
+      <div className="bg-muted/30 py-4 md:py-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <AppVersion />
-            <div className="text-sm text-gray-400">
-              © 2024 Dream To App. جميع الحقوق محفوظة.
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <AppVersion />
+              <div className="text-xs md:text-sm text-muted-foreground">
+                © 2024{' '}
+                <Link
+                  href="https://dreamto.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 rounded-sm"
+                  aria-label="زيارة موقع Dream To App (يفتح في نافذة جديدة)"
+                >
+                  Dream To App
+                </Link>
+                . جميع الحقوق محفوظة.
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground text-center sm:text-right">
+              صُنع بـ ❤️ في المملكة العربية السعودية
             </div>
           </div>
         </div>

@@ -1,32 +1,68 @@
 import React from 'react';
-import MapPinIcon from './MapPinIcon';
-import FacebookIcon from './FacebookIcon';
-import TwitterIcon from './TwitterIcon';
-import LinkedinIcon from './LinkedinIcon';
-import InstagramIcon from './InstagramIcon';
-import MailIcon from './MailIcon';
-import PhoneIcon from './PhoneIcon';
-import WhatsappIcon from './WhatsappIcon';
+import { cn } from '@/lib/utils';
 
-const iconMap: Record<string, React.ComponentType<any>> = {
-    'map-pin': MapPinIcon,
-    'facebook': FacebookIcon,
-    'twitter': TwitterIcon,
-    'linkedin': LinkedinIcon,
-    'instagram': InstagramIcon,
-    'mail': MailIcon,
-    'phone': PhoneIcon,
-    'whatsapp': WhatsappIcon,
-};
+// Dynamic imports for better code splitting and performance
+import dynamic from 'next/dynamic';
 
-interface CustomSvgIconProps extends React.SVGProps<SVGSVGElement> {
-    name: string;
+// Create a map of dynamic imports for better performance
+const iconComponents = {
+    'map-pin': dynamic(() => import('./MapPinIcon'), { ssr: true }),
+    'facebook': dynamic(() => import('./FacebookIcon'), { ssr: true }),
+    'twitter': dynamic(() => import('./TwitterIcon'), { ssr: true }),
+    'linkedin': dynamic(() => import('./LinkedinIcon'), { ssr: true }),
+    'instagram': dynamic(() => import('./InstagramIcon'), { ssr: true }),
+    'mail': dynamic(() => import('./MailIcon'), { ssr: true }),
+    'phone': dynamic(() => import('./PhoneIcon'), { ssr: true }),
+    'whatsapp': dynamic(() => import('./WhatsappIcon'), { ssr: true }),
+} as const;
+
+// Type-safe icon names
+type IconName = keyof typeof iconComponents;
+
+interface CustomSvgIconProps extends Omit<React.SVGProps<SVGSVGElement>, 'name'> {
+    name: IconName;
+    size?: 'sm' | 'md' | 'lg';
+    className?: string;
 }
 
-const CustomSvgIcon: React.FC<CustomSvgIconProps> = ({ name, ...props }) => {
-    const IconComponent = iconMap[name];
-    if (!IconComponent) return null;
-    return <IconComponent {...props} />;
+// Size mappings for consistent icon sizing
+const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6',
+} as const;
+
+const CustomSvgIcon: React.FC<CustomSvgIconProps> = ({
+    name,
+    size = 'md',
+    className,
+    ...props
+}) => {
+    const IconComponent = iconComponents[name];
+
+    if (!IconComponent) {
+        // Fallback for unknown icons with proper accessibility
+        return (
+            <div
+                className={cn(sizeClasses[size], 'bg-muted rounded flex items-center justify-center', className)}
+                role="img"
+                aria-label={`أيقونة ${name}`}
+            >
+                <span className="sr-only">أيقونة غير متوفرة</span>
+            </div>
+        );
+    }
+
+    return (
+        <IconComponent
+            className={cn(sizeClasses[size], className)}
+            role="img"
+            aria-hidden="true"
+            focusable="false"
+            {...props}
+        />
+    );
 };
 
-export default CustomSvgIcon; 
+// Memoize the component for better performance
+export default React.memo(CustomSvgIcon); 
