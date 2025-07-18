@@ -10,6 +10,7 @@ import Link from '@/components/link';
 import { ReactNode } from 'react';
 import { CarFront, Focus } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
+import NotificationBellClient from '@/components/NotificationBellClient';
 
 interface User {
     id: string;
@@ -25,6 +26,7 @@ interface HeaderUnifiedProps {
     user: User | null;
     isLoggedIn?: boolean;
     notificationBell?: ReactNode;
+    unreadCount?: number;
 }
 
 function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User | null }) {
@@ -35,13 +37,14 @@ function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User
     );
 }
 
-function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wishlistIcon }: {
+function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wishlistIcon, unreadCount }: {
     logo: string;
     logoAlt: string;
     isLoggedIn: boolean;
     user: User | null;
     notificationBell?: ReactNode;
     wishlistIcon?: ReactNode;
+    unreadCount?: number;
 }) {
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-sm transition-all duration-300">
@@ -68,7 +71,13 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
                     <SearchBar />
                     {wishlistIcon}
                     <CartIconClient />
-                    {notificationBell}
+                    {/* Use reactive notification bell for logged-in users */}
+                    {isLoggedIn ? (
+                        <NotificationBellClient
+                            initialCount={unreadCount || 0}
+                            showWarning={false}
+                        />
+                    ) : notificationBell}
                     <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
                 </div>
             </nav>
@@ -76,12 +85,13 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
     );
 }
 
-function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
+function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, unreadCount }: {
     logo: string;
     logoAlt: string;
     isLoggedIn: boolean;
     user: User | null;
     notificationBell?: ReactNode;
+    unreadCount?: number;
 }) {
     return (
         <header className="fixed top-0 left-0 right-0 w-full z-50 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-sm">
@@ -105,7 +115,13 @@ function MobileHeader({ logo, logoAlt, isLoggedIn, user, notificationBell }: {
                         </Link>
                     )}
                     <SearchBar />
-                    {notificationBell}
+                    {/* Use reactive notification bell for logged-in users */}
+                    {isLoggedIn ? (
+                        <NotificationBellClient
+                            initialCount={unreadCount || 0}
+                            showWarning={false}
+                        />
+                    ) : notificationBell}
                     <UserMenuOrLogin isLoggedIn={isLoggedIn} user={user} />
                 </div>
             </nav>
@@ -120,6 +136,7 @@ export default function HeaderUnified({
     isLoggedIn = false,
     notificationBell,
     wishlistIcon,
+    unreadCount,
 }: HeaderUnifiedProps & { wishlistIcon?: ReactNode }) {
     const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -131,6 +148,7 @@ export default function HeaderUnified({
             user={user}
             notificationBell={notificationBell}
             wishlistIcon={wishlistIcon}
+            unreadCount={unreadCount}
         />
     ) : (
         <MobileHeader
@@ -139,6 +157,7 @@ export default function HeaderUnified({
             isLoggedIn={isLoggedIn}
             user={user}
             notificationBell={notificationBell}
+            unreadCount={unreadCount}
         />
     );
 } 

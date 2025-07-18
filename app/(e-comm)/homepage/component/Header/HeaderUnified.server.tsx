@@ -18,7 +18,7 @@ interface HeaderUnifiedServerProps {
 }
 
 export default async function HeaderUnifiedServer(props: HeaderUnifiedServerProps) {
-    const { user } = props;
+    const { user, unreadCount } = props;
     const notificationBell = user ? <NotificationBell userId={user.id} /> : null;
     const wishlistIcon = await WishlistIconServer();
     return (
@@ -26,6 +26,7 @@ export default async function HeaderUnifiedServer(props: HeaderUnifiedServerProp
             {...props}
             notificationBell={notificationBell}
             wishlistIcon={wishlistIcon}
+            unreadCount={unreadCount}
         />
     );
 } 

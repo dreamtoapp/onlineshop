@@ -3,6 +3,8 @@ import HeaderUnified from './homepage/component/Header/HeaderUnified.server';
 import CustomMobileBottomNav from './homepage/component/Header/CustomMobileBottomNav';
 import { fetchEcommLayoutData } from './helpers/layoutData';
 import FilterAlert from '@/components/FilterAlert';
+import RealtimeNotificationListener from './(adminPage)/user/notifications/components/RealtimeNotificationListener';
+import NotificationTest from '@/app/components/NotificationTest';
 
 export default async function EcommerceLayout({ children }: { children: React.ReactNode }) {
   try {
@@ -31,6 +33,10 @@ export default async function EcommerceLayout({ children }: { children: React.Re
         />
         <FilterAlert />
         <CustomMobileBottomNav />
+        {/* Real-time notification listener - only for logged-in users */}
+        {session && <RealtimeNotificationListener />}
+        {/* Test component for notifications - DEVELOPMENT ONLY */}
+        {process.env.NODE_ENV === 'development' && <NotificationTest />}
         <main className='flex-grow'>
           <div className='container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-18 md:pt-20 pb-8'>
             {children}

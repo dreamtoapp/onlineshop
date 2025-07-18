@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { signOut } from 'next-auth/react';
 import { Icon } from '@/components/icons/Icon';
+import { usePusherConnectionStatus } from '@/app/(e-comm)/(adminPage)/user/notifications/components/RealtimeNotificationListener';
 
 interface UserMenuTriggerProps {
     user: {
@@ -38,6 +39,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     const [hasFetched, setHasFetched] = useState(false); // Simple caching
     const name = user?.name;
     const image = user?.image;
+    const isConnected = usePusherConnectionStatus();
 
     // User-specific navigation items only (removed universal navigation)
     const userNavItems = user ? [
@@ -145,9 +147,17 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                             {name?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                     </Avatar>
+                    {/* Notification alerts dot */}
                     {alerts && alerts.length > 0 && (
                         <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full border-2 border-background animate-pulse" />
                     )}
+                    {/* Real-time connection status dot */}
+                    <span className={`absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-background transition-colors duration-300 ${isConnected
+                        ? 'bg-green-500 shadow-sm shadow-green-500/50'
+                        : 'bg-yellow-500 shadow-sm shadow-yellow-500/50'
+                        }`}
+                        title={isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
+                    />
                 </Button>
             </DropdownMenuTrigger>
 
@@ -159,16 +169,25 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                 {/* User Info Header */}
                 <div className="p-4 border-b border-border/30 bg-muted/30">
                     <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12 border-2 border-border">
-                            <AvatarImage
-                                src={image || "/fallback/fallback.avif"}
-                                alt={name || "User"}
-                                className="object-cover"
+                        <div className="relative">
+                            <Avatar className="h-12 w-12 border-2 border-border">
+                                <AvatarImage
+                                    src={image || "/fallback/fallback.avif"}
+                                    alt={name || "User"}
+                                    className="object-cover"
+                                />
+                                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                    {name?.[0]?.toUpperCase() || "U"}
+                                </AvatarFallback>
+                            </Avatar>
+                            {/* Connection status dot for dropdown avatar */}
+                            <span className={`absolute top-0 right-0 h-3 w-3 rounded-full border-2 border-background transition-colors duration-300 ${isConnected
+                                ? 'bg-green-500 shadow-sm shadow-green-500/50'
+                                : 'bg-yellow-500 shadow-sm shadow-yellow-500/50'
+                                }`}
+                                title={isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
                             />
-                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                                {name?.[0]?.toUpperCase() || "U"}
-                            </AvatarFallback>
-                        </Avatar>
+                        </div>
                         <div className="flex-1 min-w-0">
                             <DropdownMenuLabel className="text-base font-semibold text-foreground p-0 truncate">
                                 {name || "المستخدم"}
@@ -181,6 +200,14 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                                     عضو منذ {userStats.memberSince}
                                 </p>
                             )}
+                            {/* Connection status indicator */}
+                            <div className="flex items-center gap-1.5 mt-1">
+                                <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${isConnected ? 'bg-green-500' : 'bg-yellow-500'
+                                    }`} />
+                                <span className="text-xs text-muted-foreground/70">
+                                    {isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
+                                </span>
+                            </div>
                         </div>
                         {isLoading && (
                             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />

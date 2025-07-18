@@ -5,14 +5,14 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { CheckCircle, Bell, BellOff, Filter, User, ShoppingCart, Settings, Megaphone } from 'lucide-react';
+import { CheckCircle, Bell, BellOff, Filter, ShoppingCart, Settings, Gift, RotateCcw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getUserNotifications } from './actions/getUserNotifications';
-import { handleMarkAsRead, markAllAsRead } from './actions/markAsRead';
+import { markAllAsRead, toggleNotificationRead } from './actions/markAsRead';
+import { getSystemNotificationIcon, getSystemNotificationStyle } from '@/helpers/notificationIconHelper';
 
-type NotificationType = 'order' | 'system' | 'user' | 'promotion';
+type NotificationType = 'ORDER' | 'PROMO' | 'SYSTEM';
 
 interface Notification {
     id: string;
@@ -23,11 +23,35 @@ interface Notification {
     createdAt: string;
     actionUrl?: string;
     isNew?: boolean;
-    mentionedUser?: {
-        name: string;
-        image?: string;
-    };
 }
+
+// Notification type configuration
+const notificationConfig = {
+    ORDER: {
+        label: 'الطلبات',
+        icon: ShoppingCart,
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+        borderColor: 'border-blue-200',
+        glowColor: 'border-blue-500'
+    },
+    PROMO: {
+        label: 'العروض',
+        icon: Gift,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        borderColor: 'border-purple-200',
+        glowColor: 'border-purple-500'
+    },
+    SYSTEM: {
+        label: 'النظام',
+        icon: Settings,
+        color: 'text-gray-600',
+        bgColor: 'bg-gray-50',
+        borderColor: 'border-gray-200',
+        glowColor: 'border-gray-500'
+    }
+};
 
 export default function NotificationsPage() {
     const { data: session, status } = useSession();
@@ -62,14 +86,20 @@ export default function NotificationsPage() {
         }
     }, [session]);
 
-    const handleMarkAsReadAction = async (id: string) => {
+    // 🔄 Toggle notification read/unread status
+    const handleToggleRead = async (id: string) => {
         try {
-            await handleMarkAsRead(id);
-            setNotifications(prev => prev.map(n =>
-                n.id === id ? { ...n, read: true, isNew: false } : n
-            ));
+            const result = await toggleNotificationRead(id);
+            if (result.success && result.notification) {
+                setNotifications(prev => prev.map(n =>
+                    n.id === id ? { ...n, read: result.notification!.read, isNew: false } : n
+                ));
+
+                // Trigger counter update in header
+                localStorage.setItem('notification-update', Date.now().toString());
+            }
         } catch (error) {
-            console.error('Failed to mark notification as read', error);
+            console.error('Failed to toggle notification read status', error);
         }
     };
 
@@ -78,6 +108,9 @@ export default function NotificationsPage() {
             if (session?.user?.id) {
                 await markAllAsRead(session.user.id);
                 setNotifications(prev => prev.map(n => ({ ...n, read: true, isNew: false })));
+
+                // Trigger counter update in header
+                localStorage.setItem('notification-update', Date.now().toString());
             }
         } catch (error) {
             console.error('Failed to mark all notifications as read', error);
@@ -92,7 +125,8 @@ export default function NotificationsPage() {
         ? notifications
         : notifications.filter(n => n.type === activeFilter);
 
-    const notificationTypes: NotificationType[] = ['order', 'system', 'user', 'promotion'];
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const notificationTypes: NotificationType[] = ['ORDER', 'PROMO', 'SYSTEM'];
 
     if (status === 'loading' || loading) {
         return (
@@ -134,15 +168,17 @@ export default function NotificationsPage() {
                 <h1 className="text-2xl font-bold flex items-center gap-2">
                     <Bell className="h-6 w-6 text-feature-analytics" />
                     الإشعارات
-                    <Badge variant="outline" className="ml-2">
-                        {notifications.filter(n => !n.read).length} غير مقروء
-                    </Badge>
+                    {unreadCount > 0 && (
+                        <Badge variant="destructive" className="ml-2">
+                            {unreadCount} غير مقروء
+                        </Badge>
+                    )}
                 </h1>
-                {notifications.length > 0 && (
+                {notifications.length > 0 && unreadCount > 0 && (
                     <Button
                         onClick={handleMarkAllAsReadAction}
                         variant="ghost"
-                        className="text-feature-analytics hover:bg-feature-analytics-soft"
+                        className="text-feature-analytics hover:bg-feature-analytics/10"
                     >
                         <BellOff className="h-4 w-4 mr-2" />
                         تمييز الكل كمقروء
@@ -151,119 +187,174 @@ export default function NotificationsPage() {
             </div>
 
             {/* Filter controls */}
-            <div className="flex justify-between mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                 <Button
                     variant={activeFilter === 'all' ? 'default' : 'outline'}
                     onClick={() => setActiveFilter('all')}
-                    className="flex items-center gap-2 min-w-[60px]"
+                    className="flex items-center gap-2 min-w-[80px]"
                 >
                     <Filter className="h-4 w-4" />
-                    <span className="hidden md:inline">الكل</span>
+                    الكل ({notifications.length})
                 </Button>
-                {notificationTypes.map(type => (
-                    <Button
-                        key={type}
-                        variant={activeFilter === type ? 'default' : 'outline'}
-                        onClick={() => setActiveFilter(type)}
-                        className="min-w-[40px] md:min-w-[100px]"
-                    >
-                        {type === 'order' && <ShoppingCart className="h-4 w-4 mr-2 md:mr-2" />}
-                        {type === 'system' && <Settings className="h-4 w-4 mr-2 md:mr-2" />}
-                        {type === 'user' && <User className="h-4 w-4 mr-2 md:mr-2" />}
-                        {type === 'promotion' && <Megaphone className="h-4 w-4 mr-2 md:mr-2" />}
-                        <span className="hidden md:inline">
-                            {type === 'order' && 'الطلبات'}
-                            {type === 'system' && 'النظام'}
-                            {type === 'user' && 'المستخدمين'}
-                            {type === 'promotion' && 'العروض'}
-                        </span>
-                    </Button>
-                ))}
+                {notificationTypes.map(type => {
+                    const config = notificationConfig[type] || {
+                        label: 'عام',
+                        icon: Bell,
+                        color: 'text-gray-600',
+                        bgColor: 'bg-gray-50'
+                    };
+                    const typeCount = notifications.filter(n => n.type === type).length;
+                    const IconComponent = config.icon;
+
+                    return (
+                        <Button
+                            key={type}
+                            variant={activeFilter === type ? 'default' : 'outline'}
+                            onClick={() => setActiveFilter(type)}
+                            className={`flex items-center gap-2 min-w-[100px] ${activeFilter === type ? '' : `hover:${config.bgColor}`
+                                }`}
+                        >
+                            <IconComponent className={`h-4 w-4 ${config.color}`} />
+                            {config.label} ({typeCount})
+                        </Button>
+                    );
+                })}
             </div>
 
             <div className="space-y-4">
                 {filteredNotifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
                         <BellOff className="h-12 w-12 text-muted-foreground" />
-                        <p className="text-muted-foreground text-lg">لا توجد إشعارات حالياً</p>
+                        <p className="text-muted-foreground text-lg">
+                            {activeFilter === 'all'
+                                ? 'لا توجد إشعارات حالياً'
+                                : `لا توجد إشعارات ${notificationConfig[activeFilter as NotificationType]?.label || 'عامة'}`
+                            }
+                        </p>
                         <p className="text-sm text-muted-foreground max-w-md">
-                            سيظهر هنا أي إشعارات جديدة تتلقاها حول طلباتك، نشاط الحساب والعروض الخاصة
+                            {activeFilter === 'ORDER' && 'ستظهر هنا تحديثات طلباتك من تأكيد الطلب حتى التوصيل'}
+                            {activeFilter === 'PROMO' && 'ستظهر هنا العروض الخاصة والخصومات المخصصة لك'}
+                            {activeFilter === 'SYSTEM' && 'ستظهر هنا الرسائل المهمة وتحديثات النظام'}
+                            {activeFilter === 'all' && 'سيظهر هنا أي إشعارات جديدة تتلقاها حول طلباتك والعروض الخاصة'}
                         </p>
                         <Button variant="outline" className="mt-4" onClick={() => router.push('/')}>
                             تصفح المتجر
                         </Button>
                     </div>
                 ) : (
-                    filteredNotifications.map((n) => (
-                        <div key={n.id} className="animate-in fade-in slide-in-from-bottom-5">
-                            <Card className={`relative shadow-lg border-l-8 transition-all duration-300 ${n.read
-                                ? 'border-border hover:shadow-md bg-background/80'
-                                : 'border-feature-analytics card-border-glow hover:shadow-xl bg-background'
-                                } card-hover-effect overflow-hidden`}>
-                                {n.isNew && !n.read && (
-                                    <Badge variant="default" className="absolute -top-2 -right-2 animate-pulse">
-                                        جديد
-                                    </Badge>
-                                )}
-                                <div className={`absolute top-0 right-0 h-1 w-full bg-gradient-to-r from-transparent to-feature-analytics/30 ${n.read ? 'opacity-0' : 'opacity-100'} transition-opacity`}></div>
-                                <CardHeader className="pb-3 pt-2 px-4 flex flex-row items-center justify-between">
-                                    <CardTitle className="flex items-center gap-2 text-lg font-medium">
-                                        {n.mentionedUser ? (
-                                            <Avatar className="h-8 w-8 ring-1 ring-feature-analytics/20">
-                                                <AvatarImage src={n.mentionedUser.image} />
-                                                <AvatarFallback className="bg-feature-analytics/20">
-                                                    {n.mentionedUser.name.charAt(0).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        ) : (
-                                            <span className={`h-6 w-6 icon-enhanced rounded-full p-1.5 ${n.read ? 'bg-feature-analytics/10' : 'bg-feature-analytics/20'} text-feature-analytics`}>
-                                                {n.type === 'order' && <ShoppingCart className="h-3.5 w-3.5" />}
-                                                {n.type === 'system' && <Settings className="h-3.5 w-3.5" />}
-                                                {n.type === 'user' && <User className="h-3.5 w-3.5" />}
-                                                {n.type === 'promotion' && <Megaphone className="h-3.5 w-3.5" />}
-                                            </span>
-                                        )}
-                                        <span className={n.read ? 'text-muted-foreground' : 'text-feature-analytics font-semibold'}>
-                                            {n.title}
-                                        </span>
-                                    </CardTitle>
-                                    <span className={`text-xs ${n.read ? 'text-muted-foreground/60' : 'text-muted-foreground/80'}`}>
-                                        {new Date(n.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                </CardHeader>
-                                <CardContent className="pt-3 pb-4 px-4">
-                                    <div className={`mb-3 text-sm ${n.read ? 'text-muted-foreground/70' : 'text-foreground'}`}>{n.body}</div>
-                                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
-                                        <span className="text-xs text-muted-foreground/60 italic">
-                                            {new Date(n.createdAt).toLocaleDateString('ar-EG')}
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            {n.actionUrl && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="btn-view-outline h-7 px-2 text-xs rounded-md hover:bg-feature-analytics/10"
-                                                    onClick={() => handleActionClick(n.actionUrl!)}
-                                                >
-                                                    تفاصيل
-                                                </Button>
-                                            )}
-                                            {!n.read && (
-                                                <Button
-                                                    onClick={() => handleMarkAsReadAction(n.id)}
-                                                    size="sm"
-                                                    className="btn-save h-7 px-2 text-xs rounded-md flex items-center gap-0.5"
-                                                >
-                                                    <CheckCircle className="h-3 w-3" />
-                                                    مقروء
-                                                </Button>
-                                            )}
+                    filteredNotifications.map((notification) => {
+                        // Use smart styling for SYSTEM notifications
+                        let config = notificationConfig[notification.type] || {
+                            label: 'عام',
+                            icon: Bell,
+                            color: 'text-gray-600',
+                            bgColor: 'bg-gray-50',
+                            borderColor: 'border-gray-200',
+                            glowColor: 'border-gray-500'
+                        };
+
+                        // Override for SYSTEM notifications with smart icons and colors
+                        if (notification.type === 'SYSTEM') {
+                            const smartStyle = getSystemNotificationStyle(notification.title);
+                            const smartIcon = getSystemNotificationIcon(notification.title);
+                            config = {
+                                ...config,
+                                icon: smartIcon,
+                                ...smartStyle
+                            };
+                        }
+
+                        const IconComponent = config.icon;
+
+                        return (
+                            <div key={notification.id} className="animate-in fade-in slide-in-from-bottom-5">
+                                <Card className={`relative shadow-lg border-l-4 transition-all duration-300 ${notification.read
+                                    ? `${config.borderColor} hover:shadow-md bg-background/80`
+                                    : `${config.glowColor} card-border-glow hover:shadow-xl bg-background`
+                                    } card-hover-effect overflow-hidden`}>
+                                    {notification.isNew && !notification.read && (
+                                        <Badge variant="destructive" className="absolute -top-2 -right-2 animate-pulse">
+                                            جديد
+                                        </Badge>
+                                    )}
+
+                                    <CardHeader className="pb-3 pt-4 px-4 flex flex-row items-center justify-between">
+                                        <CardTitle className="flex items-center gap-3 text-lg font-medium">
+                                            <div className={`h-10 w-10 rounded-full ${config.bgColor} flex items-center justify-center ${notification.read ? 'opacity-70' : 'opacity-100'
+                                                }`}>
+                                                <IconComponent className={`h-5 w-5 ${config.color}`} />
+                                            </div>
+                                            <div>
+                                                <span className={notification.read ? 'text-muted-foreground' : 'text-foreground font-semibold'}>
+                                                    {notification.title}
+                                                </span>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Badge variant="outline" className={`text-xs ${config.color}`}>
+                                                        {config.label}
+                                                    </Badge>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {new Date(notification.createdAt).toLocaleTimeString('ar-EG', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </CardTitle>
+                                    </CardHeader>
+
+                                    <CardContent className="pt-0 pb-4 px-4">
+                                        <div className={`mb-4 text-sm leading-relaxed ${notification.read ? 'text-muted-foreground' : 'text-foreground'
+                                            }`}>
+                                            {notification.body}
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    ))
+
+                                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50">
+                                            <span className="text-xs text-muted-foreground">
+                                                {new Date(notification.createdAt).toLocaleDateString('ar-EG', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                {notification.actionUrl && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-3 text-xs"
+                                                        onClick={() => handleActionClick(notification.actionUrl!)}
+                                                    >
+                                                        عرض التفاصيل
+                                                    </Button>
+                                                )}
+
+                                                {/* Toggle Read/Unread Button */}
+                                                <Button
+                                                    onClick={() => handleToggleRead(notification.id)}
+                                                    size="sm"
+                                                    variant={notification.read ? "outline" : "default"}
+                                                    className="h-8 px-3 text-xs flex items-center gap-1"
+                                                >
+                                                    {notification.read ? (
+                                                        <>
+                                                            <RotateCcw className="h-3 w-3" />
+                                                            غير مقروء
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <CheckCircle className="h-3 w-3" />
+                                                            مقروء
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        );
+                    })
                 )}
             </div>
         </div>

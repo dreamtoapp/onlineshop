@@ -3,7 +3,6 @@
 import db from "@/lib/prisma";
 import { checkIsLogin } from "@/lib/check-is-login";
 import { getCart } from "@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { pusherServer } from '@/lib/pusherServer';
 import { OrderNumberGenerator } from "@/helpers/orderNumberGenerator";
@@ -47,9 +46,9 @@ export async function createDraftOrder(formData: FormData) {
       throw { code: 'REDIRECT_TO_HAPPYORDER', message: 'redirect to happyorder' };
     }
 
-    // Ensure user is authenticated
+    // Ensure user is authenticated and exists
     if (!user?.id) {
-      redirect("/auth/login");
+      throw { code: 'REDIRECT_TO_LOGIN', message: 'User not authenticated' };
     }
 
     // Parse and validate all form data
@@ -164,16 +163,29 @@ export async function createDraftOrder(formData: FormData) {
     // }
     // revalidateTag("cart");
 
-    // Create notification for admin
-    await db.userNotification.create({
-      data: {
-        title: 'طلب جديد',
-        body: `طلب جديد #${order.orderNumber} بقيمة ${total.toFixed(2)} ر.س من ${validatedData.fullName}`,
-        type: 'ORDER',
-        read: false,
-        userId: user.id,
+    // Create notification for admin users (not the customer)
+    const adminUsers = await db.user.findMany({
+      where: {
+        role: { in: ['ADMIN', 'MARKETER'] }
       },
+      select: { id: true }
     });
+
+    // Create notifications for all admin users
+    const notificationPromises = adminUsers.map(admin =>
+      db.userNotification.create({
+        data: {
+          title: 'طلب جديد',
+          body: `طلب جديد #${order.orderNumber} بقيمة ${total.toFixed(2)} ر.س من ${validatedData.fullName}`,
+          type: 'ORDER',
+          read: false,
+          userId: admin.id, // Send to admin, not customer
+          actionUrl: `/dashboard/management-orders`
+        },
+      })
+    );
+
+    await Promise.all(notificationPromises);
 
     // Revalidate home page and user stats data
     revalidatePath('/');

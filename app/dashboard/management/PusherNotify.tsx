@@ -1,90 +1,49 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useNotificationStore } from '@/components/ui/notificationStore';
-import Notification from '@/components/ui/Notification';
-
-function showToast(message: string) {
-    const toast = document.createElement('div');
-    toast.innerText = message;
-    toast.style.position = 'fixed';
-    toast.style.bottom = '32px';
-    toast.style.right = '32px';
-    toast.style.background = '#323232';
-    toast.style.color = '#fff';
-    toast.style.padding = '16px 24px';
-    toast.style.borderRadius = '8px';
-    toast.style.zIndex = '9999';
-    toast.style.fontSize = '1rem';
-    toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.remove();
-    }, 4000);
-}
 
 export default function PusherNotify() {
-    const notificationsStore = useNotificationStore();
     useEffect(() => {
-        let pusher: any;
-        (async () => {
-            const Pusher = (await import('pusher-js')).default;
-            pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY || '', {
-                cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'mt1',
-            });
+        let pusher: any = null;
+        let channel: any = null;
 
-            // Subscribe to notification channels
-            const channel = pusher.subscribe('orders');
-            const adminChannel = pusher.subscribe('admin');
+        const initializePusher = async () => {
+            try {
+                // Dynamically import Pusher to avoid SSR issues
+                const { getPusherClient } = await import('@/lib/pusherClient');
+                pusher = await getPusherClient();
 
-            channel.bind('new-order', (data: any) => {
-                notificationsStore.add(
-                    <Notification
-                        type="order"
-                        title="طلب جديد"
-                        message={`رقم الطلب: ${data.orderId} من ${data.customer} | المبلغ: ${data.total?.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س`}
-                        onClose={() => notificationsStore.remove()}
-                    />,
-                    { persistent: true }
-                );
-                window.dispatchEvent(new Event('order-data-refresh'));
-            });
+                // Subscribe to orders channel for dashboard updates
+                channel = pusher.subscribe('orders');
 
-            adminChannel.bind('new-order', (data: any) => {
-                let type = 'newsletter';
-                let title = 'اشعار جديد';
-                let message = data.message || '';
-                if (data.type === 'contact') {
-                    type = 'contact';
-                    title = 'رسالة جديدة';
-                } else if (data.type === 'news') {
-                    type = 'newsletter';
-                    title = 'اشتراك جديد بالنشرة';
-                }
-                const id = Date.now() + Math.random();
-                notificationsStore.add(
-                    <Notification
-                        type={type as any}
-                        title={title}
-                        message={message}
-                        onClose={() => notificationsStore.remove(id)}
-                    />, { persistent: true, id }
-                );
-                setTimeout(() => notificationsStore.remove(id), 5000);
-            });
+                // Listen for new orders to refresh dashboard data
+                channel.bind('new-order', (_data: any) => {
+                    // Removed toast notification to prevent duplicates
+                    // Just trigger page refresh or data refetch
+                    console.log('📊 Dashboard: New order received, data will refresh');
 
-            channel.bind('order-updated', (data: any) => {
-                showToast(`تم تحديث الطلب: ${data.orderId}`);
-            });
-        })();
-        return () => {
-            if (pusher) {
-                pusher.unsubscribe('orders');
-                pusher.unsubscribe('admin');
-                pusher.disconnect();
+                    // Optional: You could trigger a data refresh here
+                    // refreshDashboardData();
+                });
+
+                console.log('✅ Dashboard Pusher notifications initialized');
+
+            } catch (error) {
+                console.error('❌ Failed to initialize dashboard Pusher:', error);
             }
         };
-    }, [notificationsStore]);
 
-    return null; // This component doesn't render anything
+        initializePusher();
+
+        // Cleanup
+        return () => {
+            if (channel) {
+                channel.unbind('new-order');
+                pusher?.unsubscribe('orders');
+            }
+        };
+    }, []);
+
+    // This component doesn't render anything
+    return null;
 } 

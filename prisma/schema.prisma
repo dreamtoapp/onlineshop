@@ -160,6 +160,7 @@ model User {
   wishlist      WishlistItem[] // User's wishlist items
   cart          Cart?          // User's cart
   UserNotification  UserNotification[]
+  errorLogs     ErrorLog[]
 
   // Driver-specific fields
   vehicleType       VehicleType? // Type of vehicle for drivers
@@ -729,4 +730,39 @@ model FAQ {
   aboutPage   AboutPageContent @relation("AboutPageFAQ", fields: [aboutPageId], references: [id], onDelete: Cascade)
   question    String
   answer      String
+}
+
+model ErrorLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  errorId   String   @unique // Human-readable error ID for users
+  message   String   // Error message
+  stack     String?  // Full error stack trace
+  digest    String?  // Next.js error digest
+  url       String?  // Page where error occurred
+  userAgent String?  // Browser/device info
+  userId    String?  @db.ObjectId // User who encountered error (if logged in)
+  user      User?    @relation(fields: [userId], references: [id])
+  severity  ErrorSeverity @default(MEDIUM)
+  status    ErrorStatus   @default(NEW)
+  resolved  Boolean  @default(false)
+  resolvedBy String? @db.ObjectId
+  resolvedAt DateTime?
+  notes     String?  // Admin notes for fixing
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ErrorStatus {
+  NEW
+  INVESTIGATING
+  IN_PROGRESS
+  RESOLVED
+  IGNORED
 }

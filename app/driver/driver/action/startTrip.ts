@@ -1,6 +1,7 @@
 'use server';
 import db from '@/lib/prisma';
 import { OrderInWay } from '@prisma/client';
+import { createOrderNotification, ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
 
 type Result<T = OrderInWay> =
   | { success: true; data: T }
@@ -19,6 +20,7 @@ export const startTrip = async (
   }
 
   try {
+    // Check if driver already has an active trip
     const existingTrip = await db.orderInWay.findFirst({
       where: { driverId },
     });
@@ -30,12 +32,31 @@ export const startTrip = async (
       };
     }
 
+    // Get order and customer details for notification
+    const order = await db.order.findUnique({
+      where: { id: orderId },
+      include: {
+        customer: true, // Customer info (User who placed the order)
+        driver: true // Driver info (User who is the driver)
+      }
+    });
+
+    if (!order) {
+      return { success: false, error: 'الطلب غير موجود' };
+    }
+
+    if (!order.driver) {
+      return { success: false, error: 'لم يتم تعيين سائق لهذا الطلب' };
+    }
+
+    // Create trip record
     const record = await db.orderInWay.create({
       data: {
         orderId,
         driverId,
         latitude,
         longitude,
+        orderNumber: order.orderNumber, // Add order number to track
       },
     });
 
@@ -45,8 +66,36 @@ export const startTrip = async (
       data: { status: 'IN_TRANSIT' },
     });
 
+    // 🚨 CREATE REAL-TIME NOTIFICATION FOR CUSTOMER
+    if (order.customerId) {
+      const notificationTemplate = ORDER_NOTIFICATION_TEMPLATES.TRIP_STARTED(
+        order.orderNumber || `#${orderId.slice(-6)}`,
+        order.driver?.name || 'السائق'
+      );
+
+      const notificationResult = await createOrderNotification({
+        userId: order.customerId,
+        orderId: order.id,
+        orderNumber: order.orderNumber || undefined,
+        driverName: order.driver?.name ?? undefined,
+        title: notificationTemplate.title,
+        body: notificationTemplate.body,
+        actionUrl: `/user/orders/${order.id}/track`
+      });
+
+      if (!notificationResult.success) {
+        console.error('Failed to send trip start notification:', notificationResult.error);
+        // Don't fail the trip start if notification fails
+      } else {
+        console.log(`✅ Trip start notification sent to user ${order.customerId}`);
+      }
+    }
+
+    console.log(`🚗 Trip started: Driver ${order.driver?.name || 'Unknown'} began trip for order ${order.orderNumber}`);
+
     return { success: true, data: record };
   } catch (error) {
+    console.error('Error starting trip:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'فشل بدء الرحلة'
