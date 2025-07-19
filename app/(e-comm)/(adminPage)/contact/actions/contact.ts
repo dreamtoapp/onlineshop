@@ -50,11 +50,27 @@ export async function submitContactForm(
           userId: userId, // Associate the notification with the authenticated user
         },
       });
-    // إرسال الإشعار عبر Pusher
-    await pusherServer.trigger('admin', 'new-order', {
-      message: notificationMessage, // Send the message as a string
-      type: puserNotifactionmsg.type, // Include the type explicitly
+    // Get admin users
+    const adminUsers = await db.user.findMany({
+      where: {
+        role: { in: ['ADMIN', 'MARKETER'] }
+      },
+      select: { id: true }
     });
+
+    // Send to each admin's specific channel for dashboard feedback
+    try {
+      const pusherPromises = adminUsers.map(admin =>
+        pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
+          message: notificationMessage,
+          type: puserNotifactionmsg.type,
+        })
+      );
+      
+      await Promise.all(pusherPromises);
+    } catch (error) {
+      console.error('Pusher trigger failed:', error);
+    }
 
     revalidatePath('/dashboard/contact');
 

@@ -144,19 +144,6 @@ export async function createDraftOrder(formData: FormData) {
       }
     });
 
-    // Pusher: Notify dashboard of new order
-    try {
-      await pusherServer.trigger('orders', 'new-order', {
-        orderId: order.orderNumber,
-        customer: validatedData.fullName,
-        total,
-        createdAt: order.createdAt,
-      });
-    } catch (err) {
-      console.error('Pusher trigger failed:', err);
-      // Optionally: fallback to DB notification or alert admin
-    }
-
     // Clear cart after successful order creation
     // for (const item of cart.items) {
     //   await db.cartItem.delete({ where: { id: item.id } });
@@ -170,6 +157,29 @@ export async function createDraftOrder(formData: FormData) {
       },
       select: { id: true }
     });
+
+    console.log(`🔍 [NEW ORDER] Found ${adminUsers.length} admin users for notifications`);
+
+    // Send dashboard feedback to admin users (for immediate toast when on dashboard)
+    try {
+      const { pusherServer } = await import('@/lib/pusherServer');
+      
+      // Send to each admin's specific channel for dashboard feedback
+      const pusherPromises = adminUsers.map(admin =>
+        pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
+          orderId: order.orderNumber,
+          customer: validatedData.fullName,
+          total,
+          createdAt: order.createdAt,
+        })
+      );
+      
+      await Promise.all(pusherPromises);
+      console.log('✅ [DASHBOARD] Dashboard feedback sent to admin users');
+    } catch (error) {
+      console.error('❌ [DASHBOARD] Failed to send dashboard feedback:', error);
+      // Don't fail the order creation if dashboard feedback fails
+    }
 
     // Create notifications for all admin users
     const notificationPromises = adminUsers.map(admin =>

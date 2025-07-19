@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { UserRole } from '@prisma/client';
 import NotificationPortal from '@/components/ui/NotificationPortal';
 import ServiceWorkerRegistration from '@/app/components/ServiceWorkerRegistration';
+import AdminNotificationWrapper from '@/app/components/AdminNotificationWrapper';
 import DashboardNav from './components/DashboardNav';
 import DashboardFooter from './components/DashboardFooter';
 import { getPendingOrdersCount } from './helpers/navigationMenu';
@@ -35,8 +36,10 @@ export default async function LayoutNew({ children }: { children: React.ReactNod
                 <DashboardFooter />
             </div>
 
+            {/* Notification Components */}
             <NotificationPortal />
             <ServiceWorkerRegistration />
+            <AdminNotificationWrapper />
         </div>
     );
 } 

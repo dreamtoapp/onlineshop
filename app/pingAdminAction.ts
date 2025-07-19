@@ -40,17 +40,30 @@ export async function pingAdminAction(userId: string, message: string) {
   // Prepare ping data
   const pingData = { userId, message, timestamp: new Date() };
 
-  // Try Pusher, fallback to DB if needed
+  // Get admin users
+  const adminUsers = await db.user.findMany({
+    where: {
+      role: { in: ['ADMIN', 'MARKETER'] }
+    },
+    select: { id: true }
+  });
+
+  // Try Pusher for dashboard feedback, fallback to DB if needed
   let fallback = false;
   try {
-    await pusherServer.trigger('admin', 'support-alert', {
-      message,
-      userId,
-      timestamp: Date.now(),
-      type: 'support',
-    });
+    // Send to each admin's specific channel for dashboard feedback
+    const pusherPromises = adminUsers.map(admin =>
+      pusherServer.trigger(`admin-${admin.id}`, 'support-alert', {
+        message,
+        userId,
+        timestamp: Date.now(),
+        type: 'support',
+      })
+    );
+    
+    await Promise.all(pusherPromises);
   } catch {
-    fallback = true; // Mark as fallback if Pusher fails
+    fallback = true;
   }
 
   // Always save to DB for audit/history and polling fallback
