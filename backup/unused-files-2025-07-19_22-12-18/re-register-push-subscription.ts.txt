@@ -1,0 +1,46 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function reRegisterPushSubscription() {
+  try {
+    console.log('🔄 Re-registering push subscription with new VAPID keys...\n');
+    
+    const testUserId = '6875122cc0fd0da262911f02'; // امواج user
+    
+    // Check current subscription
+    const currentSubscription = await prisma.pushSubscription.findUnique({
+      where: { userId: testUserId }
+    });
+
+    if (currentSubscription) {
+      console.log('📱 Current subscription found:');
+      console.log(`   Endpoint: ${currentSubscription.endpoint}`);
+      console.log(`   Created: ${currentSubscription.createdAt}`);
+      
+      // Delete old subscription
+      console.log('\n🗑️ Deleting old subscription...');
+      await prisma.pushSubscription.delete({
+        where: { userId: testUserId }
+      });
+      console.log('✅ Old subscription deleted');
+    } else {
+      console.log('❌ No existing subscription found');
+    }
+
+    console.log('\n📋 Next Steps:');
+    console.log('1. Go to your browser');
+    console.log('2. Navigate to the dashboard');
+    console.log('3. Look for the notification permission check component');
+    console.log('4. Click "تفعيل الإشعارات" (Enable Notifications)');
+    console.log('5. This will create a new subscription with the correct VAPID keys');
+    console.log('\n🎯 After re-registering, test the notification system again!');
+
+  } catch (error) {
+    console.error('❌ Error:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+reRegisterPushSubscription(); 

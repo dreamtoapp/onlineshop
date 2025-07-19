@@ -1,6 +1,6 @@
 
-import { getOrderAnalytics } from './actions/get-order-analytics';
 import { fetchOrdersAction } from '../management-dashboard/action/fetchOrders';
+import { getOrderCounts } from './actions/get-order-counts';
 import OrderManagementView from './components/OrderManagementView';
 
 export default async function OrdersManagementPage({
@@ -11,24 +11,25 @@ export default async function OrdersManagementPage({
   const resolvedSearchParams = await searchParams;
   const statusFilter = resolvedSearchParams.status || undefined;
 
-  // Fetch data in parallel
-  const [analyticsResult, filteredOrders] = await Promise.all([
-    getOrderAnalytics(),
+  // Fetch orders data and counts in parallel
+  const [filteredOrders, orderCounts] = await Promise.all([
     fetchOrdersAction({
       status: statusFilter,
       page: 1,
-      pageSize: 10,
+      pageSize: 12, // Match infinite scroll page size
     }),
+    getOrderCounts()
   ]);
 
-
-
   return (
-    <OrderManagementView
-      analyticsResult={analyticsResult}
-      initialOrders={filteredOrders ?? []}
-      statusFilter={statusFilter}
-    />
+    <div className="space-y-6">
+      {/* Simplified Order Management View - No Analytics */}
+      <OrderManagementView
+        initialOrders={filteredOrders ?? []}
+        statusFilter={statusFilter}
+        orderCounts={orderCounts}
+      />
+    </div>
   );
 }
 

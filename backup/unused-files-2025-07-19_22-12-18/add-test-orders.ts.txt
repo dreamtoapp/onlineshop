@@ -1,0 +1,407 @@
+import { PrismaClient, OrderStatus } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function addTestOrders() {
+  try {
+    console.log('🚀 Starting to add test orders...');
+
+    // First, let's get or create a test customer
+    let customer = await prisma.user.findFirst({
+      where: { role: 'CUSTOMER' }
+    });
+
+    if (!customer) {
+      customer = await prisma.user.create({
+        data: {
+          name: 'عميل تجريبي',
+          email: 'test@example.com',
+          phone: '+966501234567',
+          role: 'CUSTOMER'
+        }
+      });
+      console.log('✅ Created test customer:', customer.name);
+    }
+
+    // Get or create a test driver
+    let driver = await prisma.user.findFirst({
+      where: { role: 'DRIVER' }
+    });
+
+    if (!driver) {
+      driver = await prisma.user.create({
+        data: {
+          name: 'سعيد حسون',
+          email: 'driver@example.com',
+          phone: '+966507654321',
+          role: 'DRIVER',
+          vehicleType: 'CAR',
+          vehiclePlateNumber: 'ABC-123',
+          isActive: true
+        }
+      });
+      console.log('✅ Created test driver:', driver.name);
+    }
+
+    // Get or create a test shift
+    let shift = await prisma.shift.findFirst();
+    if (!shift) {
+      shift = await prisma.shift.create({
+        data: {
+          name: 'المناوبة الصباحية',
+          startTime: '08:00',
+          endTime: '16:00'
+        }
+      });
+      console.log('✅ Created test shift:', shift.name);
+    }
+
+    // Get or create a test address
+    let address = await prisma.address.findFirst({
+      where: { userId: customer.id }
+    });
+
+    if (!address) {
+      address = await prisma.address.create({
+        data: {
+          userId: customer.id,
+          label: 'المنزل',
+          district: 'الرياض',
+          street: 'شارع الملك فهد',
+          buildingNumber: '123',
+          floor: '1',
+          apartmentNumber: 'A1',
+          landmark: 'قرب مركز الملك فهد',
+          deliveryInstructions: 'اتصل قبل الوصول',
+          isDefault: true
+        }
+      });
+      console.log('✅ Created test address');
+    }
+
+    // Get or create test products
+    let products = await prisma.product.findMany({ take: 3 });
+    if (products.length === 0) {
+      // Create test products
+      const product1 = await prisma.product.create({
+        data: {
+          name: 'منتج تجريبي 1',
+          description: 'وصف المنتج التجريبي الأول',
+          slug: 'test-product-1',
+          price: 50.00,
+          supplierId: (await prisma.supplier.findFirst())?.id || (await prisma.supplier.create({
+            data: {
+              name: 'مورد تجريبي',
+              slug: 'test-supplier',
+              email: 'supplier@example.com',
+              phone: '+966501111111'
+            }
+          })).id,
+          published: true
+        }
+      });
+
+      const product2 = await prisma.product.create({
+        data: {
+          name: 'منتج تجريبي 2',
+          description: 'وصف المنتج التجريبي الثاني',
+          slug: 'test-product-2',
+          price: 75.00,
+          supplierId: (await prisma.supplier.findFirst())?.id || '',
+          published: true
+        }
+      });
+
+      const product3 = await prisma.product.create({
+        data: {
+          name: 'منتج تجريبي 3',
+          description: 'وصف المنتج التجريبي الثالث',
+          slug: 'test-product-3',
+          price: 100.00,
+          supplierId: (await prisma.supplier.findFirst())?.id || '',
+          published: true
+        }
+      });
+
+      products = [product1, product2, product3];
+      console.log('✅ Created test products');
+    }
+
+    // Clear existing test orders (optional - comment out if you want to keep existing)
+    // First delete order items, then orders due to foreign key constraints
+    const existingTestOrders = await prisma.order.findMany({
+      where: {
+        orderNumber: {
+          startsWith: 'TEST-'
+        }
+      }
+    });
+
+    for (const order of existingTestOrders) {
+      await prisma.orderItem.deleteMany({
+        where: { orderId: order.id }
+      });
+    }
+
+    await prisma.order.deleteMany({
+      where: {
+        orderNumber: {
+          startsWith: 'TEST-'
+        }
+      }
+    });
+    console.log('🧹 Cleared existing test orders');
+
+    // Create test orders with different statuses
+    const testOrders = [
+      // PENDING orders (4 orders)
+      {
+        orderNumber: 'TEST-PENDING-001',
+        status: OrderStatus.PENDING,
+        amount: 125.00,
+        paymentMethod: 'CASH',
+        items: [
+          { productId: products[0].id, quantity: 2, price: 50.00 },
+          { productId: products[1].id, quantity: 1, price: 25.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-PENDING-002',
+        status: OrderStatus.PENDING,
+        amount: 200.00,
+        paymentMethod: 'CARD',
+        items: [
+          { productId: products[2].id, quantity: 2, price: 100.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-PENDING-003',
+        status: OrderStatus.PENDING,
+        amount: 75.00,
+        paymentMethod: 'CASH',
+        items: [
+          { productId: products[1].id, quantity: 1, price: 75.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-PENDING-004',
+        status: OrderStatus.PENDING,
+        amount: 150.00,
+        paymentMethod: 'CASH',
+        items: [
+          { productId: products[0].id, quantity: 3, price: 50.00 }
+        ]
+      },
+
+      // ASSIGNED orders (0 orders - to test zero count)
+      // No assigned orders to test zero count
+
+      // IN_TRANSIT orders (0 orders - to test zero count)
+      // No in-transit orders to test zero count
+
+      // DELIVERED orders (0 orders - to test zero count)
+      // No delivered orders to test zero count
+
+      // CANCELED orders (2 orders)
+      {
+        orderNumber: 'TEST-CANCELED-001',
+        status: OrderStatus.CANCELED,
+        amount: 300.00,
+        paymentMethod: 'CASH',
+        resonOfcancel: 'العميل طلب إلغاء الطلبية بسبب تغيير في الخطط',
+        items: [
+          { productId: products[2].id, quantity: 3, price: 100.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-CANCELED-002',
+        status: OrderStatus.CANCELED,
+        amount: 175.00,
+        paymentMethod: 'CARD',
+        resonOfcancel: 'المنتج غير متوفر في المخزون',
+        items: [
+          { productId: products[1].id, quantity: 2, price: 75.00 },
+          { productId: products[0].id, quantity: 1, price: 25.00 }
+        ]
+      }
+    ];
+
+    // Create orders
+    for (const orderData of testOrders) {
+      const { items, ...orderInfo } = orderData;
+      
+      const order = await prisma.order.create({
+        data: {
+          ...orderInfo,
+          customerId: customer.id,
+          addressId: address.id,
+          shiftId: shift.id,
+          items: {
+            create: items
+          }
+        }
+      });
+
+      console.log(`✅ Created ${order.status} order: ${order.orderNumber} - ${order.amount} ر.س`);
+    }
+
+    // Create some orders with drivers assigned (to test ASSIGNED status)
+    const assignedOrders = [
+      {
+        orderNumber: 'TEST-ASSIGNED-001',
+        status: OrderStatus.ASSIGNED,
+        amount: 250.00,
+        paymentMethod: 'CASH',
+        driverId: driver.id,
+        items: [
+          { productId: products[0].id, quantity: 5, price: 50.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-ASSIGNED-002',
+        status: OrderStatus.ASSIGNED,
+        amount: 180.00,
+        paymentMethod: 'CARD',
+        driverId: driver.id,
+        items: [
+          { productId: products[1].id, quantity: 2, price: 75.00 },
+          { productId: products[2].id, quantity: 1, price: 30.00 }
+        ]
+      }
+    ];
+
+    for (const orderData of assignedOrders) {
+      const { items, ...orderInfo } = orderData;
+      
+      const order = await prisma.order.create({
+        data: {
+          ...orderInfo,
+          customerId: customer.id,
+          addressId: address.id,
+          shiftId: shift.id,
+          items: {
+            create: items
+          }
+        }
+      });
+
+      console.log(`✅ Created ${order.status} order: ${order.orderNumber} - ${order.amount} ر.س (Driver: ${driver.name})`);
+    }
+
+    // Create some IN_TRANSIT orders
+    const inTransitOrders = [
+      {
+        orderNumber: 'TEST-TRANSIT-001',
+        status: OrderStatus.IN_TRANSIT,
+        amount: 120.00,
+        paymentMethod: 'CASH',
+        driverId: driver.id,
+        items: [
+          { productId: products[0].id, quantity: 2, price: 50.00 },
+          { productId: products[1].id, quantity: 1, price: 20.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-TRANSIT-002',
+        status: OrderStatus.IN_TRANSIT,
+        amount: 95.00,
+        paymentMethod: 'CARD',
+        driverId: driver.id,
+        items: [
+          { productId: products[2].id, quantity: 1, price: 95.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-TRANSIT-003',
+        status: OrderStatus.IN_TRANSIT,
+        amount: 180.00,
+        paymentMethod: 'CASH',
+        driverId: driver.id,
+        items: [
+          { productId: products[0].id, quantity: 3, price: 50.00 },
+          { productId: products[2].id, quantity: 1, price: 30.00 }
+        ]
+      }
+    ];
+
+    for (const orderData of inTransitOrders) {
+      const { items, ...orderInfo } = orderData;
+      
+      const order = await prisma.order.create({
+        data: {
+          ...orderInfo,
+          customerId: customer.id,
+          addressId: address.id,
+          shiftId: shift.id,
+          items: {
+            create: items
+          }
+        }
+      });
+
+      console.log(`✅ Created ${order.status} order: ${order.orderNumber} - ${order.amount} ر.س (Driver: ${driver.name})`);
+    }
+
+    // Create some DELIVERED orders
+    const deliveredOrders = [
+      {
+        orderNumber: 'TEST-DELIVERED-001',
+        status: OrderStatus.DELIVERED,
+        amount: 85.00,
+        paymentMethod: 'CASH',
+        driverId: driver.id,
+        deliveredAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        items: [
+          { productId: products[0].id, quantity: 1, price: 50.00 },
+          { productId: products[1].id, quantity: 1, price: 35.00 }
+        ]
+      },
+      {
+        orderNumber: 'TEST-DELIVERED-002',
+        status: OrderStatus.DELIVERED,
+        amount: 200.00,
+        paymentMethod: 'CARD',
+        driverId: driver.id,
+        deliveredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        items: [
+          { productId: products[2].id, quantity: 2, price: 100.00 }
+        ]
+      }
+    ];
+
+    for (const orderData of deliveredOrders) {
+      const { items, ...orderInfo } = orderData;
+      
+      const order = await prisma.order.create({
+        data: {
+          ...orderInfo,
+          customerId: customer.id,
+          addressId: address.id,
+          shiftId: shift.id,
+          items: {
+            create: items
+          }
+        }
+      });
+
+      console.log(`✅ Created ${order.status} order: ${order.orderNumber} - ${order.amount} ر.س (Driver: ${driver.name})`);
+    }
+
+    console.log('\n🎉 Test orders created successfully!');
+    console.log('\n📊 Order Status Summary:');
+    console.log('- PENDING: 4 orders');
+    console.log('- ASSIGNED: 2 orders');
+    console.log('- IN_TRANSIT: 3 orders');
+    console.log('- DELIVERED: 2 orders');
+    console.log('- CANCELED: 2 orders');
+    console.log('\n🔍 You can now test all status cases in the dashboard!');
+
+  } catch (error) {
+    console.error('❌ Error creating test orders:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Run the script
+addTestOrders(); 

@@ -13,7 +13,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { formatDistanceToNow } from 'date-fns';
+import { TimeAgo } from '@/components/ui/time-ago';
 import { menuGroups } from '../helpers/mainMenu';
 import { Icon } from '@/components/icons/Icon';
 
@@ -216,7 +216,7 @@ export default function AppSidebar() {
       {/* Enhanced Footer */}
       <SidebarFooter className='border-t p-4 bg-muted/30 flex flex-col gap-2'>
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
-          <span>آخر تحديث: {formatDistanceToNow(new Date(), { addSuffix: true, locale: undefined })}</span>
+          <span>آخر تحديث: <TimeAgo date={new Date()} /></span>
           <span>المفضلة: {favorites.length}</span>
         </div>
         <div className='text-xs text-muted-foreground text-center'>

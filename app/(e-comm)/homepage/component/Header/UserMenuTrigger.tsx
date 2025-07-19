@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogDescrip
 import { signOut } from 'next-auth/react';
 import { Icon } from '@/components/icons/Icon';
 import { usePusherConnectionStatus } from '@/app/(e-comm)/(adminPage)/user/notifications/components/RealtimeNotificationListener';
+import PushNotificationSetup from '@/app/components/PushNotificationSetup';
 
 interface UserMenuTriggerProps {
     user: {
@@ -36,7 +37,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     const [userStats, setUserStats] = useState<UserStats | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const [hasFetched, setHasFetched] = useState(false); // Simple caching
+    const [hasFetched, setHasFetched] = useState(false);
     const name = user?.name;
     const image = user?.image;
     const isConnected = usePusherConnectionStatus();
@@ -105,7 +106,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                 const res = await fetch('/api/user/stats');
                 const data = await res.json();
                 setUserStats(data);
-                setHasFetched(true); // Mark as fetched
+                setHasFetched(true);
             } catch (error) {
                 console.error('Error loading user stats:', error);
             } finally {
@@ -163,130 +164,122 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
 
             <DropdownMenuContent
                 align="end"
-                className="w-80 p-0 bg-background/95 backdrop-blur-md border border-border/50 shadow-xl"
+                className="w-72 p-0 bg-background/95 backdrop-blur-md border border-border/50 shadow-xl max-h-[85vh] overflow-y-auto"
                 sideOffset={8}
             >
-                {/* User Info Header */}
-                <div className="p-4 border-b border-border/30 bg-muted/30">
-                    <div className="flex items-center gap-3">
+                {/* Compact User Info Header */}
+                <div className="p-3 border-b border-border/30 bg-muted/20">
+                    <div className="flex items-center gap-2.5">
                         <div className="relative">
-                            <Avatar className="h-12 w-12 border-2 border-border">
+                            <Avatar className="h-10 w-10 border border-border">
                                 <AvatarImage
                                     src={image || "/fallback/fallback.avif"}
                                     alt={name || "User"}
                                     className="object-cover"
                                 />
-                                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
                                     {name?.[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                             </Avatar>
                             {/* Connection status dot for dropdown avatar */}
-                            <span className={`absolute top-0 right-0 h-3 w-3 rounded-full border-2 border-background transition-colors duration-300 ${isConnected
-                                ? 'bg-green-500 shadow-sm shadow-green-500/50'
-                                : 'bg-yellow-500 shadow-sm shadow-yellow-500/50'
-                                }`}
-                                title={isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
-                            />
+                            <span className={`absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background transition-colors duration-300 ${isConnected
+                                ? 'bg-green-500'
+                                : 'bg-yellow-500'
+                                }`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <DropdownMenuLabel className="text-base font-semibold text-foreground p-0 truncate">
+                            <DropdownMenuLabel className="text-sm font-semibold text-foreground p-0 truncate leading-tight">
                                 {name || "المستخدم"}
                             </DropdownMenuLabel>
-                            <p className="text-sm text-muted-foreground truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                                 {user.email || "حساب شخصي"}
                             </p>
-                            {userStats && (
-                                <p className="text-xs text-muted-foreground/70 mt-1">
-                                    عضو منذ {userStats.memberSince}
-                                </p>
-                            )}
-                            {/* Connection status indicator */}
-                            <div className="flex items-center gap-1.5 mt-1">
-                                <span className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${isConnected ? 'bg-green-500' : 'bg-yellow-500'
-                                    }`} />
-                                <span className="text-xs text-muted-foreground/70">
-                                    {isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
+                            {/* Compact connection status */}
+                            <div className="flex items-center gap-1 mt-0.5">
+                                <span className={`h-1 w-1 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                                <span className="text-[10px] text-muted-foreground/60">
+                                    {isConnected ? 'متصل' : 'منقطع'}
                                 </span>
                             </div>
                         </div>
-                        {isLoading && (
-                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        )}
                     </div>
-
-                    {/* Quick Stats */}
-                    {userStats && (
-                        <div className="mt-3 grid grid-cols-3 gap-2">
-                            <div className="text-center p-2 rounded-lg bg-background/50">
-                                <div className="text-sm font-semibold text-foreground">
-                                    {userStats.totalOrders}
-                                </div>
-                                <div className="text-xs text-muted-foreground">طلبات</div>
-                            </div>
-                            <div className="text-center p-2 rounded-lg bg-background/50">
-                                <div className="text-sm font-semibold text-foreground">
-                                    {userStats.wishlistCount}
-                                </div>
-                                <div className="text-xs text-muted-foreground">مفضلة</div>
-                            </div>
-                            <div className="text-center p-2 rounded-lg bg-background/50">
-                                <div className="text-sm font-semibold text-foreground">
-                                    {userStats.reviewsCount}
-                                </div>
-                                <div className="text-xs text-muted-foreground">تقييم</div>
-                            </div>
-                        </div>
-                    )}
+                    {/* Add PushNotificationSetup button here */}
+                    <div className="mt-3">
+                        <PushNotificationSetup />
+                    </div>
                 </div>
 
-                {/* Navigation Items */}
-                <div className="p-2">
+                {/* Enhanced Analytics - Professional UI */}
+                {userStats && (
+                    <div className="mt-3 px-2">
+                        <div className="flex items-center justify-between text-[11px] font-medium">
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                <span className="text-blue-600 font-semibold tabular-nums">{userStats.totalOrders}</span>
+                                <span className="text-muted-foreground">طلبات</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div>
+                                <span className="text-pink-600 font-semibold tabular-nums">{userStats.wishlistCount}</span>
+                                <span className="text-muted-foreground">مفضلة</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                                <span className="text-amber-600 font-semibold tabular-nums">{userStats.reviewsCount}</span>
+                                <span className="text-muted-foreground">تقييم</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Scrollable Navigation Items */}
+                <div className="py-1 max-h-64 overflow-y-auto">
                     {userNavItems.map((item, index) => (
-                        <DropdownMenuItem key={index} asChild className="p-0">
+                        <DropdownMenuItem key={index} asChild className="p-0 mx-1">
                             <Link
                                 href={item.href}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors duration-200 cursor-pointer"
+                                className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 cursor-pointer group"
                             >
-                                <div className="p-1.5 rounded-md bg-muted/50">
-                                    <Icon name={item.icon} className="w-4 h-4 text-muted-foreground" />
+                                <div className="p-1 rounded bg-muted/30 group-hover:bg-muted/50 transition-colors">
+                                    <Icon name={item.icon} className="w-3.5 h-3.5 text-muted-foreground" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-sm text-foreground truncate">
+                                    <div className="font-medium text-xs text-foreground truncate">
                                         {item.label}
                                     </div>
-                                    <div className="text-xs text-muted-foreground/70 truncate">
+                                    <div className="text-[10px] text-muted-foreground/60 truncate leading-tight">
                                         {item.description}
                                     </div>
                                 </div>
                                 {item.badge && (
-                                    <Badge variant="secondary" className="text-xs h-5 px-1.5">
+                                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5 min-w-0">
                                         {item.badge}
                                     </Badge>
                                 )}
-                                <Icon name="ChevronLeft" className="w-3 h-3 text-muted-foreground/50" />
+                                <Icon name="ChevronLeft" className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-muted-foreground/60 transition-colors" />
                             </Link>
                         </DropdownMenuItem>
                     ))}
                 </div>
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="mx-2" />
 
-                {/* Logout */}
-                <div className="p-2">
+                {/* Compact Logout */}
+                <div className="p-1">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <DropdownMenuItem
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                                className="flex items-center gap-2.5 px-2 py-2 mx-1 rounded-md text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer group"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                <div className="p-1.5 rounded-md bg-destructive/10">
-                                    <Icon name="LogOut" className="w-4 h-4" />
+                                <div className="p-1 rounded bg-destructive/10 group-hover:bg-destructive/20 transition-colors">
+                                    <Icon name="LogOut" className="w-3.5 h-3.5" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="font-medium text-sm">تسجيل الخروج</div>
-                                    <div className="text-xs opacity-70">إنهاء الجلسة</div>
+                                    <div className="font-medium text-xs">تسجيل الخروج</div>
+                                    <div className="text-[10px] opacity-60 leading-tight">إنهاء الجلسة</div>
                                 </div>
-                                <Icon name="ChevronLeft" className="w-3 h-3 opacity-50" />
+                                <Icon name="ChevronLeft" className="w-2.5 h-2.5 opacity-40 group-hover:opacity-60 transition-opacity" />
                             </DropdownMenuItem>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="max-w-md">

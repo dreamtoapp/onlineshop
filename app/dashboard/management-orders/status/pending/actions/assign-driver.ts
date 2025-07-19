@@ -7,8 +7,6 @@ import { auth } from '@/auth';
 import db from '@/lib/prisma';
 
 export async function assignDriver(orderId: string, driverId: string) {
-
-
   try {
     const session = await auth();
 
@@ -34,6 +32,20 @@ export async function assignDriver(orderId: string, driverId: string) {
         message: 'Driver (user) not found or not a driver.',
       };
     }
+
+    // Get order details for notification
+    const order = await db.order.findUnique({
+      where: { id: orderId },
+      include: { customer: true }
+    });
+
+    if (!order) {
+      return {
+        state: 'error',
+        message: 'Order not found.',
+      };
+    }
+
     // Update the order with the driver ID
     await db.order.update({
       where: {
@@ -44,6 +56,44 @@ export async function assignDriver(orderId: string, driverId: string) {
         status: OrderStatus.ASSIGNED,
       },
     });
+
+    // Send notifications to customer
+    try {
+      console.log('🚀 [PENDING ASSIGNMENT] Sending notifications...');
+      
+      // Import notification functions directly
+      const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
+      const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
+      const { PushNotificationService } = await import('@/lib/push-notification-service');
+      
+      // Create notification template
+      const template = ORDER_NOTIFICATION_TEMPLATES.ORDER_SHIPPED(order.orderNumber, driver.name || undefined);
+      
+      // Send in-app notification
+      console.log('📱 [PENDING ASSIGNMENT] Sending in-app notification...');
+      const inAppResult = await createOrderNotification({
+        userId: order.customerId,
+        orderId: orderId,
+        orderNumber: order.orderNumber,
+        driverName: driver.name || undefined,
+        ...template
+      });
+      
+      // Send push notification
+      console.log('🔔 [PENDING ASSIGNMENT] Sending push notification...');
+      const pushResult = await PushNotificationService.sendOrderNotification(
+        order.customerId,
+        orderId,
+        order.orderNumber,
+        'order_shipped',
+        driver.name || undefined
+      );
+      
+      console.log(`✅ [PENDING ASSIGNMENT] Notifications sent - In-app: ${inAppResult.success}, Push: ${pushResult}`);
+      
+    } catch (error) {
+      console.error('❌ [PENDING ASSIGNMENT] Notification error:', error);
+    }
 
     revalidatePath('/dashboard/orders-management/status/pending');
     return {

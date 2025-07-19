@@ -1,0 +1,75 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function checkUserSubscription() {
+  try {
+    const testUserId = '6875122cc0fd0da262911f02';
+    
+    // Check user
+    const user = await prisma.user.findUnique({
+      where: { id: testUserId }
+    });
+    
+    if (!user) {
+      console.log('❌ Test user not found');
+      return;
+    }
+    
+    console.log(`✅ User: ${user.name} (${user.email})`);
+    
+    // Check push subscription
+    const pushSubscription = await prisma.pushSubscription.findUnique({
+      where: { userId: testUserId }
+    });
+    
+    if (pushSubscription) {
+      console.log(`✅ Push subscription found:`);
+      console.log(`   - Endpoint: ${pushSubscription.endpoint.substring(0, 50)}...`);
+      console.log(`   - Created: ${pushSubscription.createdAt}`);
+    } else {
+      console.log(`❌ No push subscription found for user`);
+    }
+    
+    // Check recent notifications
+    const notifications = await prisma.userNotification.findMany({
+      where: { userId: testUserId },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+    
+    console.log(`\n📱 Recent notifications (${notifications.length}):`);
+    notifications.forEach((notification, index) => {
+      console.log(`   ${index + 1}. ${notification.title}`);
+      console.log(`      Body: ${notification.body}`);
+      console.log(`      Type: ${notification.type}`);
+      console.log(`      Read: ${notification.read}`);
+      console.log(`      Created: ${notification.createdAt}`);
+      console.log('');
+    });
+    
+    // Check recent orders
+    const orders = await prisma.order.findMany({
+      where: { customerId: testUserId },
+      orderBy: { createdAt: 'desc' },
+      take: 3
+    });
+    
+    console.log(`\n📦 Recent orders (${orders.length}):`);
+    orders.forEach((order, index) => {
+      console.log(`   ${index + 1}. ${order.orderNumber}`);
+      console.log(`      Status: ${order.status}`);
+      console.log(`      Driver: ${order.driverId || 'None'}`);
+      console.log(`      Amount: ${order.amount}`);
+      console.log(`      Created: ${order.createdAt}`);
+      console.log('');
+    });
+    
+  } catch (error) {
+    console.error('❌ Error checking user subscription:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+checkUserSubscription(); 

@@ -161,6 +161,7 @@ model User {
   cart          Cart?          // User's cart
   UserNotification  UserNotification[]
   errorLogs     ErrorLog[]
+  pushSubscription PushSubscription?
 
   // Driver-specific fields
   vehicleType       VehicleType? // Type of vehicle for drivers
@@ -765,4 +766,17 @@ enum ErrorStatus {
   IN_PROGRESS
   RESOLVED
   IGNORED
+}
+
+model PushSubscription {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("push_subscriptions")
 }

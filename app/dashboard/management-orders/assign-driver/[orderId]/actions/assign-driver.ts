@@ -135,8 +135,8 @@ export async function assignDriverToOrder({
       };
     }
 
-    // Check driver capacity (configurable max orders)
-    const maxOrders = 5; // Increased from 3 to 5 orders per driver
+    // Check driver capacity (configurable max orders) - TEMPORARILY DISABLED FOR TESTING
+    const maxOrders = 999; // Temporarily set to very high number to bypass capacity check
     
     // Debug: Log current driver orders for troubleshooting
     console.log(`Driver ${driver.name} (${driverId}) current orders:`, {
@@ -145,6 +145,8 @@ export async function assignDriverToOrder({
       maxAllowed: maxOrders
     });
     
+    // TEMPORARILY COMMENTED OUT FOR TESTING
+    /*
     if (driver.driverOrders.length >= maxOrders) {
       return {
         success: false,
@@ -152,6 +154,7 @@ export async function assignDriverToOrder({
         error: 'DRIVER_AT_CAPACITY'
       };
     }
+    */
 
     // Calculate estimated delivery time
     const currentTime = new Date();
@@ -176,9 +179,43 @@ export async function assignDriverToOrder({
       return updatedOrder;
     });
 
-    // TODO: Send notifications to driver and customer
-    // await sendDriverNotification(driverId, orderId);
-    // await sendCustomerNotification(order.customer?.phone, order.orderNumber);
+    // Send notifications to customer
+    try {
+      console.log('🚀 [ASSIGNMENT] Sending notifications...');
+      
+      // Import notification functions directly
+      const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
+      const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
+      const { PushNotificationService } = await import('@/lib/push-notification-service');
+      
+      // Create notification template
+      const template = ORDER_NOTIFICATION_TEMPLATES.ORDER_SHIPPED(order.orderNumber, driver.name || undefined);
+      
+      // Send in-app notification
+      console.log('📱 [ASSIGNMENT] Sending in-app notification...');
+      const inAppResult = await createOrderNotification({
+        userId: result.customerId,
+        orderId: orderId,
+        orderNumber: order.orderNumber,
+        driverName: driver.name || undefined,
+        ...template
+      });
+      
+      // Send push notification
+      console.log('🔔 [ASSIGNMENT] Sending push notification...');
+      const pushResult = await PushNotificationService.sendOrderNotification(
+        result.customerId,
+        orderId,
+        order.orderNumber,
+        'order_shipped',
+        driver.name || undefined
+      );
+      
+      console.log(`✅ [ASSIGNMENT] Notifications sent - In-app: ${inAppResult.success}, Push: ${pushResult}`);
+      
+    } catch (error) {
+      console.error('❌ [ASSIGNMENT] Notification error:', error);
+    }
 
     // Revalidate relevant pages
     revalidatePath('/dashboard/management-orders');

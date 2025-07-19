@@ -4,8 +4,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import NewsletterClientWrapper from './NewsletterClientWrapper';
 import { Icon } from '@/components/icons/Icon';
-import CustomSvgIcon from './CustomSvgIcon';
 import AppVersion from '../AppVersion';
+import LazyFooterContactIcons from './LazyFooterContactIcons';
 
 interface FooterProps {
   aboutus?: string;
@@ -215,102 +215,15 @@ function EnhancedContact({
         <Icon name="MapPin" className="h-4 w-4 md:h-5 md:w-5 text-feature-suppliers shrink-0" />
         <span>تواصل معنا</span>
       </h3>
-
-      <address className="not-italic space-y-4">
-        {email && (
-          <div className="group flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-200 shrink-0">
-              <CustomSvgIcon name="mail" className="h-4 w-4 text-primary" />
-            </div>
-            <a
-              href={`mailto:${email}`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md truncate"
-              aria-label={`إرسال بريد إلكتروني إلى ${email}`}
-            >
-              {email}
-            </a>
-          </div>
-        )}
-
-        {phone && (
-          <div className="group flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-200 shrink-0">
-              <CustomSvgIcon name="phone" className="h-4 w-4 text-primary" />
-            </div>
-            <a
-              href={`tel:${phone}`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
-              aria-label={`الاتصال بالرقم ${phone}`}
-            >
-              {phone}
-            </a>
-          </div>
-        )}
-
-        {address && (
-          <div className="group flex items-start gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <CustomSvgIcon name="map-pin" className="h-4 w-4 text-primary" />
-            </div>
-            <span className="text-sm text-muted-foreground leading-relaxed">
-              {address}
-            </span>
-          </div>
-        )}
-
-        {/* Social Media Links - Enhanced mobile layout */}
-        {(facebook || instagram || twitter || linkedin) && (
-          <div className="pt-4 border-t border-border">
-            <h4 className="text-sm font-medium text-foreground mb-3">تابعنا على</h4>
-            <div className="flex gap-3 flex-wrap">
-              {facebook && (
-                <Link
-                  href={facebook}
-                  aria-label="تابعنا على فيسبوك (يفتح في نافذة جديدة)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <CustomSvgIcon name="facebook" className="h-5 w-5 text-primary" />
-                </Link>
-              )}
-              {instagram && (
-                <Link
-                  href={instagram}
-                  aria-label="تابعنا على انستغرام (يفتح في نافذة جديدة)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <CustomSvgIcon name="instagram" className="h-5 w-5 text-primary" />
-                </Link>
-              )}
-              {twitter && (
-                <Link
-                  href={twitter}
-                  aria-label="تابعنا على تويتر (يفتح في نافذة جديدة)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <CustomSvgIcon name="twitter" className="h-5 w-5 text-primary" />
-                </Link>
-              )}
-              {linkedin && (
-                <Link
-                  href={linkedin}
-                  aria-label="تابعنا على لينكدإن (يفتح في نافذة جديدة)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <CustomSvgIcon name="linkedin" className="h-5 w-5 text-primary" />
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-      </address>
+      <LazyFooterContactIcons
+        email={email}
+        phone={phone}
+        address={address}
+        facebook={facebook}
+        instagram={instagram}
+        twitter={twitter}
+        linkedin={linkedin}
+      />
     </div>
   );
 }

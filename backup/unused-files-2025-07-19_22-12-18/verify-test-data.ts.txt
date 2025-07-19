@@ -1,0 +1,84 @@
+import { PrismaClient, OrderStatus } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function verifyTestData() {
+  try {
+    console.log('🔍 Verifying test data...\n');
+
+    // Get counts for each status
+    const [
+      total,
+      pending,
+      assigned,
+      inTransit,
+      delivered,
+      canceled
+    ] = await Promise.all([
+      prisma.order.count(),
+      prisma.order.count({ where: { status: OrderStatus.PENDING } }),
+      prisma.order.count({ where: { status: OrderStatus.ASSIGNED } }),
+      prisma.order.count({ where: { status: OrderStatus.IN_TRANSIT } }),
+      prisma.order.count({ where: { status: OrderStatus.DELIVERED } }),
+      prisma.order.count({ where: { status: OrderStatus.CANCELED } })
+    ]);
+
+    console.log('📊 Order Status Counts:');
+    console.log('=======================');
+    console.log(`Total Orders: ${total}`);
+    console.log(`PENDING: ${pending}`);
+    console.log(`ASSIGNED: ${assigned}`);
+    console.log(`IN_TRANSIT: ${inTransit}`);
+    console.log(`DELIVERED: ${delivered}`);
+    console.log(`CANCELED: ${canceled}`);
+
+    // Get some sample orders to verify data
+    console.log('\n📋 Sample Orders:');
+    console.log('=================');
+    
+    const sampleOrders = await prisma.order.findMany({
+      take: 5,
+      include: {
+        customer: true,
+        driver: true,
+        items: {
+          include: {
+            product: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    sampleOrders.forEach((order, index) => {
+      console.log(`\n${index + 1}. Order: ${order.orderNumber}`);
+      console.log(`   Status: ${order.status}`);
+      console.log(`   Amount: ${order.amount} ر.س`);
+      console.log(`   Customer: ${order.customer?.name || 'Unknown'}`);
+      console.log(`   Driver: ${order.driver?.name || 'Not assigned'}`);
+      console.log(`   Items: ${order.items.length} products`);
+      if (order.resonOfcancel) {
+        console.log(`   Cancel Reason: ${order.resonOfcancel}`);
+      }
+    });
+
+    console.log('\n✅ Test data verification complete!');
+    console.log('\n🎯 Expected counts:');
+    console.log('- PENDING: 4 orders');
+    console.log('- ASSIGNED: 2 orders');
+    console.log('- IN_TRANSIT: 3 orders');
+    console.log('- DELIVERED: 2 orders');
+    console.log('- CANCELED: 2 orders');
+    console.log('- TOTAL: 13 orders');
+
+  } catch (error) {
+    console.error('❌ Error verifying test data:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Run the verification
+verifyTestData(); 

@@ -29,19 +29,12 @@ export async function generateMetadata({
 
 interface AssignDriverPageProps {
     params: Promise<{ orderId: string }>;
-    searchParams: Promise<{
-        view?: 'grid' | 'list' | 'map';
-        filter?: string;
-        sort?: 'distance' | 'rating' | 'availability' | 'performance';
-    }>;
 }
 
 export default async function AssignDriverPage({
-    params,
-    searchParams
+    params
 }: AssignDriverPageProps) {
     const { orderId } = await params;
-    const { view = 'grid', filter, sort = 'distance' } = await searchParams;
 
     try {
         // Fetch data in parallel
@@ -70,9 +63,6 @@ export default async function AssignDriverPage({
                 order={order}
                 drivers={drivers}
                 orderId={orderId}
-                view={view}
-                filter={filter}
-                sort={sort}
             />
         );
     } catch (error) {

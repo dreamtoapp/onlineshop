@@ -16,8 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { Icon } from '@/components/icons/Icon';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/databaseTypes';
-import { formatDistanceToNow } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { TimeAgo } from '@/components/ui/time-ago';
 import { OrderStatus } from '@prisma/client';
 
 interface InWayOrdersViewProps {
@@ -185,7 +184,7 @@ function OrderCard({ order }: OrderCardProps) {
               <div className="flex items-center gap-2">
                 <Icon name="Calendar" className="h-3 w-3 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  منذ {formatDistanceToNow(new Date(order.createdAt), { addSuffix: false, locale: ar })}
+                  <TimeAgo date={order.createdAt} />
                 </span>
               </div>
             </div>

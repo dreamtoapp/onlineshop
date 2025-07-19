@@ -1,0 +1,79 @@
+import { PrismaClient } from '@prisma/client';
+
+const db = new PrismaClient();
+
+async function verifyOrderData() {
+  console.log('🔍 Verifying Order Management Data Integrity...\n');
+
+  try {
+    // 1. Total Orders Count
+    const totalOrders = await db.order.count();
+    console.log(`📊 Total Orders: ${totalOrders}`);
+
+    // 2. Orders by Status
+    const ordersByStatus = await db.order.groupBy({
+      by: ['status'],
+      _count: { status: true }
+    });
+    
+    console.log('\n📈 Orders by Status:');
+    ordersByStatus.forEach(status => {
+      console.log(`  ${status.status}: ${status._count.status}`);
+    });
+
+    // 3. Total Revenue
+    const revenueResult = await db.order.aggregate({
+      _sum: { amount: true }
+    });
+    const totalRevenue = revenueResult._sum.amount || 0;
+    console.log(`\n💰 Total Revenue: ${totalRevenue} ر.س`);
+
+    // 4. Average Order Value
+    const avgOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+    console.log(`📊 Average Order Value: ${avgOrderValue} ر.س`);
+
+    // 5. Recent Orders
+    const recentOrders = await db.order.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: { customer: true }
+    });
+
+    console.log('\n🕒 Recent Orders:');
+    recentOrders.forEach(order => {
+      console.log(`  ${order.orderNumber}: ${order.customer?.name || 'Unknown'} - ${order.amount} ر.س (${order.status})`);
+    });
+
+    // 6. Data Integrity Checks
+    console.log('\n✅ Data Integrity Checks:');
+    
+    // Check for orders with negative amounts
+    const negativeAmountOrders = await db.order.count({
+      where: { amount: { lt: 0 } }
+    });
+    console.log(`  Orders with negative amounts: ${negativeAmountOrders}`);
+
+    // Check for orders with invalid statuses
+    const validStatuses = ['PENDING', 'IN_TRANSIT', 'DELIVERED', 'CANCELED', 'ASSIGNED'];
+    const invalidStatusOrders = await db.order.count({
+      where: { status: { notIn: validStatuses } }
+    });
+    console.log(`  Orders with invalid statuses: ${invalidStatusOrders}`);
+
+    // Check for orders with zero amounts
+    const zeroAmountOrders = await db.order.count({
+      where: { amount: { equals: 0 } }
+    });
+    console.log(`  Orders with zero amounts: ${zeroAmountOrders}`);
+
+    console.log('\n🎉 Data verification completed successfully!');
+
+  } catch (error) {
+    console.error('❌ Error during data verification:', error);
+  } finally {
+    await db.$disconnect();
+  }
+}
+
+// Run verification
+verifyOrderData(); 

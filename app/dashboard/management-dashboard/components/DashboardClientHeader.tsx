@@ -5,7 +5,7 @@ const PusherNotify = dynamic(() => import('@/app/dashboard/management/PusherNoti
 
 export default function DashboardClientHeader() {
     return (
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-3 flex-wrap'>
             <QuickActions />
             <PusherNotify />
         </div>

@@ -68,26 +68,43 @@ export const startTrip = async (
 
     // 🚨 CREATE REAL-TIME NOTIFICATION FOR CUSTOMER
     if (order.customerId) {
-      const notificationTemplate = ORDER_NOTIFICATION_TEMPLATES.TRIP_STARTED(
-        order.orderNumber || `#${orderId.slice(-6)}`,
-        order.driver?.name || 'السائق'
-      );
+      try {
+        const { PushNotificationService } = await import('@/lib/push-notification-service');
+        
+        const notificationTemplate = ORDER_NOTIFICATION_TEMPLATES.TRIP_STARTED(
+          order.orderNumber || `#${orderId.slice(-6)}`,
+          order.driver?.name || 'السائق'
+        );
 
-      const notificationResult = await createOrderNotification({
-        userId: order.customerId,
-        orderId: order.id,
-        orderNumber: order.orderNumber || undefined,
-        driverName: order.driver?.name ?? undefined,
-        title: notificationTemplate.title,
-        body: notificationTemplate.body,
-        actionUrl: `/user/orders/${order.id}/track`
-      });
+        // Create in-app notification
+        const notificationResult = await createOrderNotification({
+          userId: order.customerId,
+          orderId: order.id,
+          orderNumber: order.orderNumber || undefined,
+          driverName: order.driver?.name ?? undefined,
+          title: notificationTemplate.title,
+          body: notificationTemplate.body,
+          actionUrl: `/user/orders/${order.id}/track`
+        });
 
-      if (!notificationResult.success) {
-        console.error('Failed to send trip start notification:', notificationResult.error);
+        // Send push notification
+        await PushNotificationService.sendOrderNotification(
+          order.customerId,
+          order.id,
+          order.orderNumber || `#${orderId.slice(-6)}`,
+          'trip_started',
+          order.driver?.name || undefined
+        );
+
+        if (!notificationResult.success) {
+          console.error('Failed to send trip start notification:', notificationResult.error);
+          // Don't fail the trip start if notification fails
+        } else {
+          console.log(`✅ Trip start notifications sent to user ${order.customerId}`);
+        }
+      } catch (error) {
+        console.error('Failed to send trip start notifications:', error);
         // Don't fail the trip start if notification fails
-      } else {
-        console.log(`✅ Trip start notification sent to user ${order.customerId}`);
       }
     }
 

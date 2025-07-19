@@ -2,6 +2,7 @@
 
 import db from '@/lib/prisma';
 import { pusherServer } from '@/lib/pusherServer';
+import { ORDER_NOTIFICATION_TEMPLATES } from '../types/notificationTypes';
 
 interface CreateOrderNotificationParams {
   userId: string;
@@ -70,27 +71,5 @@ export async function createOrderNotification({
   }
 }
 
-/**
- * Pre-built notification templates for common ORDER events
- */
-export const ORDER_NOTIFICATION_TEMPLATES = {
-  TRIP_STARTED: (orderNumber: string, driverName: string) => ({
-    title: 'بدأ السائق في التوجه إليك 🚗',
-    body: `السائق ${driverName} بدأ رحلة توصيل طلبك ${orderNumber}. سيصل إليك قريباً!`,
-  }),
-  
-  DRIVER_ASSIGNED: (orderNumber: string, driverName: string) => ({
-    title: 'تم تعيين سائق للتوصيل',
-    body: `تم تعيين السائق ${driverName} لتوصيل طلبك ${orderNumber}. سيبدأ التوصيل قريباً.`,
-  }),
-  
-  ORDER_DELIVERED: (orderNumber: string) => ({
-    title: 'تم توصيل طلبك بنجاح ✅',
-    body: `تم توصيل طلبك ${orderNumber} بنجاح. شكراً لاختيارك متجرنا!`,
-  }),
-  
-  ORDER_CANCELLED: (orderNumber: string, reason?: string) => ({
-    title: 'تم إلغاء طلبك',
-    body: `تم إلغاء طلبك ${orderNumber}${reason ? ` - ${reason}` : ''}. سيتم استرداد المبلغ إلى محفظتك.`,
-  })
-}; 
+// Export the templates for use in other files
+export { ORDER_NOTIFICATION_TEMPLATES }; 

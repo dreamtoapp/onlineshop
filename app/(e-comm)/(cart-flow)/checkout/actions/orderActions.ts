@@ -187,6 +187,58 @@ export async function createDraftOrder(formData: FormData) {
 
     await Promise.all(notificationPromises);
 
+    // Send push notifications to all admin users
+    try {
+      console.log('🚀 [NEW ORDER] Sending push notifications to admins...');
+      
+      // Import notification functions
+      const { PushNotificationService } = await import('@/lib/push-notification-service');
+      const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
+      
+      // Create notification template for new order
+      const template = ORDER_NOTIFICATION_TEMPLATES.NEW_ORDER(order.orderNumber, validatedData.fullName, total);
+      
+      // Prepare push notification payload
+      const payload = {
+        title: template.title,
+        body: template.body,
+        icon: '/icons/icon-192x192.png',
+        badge: '/icons/icon-192x192.png',
+        tag: `order-${order.id}-new`,
+        data: { 
+          orderId: order.id, 
+          orderNumber: order.orderNumber, 
+          type: 'new_order',
+          customerName: validatedData.fullName,
+          total: total
+        },
+        requireInteraction: true,
+        actions: [
+          {
+            action: 'view_order',
+            title: 'عرض الطلب',
+            icon: '/icons/icon-192x192.png'
+          },
+          {
+            action: 'close',
+            title: 'إغلاق'
+          }
+        ]
+      };
+      
+      // Get admin user IDs
+      const adminUserIds = adminUsers.map(admin => admin.id);
+      
+      // Send push notifications to all admin users
+      const pushResult = await PushNotificationService.sendToUsers(adminUserIds, payload);
+      
+      console.log(`✅ [NEW ORDER] Push notifications sent - Success: ${pushResult.success.length}/${adminUserIds.length}, Failed: ${pushResult.failed.length}`);
+      
+    } catch (error) {
+      console.error('❌ [NEW ORDER] Failed to send push notifications:', error);
+      // Don't fail the order creation if push notifications fail
+    }
+
     // Revalidate home page and user stats data
     revalidatePath('/');
     revalidatePath('/dashboard');

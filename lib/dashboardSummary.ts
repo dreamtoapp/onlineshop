@@ -7,7 +7,7 @@ export async function getDashboardSummary() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const ordersToday = await db.order.count({ where: { createdAt: { gte: today } } });
-  const pendingOrders = await db.order.count({ where: { status: { in: [OrderStatus.PENDING, OrderStatus.ASSIGNED].filter(Boolean) } } });
+  const pendingOrders = await db.order.count({ where: { status: { in: [OrderStatus.PENDING, OrderStatus.ASSIGNED] } } });
   const completedOrders = await db.order.count({ where: { status: OrderStatus.DELIVERED } });
   const cancelledOrders = await db.order.count({ where: { status: OrderStatus.CANCELED } });
 
@@ -81,7 +81,7 @@ export async function getDashboardSummary() {
     _count: { _all: true },
     where: {
       status: {
-        in: [OrderStatus.PENDING, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.CANCELED].filter(Boolean)
+        in: [OrderStatus.PENDING, OrderStatus.ASSIGNED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.CANCELED]
       }
     }
   });
@@ -94,7 +94,7 @@ export async function getDashboardSummary() {
   const recentOrders = await db.order.findMany({
     where: {
       status: {
-        in: [OrderStatus.PENDING, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.CANCELED].filter(Boolean)
+        in: [OrderStatus.PENDING, OrderStatus.ASSIGNED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.CANCELED]
       }
     },
     orderBy: { createdAt: 'desc' },
