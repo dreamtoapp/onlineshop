@@ -122,13 +122,14 @@ export default function CartPageView() {
                             setMergeToastShown(true);
                         }
                     }
-                    // Error: If data is null for authenticated user, show error toast
+                    // Don't show error for null data - this might be normal after merge
                     if (!data) {
-                        toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
+                        console.log('Cart data is null, this might be normal after merge');
                     }
                 })
-                .catch(() => {
+                .catch((error) => {
                     setLoading(false);
+                    console.error('Cart loading error:', error);
                     toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
                 });
         }

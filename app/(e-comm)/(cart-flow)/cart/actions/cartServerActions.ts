@@ -58,46 +58,59 @@ export async function getCart(): Promise<CartWithItems | null> {
 
     // Merge guest cart if present
     if (localCartId) {
-      const localCart = await db.cart.findUnique({
-        where: { id: localCartId },
-        include: { items: { include: { product: true } } },
-      });
-      if (localCart && localCart.items.length > 0) {
-        if (userCart) {
-          await db.$transaction(async (tx) => {
-            for (const item of localCart.items) {
-              if (!userCart) throw new Error('userCart is unexpectedly null');
-              const existingItem = userCart.items.find(
-                (i: typeof item) => i.productId === item.productId
-              );
-              if (existingItem) {
-                await tx.cartItem.update({
-                  where: { id: existingItem.id },
-                  data: { quantity: existingItem.quantity + item.quantity },
-                });
-              } else {
-                await tx.cartItem.create({
-                  data: {
-                    cartId: userCart.id,
-                    productId: item.productId,
-                    quantity: item.quantity,
-                  },
-                });
-              }
-            }
-          });
-          await db.cart.delete({ where: { id: localCartId } });
-        } else {
-          await db.cart.update({
-            where: { id: localCartId },
-            data: { userId: user.id },
-          });
-        }
-        userCart = await db.cart.findUnique({
-          where: { userId: user.id },
+      try {
+        const localCart = await db.cart.findUnique({
+          where: { id: localCartId },
           include: { items: { include: { product: true } } },
         });
-        // Note: Cookie will be cleared by client-side action after successful merge
+        
+        if (localCart && localCart.items.length > 0) {
+          if (userCart) {
+            await db.$transaction(async (tx) => {
+              for (const item of localCart.items) {
+                if (!userCart) throw new Error('userCart is unexpectedly null');
+                const existingItem = userCart.items.find(
+                  (i: typeof item) => i.productId === item.productId
+                );
+                if (existingItem) {
+                  await tx.cartItem.update({
+                    where: { id: existingItem.id },
+                    data: { quantity: existingItem.quantity + item.quantity },
+                  });
+                } else {
+                  await tx.cartItem.create({
+                    data: {
+                      cartId: userCart.id,
+                      productId: item.productId,
+                      quantity: item.quantity,
+                    },
+                  });
+                }
+              }
+            });
+            await db.cart.delete({ where: { id: localCartId } });
+          } else {
+            await db.cart.update({
+              where: { id: localCartId },
+              data: { userId: user.id },
+            });
+          }
+          userCart = await db.cart.findUnique({
+            where: { userId: user.id },
+            include: { items: { include: { product: true } } },
+          });
+          
+          // Clear the cookie immediately after successful merge
+          await clearCartIdCookie();
+        } else if (!localCart) {
+          // Cart was deleted but cookie still exists - clear it
+          console.log('Cart not found, clearing stale cookie');
+          await clearCartIdCookie();
+        }
+      } catch (error) {
+        console.error('Error during cart merge:', error);
+        // Clear cookie on any error to prevent future issues
+        await clearCartIdCookie();
       }
     }
     const result = userCart;
