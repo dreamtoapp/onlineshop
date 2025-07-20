@@ -18,8 +18,8 @@ export default async function AdminPage() {
       {/* Page Title */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
-          <h1 className='text-3xl font-bold text-purple-700'>ادارة المشرفين</h1>
-          <Badge variant="outline" className="border-purple-200 text-purple-700">{admins.length}</Badge>
+          <h1 className='text-3xl font-bold text-primary'>ادارة المشرفين</h1>
+          <Badge variant="outline" className="border-primary/20 text-primary">{admins.length}</Badge>
         </div>
         <AdminUpsert
           mode='new'
@@ -29,21 +29,7 @@ export default async function AdminPage() {
             name: '',
             email: '',
             phone: '',
-            addressLabel: 'العمل',
-            district: '',
-            street: '',
-            buildingNumber: '',
-            floor: '',
-            apartmentNumber: '',
-            landmark: '',
-            deliveryInstructions: '',
             password: '',
-            sharedLocationLink: '',
-            latitude: '',
-            longitude: '',
-            adminLevel: 'ADMIN',
-            permissions: [],
-            isActive: true,
           }} />
       </div>
 

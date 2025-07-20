@@ -12,9 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icon } from '@/components/icons/Icon';
-import {
-    extractCoordinatesFromUrl,
-} from '@/utils/extract-latAndLog-fromWhatsAppLink';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { upsertAdmin } from '../actions/upsertAdmin';
@@ -68,12 +66,8 @@ export default function AdminUpsert({
             phone: defaultValues.phone || '',
 
             password: defaultValues.password || '',
-            sharedLocationLink: defaultValues.sharedLocationLink || '',
-            latitude: defaultValues.latitude || '',
-            longitude: defaultValues.longitude || '',
-            adminLevel: defaultValues.adminLevel || 'ADMIN',
-            permissions: defaultValues.permissions || [],
-            isActive: defaultValues.isActive ?? true,
+
+
         },
     });
 
@@ -94,30 +88,7 @@ export default function AdminUpsert({
         }
     };
 
-    const handleExtractCoordinates = () => {
-        const input = getValues('sharedLocationLink');
-        const coords = extractCoordinatesFromUrl(input || '');
 
-        if (coords) {
-            setValue('latitude', coords.lat.toString());
-            setValue('longitude', coords.lng.toString());
-            toast.success('تم استخراج الإحداثيات بنجاح');
-        } else {
-            toast.error('تعذر استخراج الإحداثيات من الرابط');
-        }
-    };
-
-    const handleOpenWhatsApp = () => {
-        const input = getValues('sharedLocationLink');
-        if (input) {
-            window.open(input, '_blank');
-        }
-    };
-
-    const isWhatsAppLinkValid = () => {
-        const url = getValues('sharedLocationLink');
-        return url?.startsWith('https://wa.me/') || url?.includes('google.com/maps');
-    };
 
     return (
         <AppDialog
@@ -152,17 +123,17 @@ export default function AdminUpsert({
 
                     return (
                         <div key={section.section} className="border rounded-lg">
-                            <div className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <div className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
                                 <button
                                     type="button"
                                     onClick={() => toggleSection(section.section)}
                                     className="flex items-center gap-2 flex-1 text-left"
                                 >
-                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                    <h3 className="text-sm font-semibold text-foreground">
                                         {section.section}
                                     </h3>
                                     {!isExpanded && (
-                                        <span className="text-xs text-gray-500">({section.fields.length} حقول)</span>
+                                        <span className="text-xs text-muted-foreground">({section.fields.length} حقول)</span>
                                     )}
                                 </button>
 
@@ -173,7 +144,7 @@ export default function AdminUpsert({
                                     <button
                                         type="button"
                                         onClick={() => toggleSection(section.section)}
-                                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                        className="p-1 hover:bg-muted rounded transition-colors"
                                     >
                                         {isExpanded ? (
                                             <Icon name="ChevronUp" className="h-4 w-4" />
@@ -188,44 +159,6 @@ export default function AdminUpsert({
                                 <div className="p-4 pt-0 space-y-3">
                                     <div className="grid grid-cols-1 gap-4">
                                         {section.fields.map((field) => {
-                                            if (field.name === 'sharedLocationLink') {
-                                                return (
-                                                    <div
-                                                        key={field.name}
-                                                        className="flex gap-2 items-start"
-                                                    >
-                                                        <div className="flex-1">
-                                                            <Input
-                                                                {...field.register}
-                                                                type={field.type}
-                                                                placeholder={field.placeholder}
-                                                                disabled={isSubmitting}
-                                                            />
-                                                            <FormError message={field.error} />
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                onClick={handleExtractCoordinates}
-                                                                disabled={isSubmitting || !isWhatsAppLinkValid()}
-                                                            >
-                                                                <Icon name="LocateFixed" />
-                                                            </Button>
-                                                            <Button
-                                                                type="button"
-                                                                variant="secondary"
-                                                                onClick={handleOpenWhatsApp}
-                                                                disabled={!isWhatsAppLinkValid()}
-                                                            >
-                                                                <Icon name="MapPin" />
-                                                            </Button>
-                                                            <InfoTooltip content="يمكنك نسخ رابط مشاركة الموقع من WhatsApp أو خرائط Google وسنقوم باستخراج الإحداثيات تلقائياً." />
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
 
                                             // Handle select fields
                                             if (field.type === 'select' && field.options) {

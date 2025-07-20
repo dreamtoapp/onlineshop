@@ -133,10 +133,10 @@ export default function MarketerCard({ marketer }: MarketerCardProps) {
 
                     {/* Marketer Level */}
                     {marketer.marketerLevel && (
-                        <p className='flex items-center gap-2 text-sm text-muted-foreground'>
+                        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                             <Icon name="TrendingUp" size="xs" className="text-orange-600" />
                             <strong className='font-medium'>Level:</strong> {getLevelBadge(marketer.marketerLevel)}
-                        </p>
+                        </div>
                     )}
 
                     {/* Specialization */}

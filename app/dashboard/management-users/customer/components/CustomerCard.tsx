@@ -97,7 +97,7 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
                             <CardTitle className='line-clamp-1 text-lg font-semibold text-primary'>
                                 {safeCustomer.name}
                             </CardTitle>
-                            <p className='text-xs text-muted-foreground flex items-center gap-1'>
+                            <div className='text-xs text-muted-foreground flex items-center gap-1'>
                                 <Icon name="Phone" size="xs" className="text-primary w-3 h-3" />
                                 {customer.phone ? (
                                     <a
@@ -110,7 +110,7 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
                                 ) : (
                                     'No Phone'
                                 )}
-                            </p>
+                            </div>
                         </div>
                     </div>
                     <div className='flex items-center gap-2'>

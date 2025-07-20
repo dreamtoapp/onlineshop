@@ -23,19 +23,7 @@ export async function upsertAdmin(
       name,
       email,
       phone,
-      addressLabel,
-      district,
-      street,
-      buildingNumber,
-      floor,
-      apartmentNumber,
-      landmark,
-      deliveryInstructions,
       password,
-
-      latitude,
-      longitude,
-
     } = formData;
 
     if (mode === 'new') {
@@ -64,22 +52,6 @@ export async function upsertAdmin(
           phone,
           password,
           role: UserRole.ADMIN,
-          // Create default address using Address Book system
-          addresses: {
-            create: {
-              label: addressLabel,
-              district,
-              street,
-              buildingNumber,
-              floor,
-              apartmentNumber,
-              landmark,
-              deliveryInstructions,
-              latitude,
-              longitude,
-              isDefault: true,
-            },
-          },
         },
       });
 
@@ -128,48 +100,6 @@ export async function upsertAdmin(
           password,
         },
       });
-
-      // Update or create default address
-      const existingAddress = await prisma.address.findFirst({
-        where: { userId: adminId, isDefault: true },
-      });
-
-      if (existingAddress) {
-        // Update existing default address
-        await prisma.address.update({
-          where: { id: existingAddress.id },
-          data: {
-            label: addressLabel,
-            district,
-            street,
-            buildingNumber,
-            floor,
-            apartmentNumber,
-            landmark,
-            deliveryInstructions,
-            latitude,
-            longitude,
-          },
-        });
-      } else {
-        // Create new default address
-        await prisma.address.create({
-          data: {
-            userId: adminId,
-            label: addressLabel,
-            district,
-            street,
-            buildingNumber,
-            floor,
-            apartmentNumber,
-            landmark,
-            deliveryInstructions,
-            latitude,
-            longitude,
-            isDefault: true,
-          },
-        });
-      }
 
       revalidatePath('/dashboard/management-users/admin');
       return {
