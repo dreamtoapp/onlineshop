@@ -28,7 +28,7 @@ export default async function LayoutNew({ children }: { children: React.ReactNod
 
             {/* Main Content Area */}
             <div className='flex flex-1 flex-col pt-16'>
-                <main className='w-full flex-1 bg-background p-6'>
+                <main className='w-full flex-1 bg-background p-6 flex flex-col'>
                     {children}
                 </main>
 

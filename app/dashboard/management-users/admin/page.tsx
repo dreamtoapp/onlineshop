@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
-import { UserRole } from '@prisma/client';
 
-import { getUsers } from '../shared/actions/getUsers';
-import UserCard from '../shared/components/UserCard';
-import AddUser from '../shared/components/UserUpsert';
+import { getAdmins } from './actions/getAdmins';
+import AdminCard from './components/AdminCard';
+import AdminUpsert from './components/AdminUpsert';
 
 export default async function AdminPage() {
-  const admins = await getUsers(UserRole.ADMIN);
+  const admins = await getAdmins();
 
   if (!admins) {
     notFound();
@@ -19,36 +18,44 @@ export default async function AdminPage() {
       {/* Page Title */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
-          <h1 className='text-3xl font-bold text-primary'>ادارة المشرفين</h1>
-          <Badge variant="outline">{admins.length}</Badge>
+          <h1 className='text-3xl font-bold text-purple-700'>ادارة المشرفين</h1>
+          <Badge variant="outline" className="border-purple-200 text-purple-700">{admins.length}</Badge>
         </div>
-        <AddUser
-          role={UserRole.ADMIN}
+        <AdminUpsert
           mode='new'
-          title={"إضافة مشرف"}
-          description={"يرجى إدخال بيانات المشرف"}
+          title="إضافة مشرف جديد"
+          description="يرجى إدخال بيانات المشرف"
           defaultValues={{
             name: '',
             email: '',
             phone: '',
-            address: '',
+            addressLabel: 'العمل',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            floor: '',
+            apartmentNumber: '',
+            landmark: '',
+            deliveryInstructions: '',
             password: '',
             sharedLocationLink: '',
             latitude: '',
             longitude: '',
+            adminLevel: 'ADMIN',
+            permissions: [],
+            isActive: true,
           }} />
       </div>
 
-
-
-
-      {/* Driver List */}
+      {/* Admin List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {admins.length > 0 ? (
-          admins.map((admin) => <UserCard key={admin.id} user={{
-            ...admin,
-            name: admin.name || '',
-          }} />)
+          admins.map((admin) => (
+            <AdminCard key={admin.id} admin={{
+              ...admin,
+              name: admin.name || '',
+            }} />
+          ))
         ) : (
           <div className='col-span-full text-center text-muted-foreground'>
             لا يوجد مشرفون متاحون. يرجى إضافة مشرف جديد.

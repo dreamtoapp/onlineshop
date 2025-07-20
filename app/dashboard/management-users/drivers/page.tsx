@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
-import { UserRole } from '@prisma/client';
 
-import { getUsers } from '../shared/actions/getUsers';
-import UserCard from '../shared/components/UserCard';
-import AddUser from '../shared/components/UserUpsert';
+import { getDrivers } from './actions/getDrivers';
+import DriverCard from './components/DriverCard';
+import DriverUpsert from './components/DriverUpsert';
 
 export default async function DriversPage() {
-  const drivers = await getUsers(UserRole.DRIVER);
+  const drivers = await getDrivers();
 
   if (!drivers) {
     notFound();
@@ -17,29 +16,29 @@ export default async function DriversPage() {
   return (
     <div className='space-y-6 bg-background p-6 text-foreground'>
       {/* Page Title */}
-
       <div className='flex items-center justify-between'>
-
-
         <div className='flex items-center gap-4'>
-          <h1 className='text-3xl font-bold text-primary'>ادارة السائقين</h1>
-          <Badge variant="outline">{drivers.length}</Badge>
+          <h1 className='text-3xl font-bold text-green-700'>ادارة السائقين</h1>
+          <Badge variant="outline" className="border-green-200 text-green-700">{drivers.length}</Badge>
         </div>
-        <AddUser
-          role={UserRole.DRIVER}
+        <DriverUpsert
           mode='new'
-          title={"إضافة سائق"}
-          description={"يرجى إدخال بيانات السائق"}
+          title="إضافة سائق جديد"
+          description="يرجى إدخال بيانات السائق"
           defaultValues={{
             name: '',
             email: '',
             phone: '',
-            address: '',
+            addressLabel: 'المنزل',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            floor: '',
+            apartmentNumber: '',
+            landmark: '',
+            deliveryInstructions: '',
             password: '',
-            sharedLocationLink: '',
-            latitude: '',
-            longitude: '',
-            vehicleType: undefined,
+            vehicleType: 'CAR',
             vehiclePlateNumber: '',
             vehicleColor: '',
             vehicleModel: '',
@@ -49,16 +48,17 @@ export default async function DriversPage() {
           }} />
       </div>
 
-
-
-
       {/* Driver List */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {drivers.length > 0 ? (
-          drivers.map((driver) => <UserCard key={driver.id} user={{
-            ...driver,
-            name: driver.name || '',
-          }} />)
+          drivers.map((driver) => (
+            <DriverCard key={driver.id} driver={{
+              ...driver,
+              name: driver.name || '',
+              experience: driver.experience?.toString() || '',
+              maxOrders: driver.maxOrders?.toString() || '3',
+            }} />
+          ))
         ) : (
           <div className='col-span-full text-center text-muted-foreground'>
             لا يوجد سائقون متاحون. يرجى إضافة سائق جديد.
