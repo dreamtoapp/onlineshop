@@ -24,16 +24,7 @@ export async function upsertCustomer(
       name,
       email,
       phone,
-      addressLabel,
-      district,
-      street,
-      buildingNumber,
-      floor,
-      apartmentNumber,
-      landmark,
-      deliveryInstructions,
       password,
-
     } = formData;
 
     if (mode === 'new') {
@@ -62,21 +53,6 @@ export async function upsertCustomer(
           phone,
           password,
           role: UserRole.CUSTOMER,
-          // Create default address using Address Book system
-          addresses: {
-            create: {
-              label: addressLabel,
-              district,
-              street,
-              buildingNumber,
-              floor,
-              apartmentNumber,
-              landmark,
-              deliveryInstructions,
-
-              isDefault: true,
-            },
-          },
         },
       });
 
@@ -125,44 +101,6 @@ export async function upsertCustomer(
           password,
         },
       });
-
-      // Update or create default address
-      const existingAddress = await prisma.address.findFirst({
-        where: { userId, isDefault: true },
-      });
-
-      if (existingAddress) {
-        // Update existing default address
-        await prisma.address.update({
-          where: { id: existingAddress.id },
-          data: {
-            label: addressLabel,
-            district,
-            street,
-            buildingNumber,
-            floor,
-            apartmentNumber,
-            landmark,
-            deliveryInstructions,
-          },
-        });
-      } else {
-        // Create new default address
-        await prisma.address.create({
-          data: {
-            userId,
-            label: addressLabel,
-            district,
-            street,
-            buildingNumber,
-            floor,
-            apartmentNumber,
-            landmark,
-            deliveryInstructions,
-            isDefault: true,
-          },
-        });
-      }
 
       revalidatePath('/dashboard/management-users/customer');
       return {

@@ -13,10 +13,10 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/icons/Icon';
 import { UserRole } from '@prisma/client';
-import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 import DeleteCustomerAlert from './DeleteCustomerAlert';
 import CustomerUpsert from './CustomerUpsert';
+import AddressBook from './AddressBook';
 
 type CustomerCardProps = {
     customer: {
@@ -199,46 +199,10 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
                     </div>
 
                     {/* Address Section */}
-                    <div className='border-t border-border/50 pt-3'>
-                        <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
-                            <Icon name="MapPin" size="xs" className="text-primary w-3 h-3" />
-                            Addresses
-                        </h4>
-                        {customer.addresses && customer.addresses.length > 0 ? (
-                            <div className='space-y-2'>
-                                {customer.addresses.map((address) => (
-                                    <div key={address.id} className='p-2 rounded-lg bg-muted/10 border border-border/30'>
-                                        <div className='flex items-center justify-between mb-1'>
-                                            <span className='text-xs font-medium text-primary'>{address.label}</span>
-                                            {address.isDefault && (
-                                                <Badge variant="outline" className="text-xs">Default</Badge>
-                                            )}
-                                        </div>
-                                        <p className='text-xs text-muted-foreground mb-2'>
-                                            {address.district}, {address.street}, مبنى {address.buildingNumber}
-                                            {address.apartmentNumber && `، شقة ${address.apartmentNumber}`}
-                                            {address.floor && `، طابق ${address.floor}`}
-                                            {address.landmark && `، معلم: ${address.landmark}`}
-                                        </p>
-                                        {address.latitude && address.longitude && (
-                                            <GoogleMapsLink
-                                                latitude={address.latitude}
-                                                longitude={address.longitude}
-                                                label="عرض على الخريطة"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className='p-2 rounded-lg bg-muted/10 border border-border/30'>
-                                <p className='text-xs text-muted-foreground text-center'>No Address Available</p>
-                            </div>
-                        )}
-                    </div>
+                    <AddressBook
+                        addresses={customer.addresses || []}
+                        onAddressUpdate={() => window.location.reload()}
+                    />
                 </div>
             </CardContent>
 
@@ -252,14 +216,6 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
                         name: customer.name,
                         email: customer.email || '',
                         phone: customer.phone || '',
-                        addressLabel: customer.addresses?.[0]?.label || 'المنزل',
-                        district: customer.addresses?.[0]?.district || '',
-                        street: customer.addresses?.[0]?.street || '',
-                        buildingNumber: customer.addresses?.[0]?.buildingNumber || '',
-                        floor: customer.addresses?.[0]?.floor || '',
-                        apartmentNumber: customer.addresses?.[0]?.apartmentNumber || '',
-                        landmark: customer.addresses?.[0]?.landmark || '',
-                        deliveryInstructions: customer.addresses?.[0]?.deliveryInstructions || '',
                         password: customer.password || '',
                     }}
                     userId={customer.id}

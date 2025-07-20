@@ -29,21 +29,15 @@ export default async function CustomerPage() {
             name: '',
             email: '',
             phone: '',
-            addressLabel: 'المنزل',
-            district: '',
-            street: '',
-            buildingNumber: '',
-            floor: '',
-            apartmentNumber: '',
-            landmark: '',
-            deliveryInstructions: '',
             password: '',
-
           }} />
       </div>
 
       {/* Customer List with Sorting */}
-      <CustomerList customers={customers} />
+      <CustomerList customers={customers.map(customer => ({
+        ...customer,
+        name: customer.name || 'No Name'
+      }))} />
     </div>
   );
 }
