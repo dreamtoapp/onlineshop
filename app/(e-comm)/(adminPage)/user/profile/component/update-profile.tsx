@@ -29,6 +29,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ActionAlert } from './ActionAlert';
+import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 import { updateUserProfile } from '../action/update-user-profile';
 import { handleLogout } from '../action/logout';
@@ -347,6 +348,18 @@ function AddressManagementCard({ hasDefaultAddress, defaultAddress }: { hasDefau
               {defaultAddress.floor ? `، طابق ${defaultAddress.floor}` : ''}
               {defaultAddress.landmark ? `، معلم: ${defaultAddress.landmark}` : ''}
             </div>
+            {defaultAddress.latitude && defaultAddress.longitude && (
+              <div className="mt-2">
+                <GoogleMapsLink
+                  latitude={defaultAddress.latitude}
+                  longitude={defaultAddress.longitude}
+                  label="عرض على الخريطة"
+                  variant="ghost"
+                  size="sm"
+                  className="text-green-700 hover:text-green-800 hover:bg-green-100"
+                />
+              </div>
+            )}
           </div>
         )}
         <div className="text-center space-y-3">

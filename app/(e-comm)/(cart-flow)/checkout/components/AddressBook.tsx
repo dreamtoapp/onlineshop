@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import AddressListDialog from "./client/AddressListDialog";
 import { Address as PrismaAddress } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import GoogleMapsLink from "@/components/GoogleMapsLink";
 
 export type AddressWithDefault = PrismaAddress & { isDefault?: boolean };
 
@@ -81,6 +82,18 @@ export default function AddressBook({ addresses, selectedAddressId, onSelectAddr
                         <div className="flex-1">
                             <div className="font-medium">{addr.label || 'عنوان'}</div>
                             <div className="text-sm text-muted-foreground">{addr.district}, {addr.street}, مبنى {addr.buildingNumber}</div>
+                            {addr.latitude && addr.longitude && (
+                                <div className="mt-2">
+                                    <GoogleMapsLink
+                                        latitude={addr.latitude}
+                                        longitude={addr.longitude}
+                                        label="عرض على الخريطة"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-feature-commerce hover:text-feature-commerce/80 hover:bg-feature-commerce/10"
+                                    />
+                                </div>
+                            )}
                         </div>
                         {addr.isDefault && <Badge className="bg-feature-commerce text-white">افتراضي</Badge>}
                     </div>

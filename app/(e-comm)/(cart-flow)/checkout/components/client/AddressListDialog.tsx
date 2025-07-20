@@ -10,6 +10,7 @@ import AddressForm, { AddressFormData } from '../AddressForm';
 import { useRouter } from 'next/navigation';
 import { Address as PrismaAddress } from "@prisma/client";
 import AddressLocationModal from '../AddressLocationModal';
+import GoogleMapsLink from "@/components/GoogleMapsLink";
 
 type Address = PrismaAddress & { isDefault?: boolean };
 
@@ -283,9 +284,19 @@ export default function AddressListDialog({ addresses, onSelectAddress }: Addres
                                     {/* Location status */}
                                     <div className="mt-2">
                                         {address.latitude && address.longitude ? (
-                                            <Badge variant="outline" className="text-xs border-green-600 text-green-700">
-                                                ✅ موقع محدد
-                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="text-xs border-green-600 text-green-700">
+                                                    ✅ موقع محدد
+                                                </Badge>
+                                                <GoogleMapsLink
+                                                    latitude={address.latitude}
+                                                    longitude={address.longitude}
+                                                    label="عرض على الخريطة"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-feature-commerce hover:text-feature-commerce/80 hover:bg-feature-commerce/10"
+                                                />
+                                            </div>
                                         ) : (
                                             <Badge variant="outline" className="text-xs border-orange-600 text-orange-700">
                                                 ⚠️ يحتاج تحديد موقع

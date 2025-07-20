@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import AddressForm from './AddressForm';
 import { getAddresses, deleteAddress, setDefaultAddress } from '../actions/addressActions';
 import { toast } from 'sonner';
+import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 interface Address {
     id: string;
@@ -294,9 +295,16 @@ export default function AddressManagement({ userId }: AddressManagementProps) {
                                         </p>
                                     )}
                                     {address.latitude && address.longitude && (
-                                        <p className="text-xs text-muted-foreground">
-                                            الموقع: {address.latitude}, {address.longitude}
-                                        </p>
+                                        <div className="mt-2">
+                                            <GoogleMapsLink
+                                                latitude={address.latitude}
+                                                longitude={address.longitude}
+                                                label="عرض على الخريطة"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-feature-users hover:text-feature-users/80 hover:bg-feature-users/10"
+                                            />
+                                        </div>
                                     )}
                                 </div>
                                 {!address.isDefault && (

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Icon } from '@/components/icons/Icon';
 import { UserRole } from '@prisma/client';
+import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 import DeleteDriverAlert from './DeleteUser';
 import AddUser from './UserUpsert';
@@ -85,6 +86,19 @@ export default function UserCard({ user }: UserCardProps) {
           <p className='flex items-center gap-2 text-sm text-muted-foreground'>
             <strong className='font-medium'>Phone:</strong> {safeUser.phone || 'No Phone'}
           </p>
+          {user.latitude && user.longitude && (
+            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+              <strong className='font-medium'>Location:</strong>
+              <GoogleMapsLink
+                latitude={user.latitude}
+                longitude={user.longitude}
+                label="عرض على الخريطة"
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:text-primary/80 hover:bg-primary/10"
+              />
+            </div>
+          )}
         </div>
       </CardContent>
 
