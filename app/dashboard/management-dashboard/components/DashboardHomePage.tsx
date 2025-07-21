@@ -10,7 +10,7 @@ import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 
 interface DashboardHomePageProps {
   summary: {
-    orders: { total: number; today: number; pending: number; completed: number; cancelled: number };
+    orders: { total: number; today: number; pending: number; completed: number; cancelled: number; assigned: number };
     sales: { total: number; today: number };
     customers: { total: number; today: number };
     products: { total: number; outOfStock: number };
@@ -99,70 +99,90 @@ export default function DashboardHomePage({ summary: initialSummary }: Dashboard
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-l-info">
-          <CardContent className="p-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 xl:gap-5">
+        {/* Each Card: reduced padding, min-w-0, compact font, hover effect */}
+        <Card className="min-w-0 transition-transform duration-150 hover:scale-[1.03] hover:shadow-lg p-0">
+          <CardContent className="p-3 md:p-4 xl:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">الطلبات اليوم</p>
-                <p className="text-2xl font-bold">{formatNumberEn(summary.orders.today)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs md:text-sm font-medium text-muted-foreground">الطلبات اليوم</p>
+                <p className="text-xl md:text-2xl font-bold">{formatNumberEn(summary.orders.today)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
                   من إجمالي {formatNumberEn(summary.orders.total)} طلب
                 </p>
               </div>
-              <div className="h-12 w-12 bg-info/10 rounded-lg flex items-center justify-center">
-                <Icon name="ClipboardList" className="h-6 w-6 text-info" />
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-info/10 rounded-lg flex items-center justify-center">
+                <Icon name="ClipboardList" className="h-5 w-5 md:h-6 md:w-6 text-info" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-success">
-          <CardContent className="p-6">
+        <Card className="min-w-0 transition-transform duration-150 hover:scale-[1.03] hover:shadow-lg p-0">
+          <CardContent className="p-3 md:p-4 xl:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">المبيعات اليوم</p>
-                <p className="text-2xl font-bold">{formatCurrency(summary.sales.today)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs md:text-sm font-medium text-muted-foreground">المبيعات اليوم</p>
+                <p className="text-xl md:text-2xl font-bold">{formatCurrency(summary.sales.today)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
                   من إجمالي {formatCurrency(summary.sales.total)}
                 </p>
               </div>
-              <div className="h-12 w-12 bg-success/10 rounded-lg flex items-center justify-center">
-                <Icon name="DollarSign" className="h-6 w-6 text-success" />
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-success/10 rounded-lg flex items-center justify-center">
+                <Icon name="DollarSign" className="h-5 w-5 md:h-6 md:w-6 text-success" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-accent">
-          <CardContent className="p-6">
+        <Card className="min-w-0 transition-transform duration-150 hover:scale-[1.03] hover:shadow-lg p-0">
+          <CardContent className="p-3 md:p-4 xl:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">العملاء الجدد</p>
-                <p className="text-2xl font-bold">{formatNumberEn(summary.customers.today)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs md:text-sm font-medium text-muted-foreground">العملاء الجدد</p>
+                <p className="text-xl md:text-2xl font-bold">{formatNumberEn(summary.customers.today)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
                   من إجمالي {formatNumberEn(summary.customers.total)} عميل
                 </p>
               </div>
-              <div className="h-12 w-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                <Icon name="Users" className="h-6 w-6 text-accent-foreground" />
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                <Icon name="Users" className="h-5 w-5 md:h-6 md:w-6 text-accent-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-warning">
-          <CardContent className="p-6">
+        {/* Pending Orders Card */}
+        <Card className="min-w-0 transition-transform duration-150 hover:scale-[1.03] hover:shadow-lg p-0">
+          <CardContent className="p-3 md:p-4 xl:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">الطلبات المعلقة</p>
-                <p className="text-2xl font-bold">{formatNumberEn(summary.orders.pending)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs md:text-sm font-medium text-muted-foreground">الطلبات المعلقة</p>
+                <p className="text-xl md:text-2xl font-bold">{formatNumberEn(summary.orders.pending)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
                   تحتاج إلى معالجة
                 </p>
               </div>
-              <div className="h-12 w-12 bg-warning/10 rounded-lg flex items-center justify-center">
-                <Icon name="Clock" className="h-6 w-6 text-warning" />
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-warning/10 rounded-lg flex items-center justify-center">
+                <Icon name="Clock" className="h-5 w-5 md:h-6 md:w-6 text-warning" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Assigned Orders Card */}
+        <Card className="min-w-0 transition-transform duration-150 hover:scale-[1.03] hover:shadow-lg p-0">
+          <CardContent className="p-3 md:p-4 xl:p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm font-medium text-muted-foreground">الطلبات المُخصصة</p>
+                <p className="text-xl md:text-2xl font-bold">{formatNumberEn(summary.orders.assigned)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
+                  تم تعيينها لسائقين
+                </p>
+              </div>
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                <Icon name="UserCheck" className="h-5 w-5 md:h-6 md:w-6 text-accent-foreground" />
               </div>
             </div>
           </CardContent>

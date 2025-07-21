@@ -58,10 +58,10 @@ export const navigationItems = [
     href: '/dashboard/management-users/drivers',
     icon: 'Truck',
     children: [
-      { label: 'المشرفون', href: '/dashboard/management-users/admin', icon: 'ShieldCheck' },
-      { label: 'التسويق', href: '/dashboard/management-users/marketer', icon: 'Megaphone' },
+      { label: 'المشرفون', href: '/dashboard/management-users/admin', icon: 'Shield' },
+      // { label: 'التسويق', href: '/dashboard/management-users/marketer', icon: 'Megaphone' },
       { label: 'السائقون', href: '/dashboard/management-users/drivers', icon: 'Truck' },
-      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'CalendarClock' }
+     
     ]
   },
   {
@@ -69,10 +69,22 @@ export const navigationItems = [
     href: '/dashboard/management/settings',
     icon: 'Settings',
     children: [
-      { label: 'الإعدادات', href: '/dashboard/management/settings', icon: 'Settings' },
+      { label: 'معلومات الشركة', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
+      { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
+      { label: 'المعلومات الضريبية', href: '/dashboard/management/settings/tax-info', icon: 'Receipt' },
+      { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
+      { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
+      { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
+      { label: '---', href: '#', icon: 'Minus', key: 'divider-1' },
+      { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
+      { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
+      { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
+      { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
+      { label: '---', href: '#', icon: 'Minus', key: 'divider-2' },
       { label: 'التنبيهات', href: '/dashboard/management-notification', icon: 'Bell' },
-      { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' },
-      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' }
+      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
+      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
+      { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' }
     ]
   },
   {
@@ -95,9 +107,11 @@ export type NavigationItem = {
   href: string;
   icon: string;
   badge?: string;
+  key?: string;
   children?: {
     label: string;
     href: string;
     icon: string;
+    key?: string;
   }[];
 }; 

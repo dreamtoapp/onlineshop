@@ -20,7 +20,9 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { navigationItems } from '../helpers/navigationMenu';
+import { navigationItems, type NavigationItem } from '../helpers/navigationMenu';
+
+type NavigationChild = NonNullable<NavigationItem['children']>[0];
 
 interface MobileNavigationProps {
     pendingOrdersCount?: number;
@@ -67,18 +69,31 @@ export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavig
                                                 <span>{item.label}</span>
                                                 {item.badge && (
                                                     <Badge variant="secondary" className="text-xs">
-                                                        {item.badge === 'pending' ? pendingOrdersCount : item.badge}
+                                                        {item.badge === 'pending'
+                                                            ? (pendingOrdersCount > 0 ? pendingOrdersCount : '😔')
+                                                            : item.badge}
                                                     </Badge>
                                                 )}
                                             </div>
                                         </AccordionTrigger>
                                         <AccordionContent>
                                             <div className="flex flex-col gap-1 pr-6">
-                                                {item.children?.map((child) => {
+                                                {item.children?.map((child: NavigationChild, index) => {
                                                     const isChildActive = isActive(child.href);
+
+                                                    // Handle divider
+                                                    if (child.label === '---') {
+                                                        return (
+                                                            <div
+                                                                key={child.key || `divider-${index}`}
+                                                                className="border-t border-border my-2"
+                                                            />
+                                                        );
+                                                    }
+
                                                     return (
                                                         <Link
-                                                            key={child.href}
+                                                            key={child.key || `${child.href}-${index}`}
                                                             href={child.href}
                                                             onClick={() => setIsOpen(false)}
                                                             className={cn(

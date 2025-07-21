@@ -9,7 +9,17 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const subscription = await request.json();
+    let subscription;
+    try {
+      subscription = await request.json();
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      return Response.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
+
+    if (!subscription || !subscription.endpoint || !subscription.keys) {
+      return Response.json({ error: 'Invalid subscription data' }, { status: 400 });
+    }
 
     await db.pushSubscription.upsert({
       where: { userId: session.user.id },

@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { z } from 'zod';
 import {
     AlertDialog,
@@ -148,104 +149,165 @@ export default function FeaturesTabClient({ aboutPageId }: { aboutPageId: string
     }
 
     return (
-        <Card className="p-6 mb-4">
-            <h2 className="text-xl font-bold mb-4">إدارة المميزات</h2>
-            <form onSubmit={handleAddOrEdit} className="space-y-4 mb-6">
-                <div>
-                    <label className="block font-bold mb-1">العنوان</label>
-                    <Input ref={titleInputRef} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-                    {error && typeof error === 'object' && error.fieldErrors?.title && (
-                        <p className="text-red-500 text-sm mt-1">{error.fieldErrors.title[0]}</p>
-                    )}
-                </div>
-                <div>
-                    <label className="block font-bold mb-1">الوصف</label>
-                    <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-                    {error && typeof error === 'object' && error.fieldErrors?.description && (
-                        <p className="text-red-500 text-sm mt-1">{error.fieldErrors.description[0]}</p>
-                    )}
-                </div>
-                <div>
-                    <label className="block font-bold mb-1">صورة الميزة</label>
-                    {editId ? (
-                        <div className="w-32 h-20">
-                            <AddImage
-                                url={form.imageUrl}
-                                alt="صورة الميزة"
-                                recordId={editId}
-                                table="feature"
-                                tableField="imageUrl"
-                                onUploadComplete={url => setForm(f => ({ ...f, imageUrl: url }))}
-                                autoUpload
+        <div className="space-y-6" dir="rtl">
+            {/* Add/Edit Form Card */}
+            <Card>
+                <CardHeader className="text-right">
+                    <CardTitle>{editId ? 'تعديل الميزة' : 'إضافة ميزة جديدة'}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-right">
+                    <form onSubmit={handleAddOrEdit} className="space-y-4">
+                        <div>
+                            <Label htmlFor="featureTitle" className="text-sm font-medium text-right block">العنوان</Label>
+                            <Input
+                                id="featureTitle"
+                                ref={titleInputRef}
+                                value={form.title}
+                                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                                className="mt-1 text-right"
+                                placeholder="أدخل عنوان الميزة"
+                                dir="rtl"
                             />
-                            {error && typeof error === 'object' && error.fieldErrors?.imageUrl && (
-                                <p className="text-red-500 text-sm mt-1">{error.fieldErrors.imageUrl[0]}</p>
+                            {error && typeof error === 'object' && error.fieldErrors?.title && (
+                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.title[0]}</p>
                             )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="featureDescription" className="text-sm font-medium text-right block">الوصف</Label>
+                            <Textarea
+                                id="featureDescription"
+                                value={form.description}
+                                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                                className="mt-1 min-h-[100px] text-right"
+                                placeholder="أدخل وصف الميزة"
+                                dir="rtl"
+                            />
+                            {error && typeof error === 'object' && error.fieldErrors?.description && (
+                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.description[0]}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="featureImage" className="text-sm font-medium text-right block">صورة الميزة</Label>
+                            {editId ? (
+                                <div className="mt-1 w-48 h-32 border rounded-md overflow-hidden">
+                                    <AddImage
+                                        url={form.imageUrl}
+                                        alt="صورة الميزة"
+                                        recordId={editId}
+                                        table="feature"
+                                        tableField="imageUrl"
+                                        onUploadComplete={url => setForm(f => ({ ...f, imageUrl: url }))}
+                                        autoUpload
+                                    />
+                                </div>
+                            ) : (
+                                <Alert className="mt-2 text-right">
+                                    <AlertTitle>إرشادات الصورة</AlertTitle>
+                                    <AlertDescription>
+                                        أضف الميزة ثم ارفع الصورة بعد تحديد الميزة للتعديل
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                            {error && typeof error === 'object' && error.fieldErrors?.imageUrl && (
+                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.imageUrl[0]}</p>
+                            )}
+                        </div>
+
+                        {error && typeof error === 'object' && error.fieldErrors?.aboutPageId && (
+                            <p className="text-destructive text-sm text-right">{error.fieldErrors.aboutPageId[0]}</p>
+                        )}
+                        {error && typeof error === 'object' && Array.isArray(error.formErrors) && error.formErrors.length > 0 && (
+                            <ul className="text-destructive text-sm text-right">
+                                {error.formErrors.map((msg: string, i: number) => <li key={i}>{msg}</li>)}
+                            </ul>
+                        )}
+                        {error && typeof error === 'string' && (
+                            <p className="text-destructive text-sm text-right">{error}</p>
+                        )}
+
+                        <div className="flex gap-2 pt-4 justify-end">
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                            >
+                                {loading ? 'جاري الحفظ...' : (editId ? 'تحديث الميزة' : 'إضافة الميزة')}
+                            </Button>
+                            {editId && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCancelEdit}
+                                >
+                                    إلغاء
+                                </Button>
+                            )}
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
+            {/* Features List Card */}
+            <Card>
+                <CardHeader className="text-right">
+                    <CardTitle>المميزات الحالية ({features.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {features.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                            لا توجد مميزات مضافة بعد
                         </div>
                     ) : (
-                        <Alert variant="default" className="w-64 mt-2">
-                            <AlertTitle>إرشادات الصورة</AlertTitle>
-                            <AlertDescription>
-                                أضف الميزة ثم ارفع الصورة بعد تحديد الميزة للتعديل
-                            </AlertDescription>
-                        </Alert>
+                        <div className="space-y-4">
+                            {features.map((feature) => (
+                                <div key={feature.id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4" dir="rtl">
+                                    <div className="flex-1 text-right">
+                                        <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                                        <p className="text-sm text-muted-foreground mb-3">{feature.description}</p>
+                                        {feature.imageUrl && feature.imageUrl.trim() !== '' && (
+                                            <Image
+                                                src={feature.imageUrl}
+                                                alt={feature.title}
+                                                width={96}
+                                                height={64}
+                                                className="w-24 h-16 object-cover rounded-md"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleEdit(feature)}
+                                        >
+                                            تعديل
+                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="sm">حذف</Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent dir="rtl">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        هل أنت متأكد من حذف هذه الميزة؟ لا يمكن التراجع عن هذا الإجراء.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(feature.id)}>حذف</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     )}
-                </div>
-                {error && typeof error === 'object' && error.fieldErrors?.aboutPageId && (
-                    <p className="text-red-500 text-sm mt-1">{error.fieldErrors.aboutPageId[0]}</p>
-                )}
-                {error && typeof error === 'object' && Array.isArray(error.formErrors) && error.formErrors.length > 0 && (
-                    <ul className="text-red-500 mb-2">
-                        {error.formErrors.map((msg: string, i: number) => <li key={i}>{msg}</li>)}
-                    </ul>
-                )}
-                {error && typeof error === 'string' && (
-                    <p className="text-red-500">{error}</p>
-                )}
-                <div className="flex gap-2">
-                    <Button type="submit" disabled={loading}>{editId ? 'تحديث' : 'إضافة'}</Button>
-                    {editId && <Button type="button" variant="outline" onClick={handleCancelEdit}>إلغاء</Button>}
-                </div>
-            </form>
-            <ul className="space-y-4">
-                {features.map((feature) => (
-                    <li key={feature.id} className="border rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <div className="font-bold">{feature.title}</div>
-                            <div className="text-sm text-muted-foreground mb-2">{feature.description}</div>
-                            {feature.imageUrl && feature.imageUrl.trim() !== '' && (
-                                <Image
-                                    src={feature.imageUrl}
-                                    alt={feature.title}
-                                    width={96}
-                                    height={64}
-                                    className="w-24 h-16 object-cover rounded mt-2"
-                                />
-                            )}
-                        </div>
-                        <div className="flex gap-2 mt-2 md:mt-0">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(feature)}>تعديل</Button>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="sm">حذف</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            هل أنت متأكد من حذف هذه الميزة؟ لا يمكن التراجع عن هذا الإجراء.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDelete(feature.id)}>حذف</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </Card>
+                </CardContent>
+            </Card>
+        </div>
     );
 } 

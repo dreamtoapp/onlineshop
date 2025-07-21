@@ -9,8 +9,12 @@ import PlaceOrderButton from "./PlaceOrderButton";
 import { AddressWithDefault } from "./AddressBook";
 import { UserProfile } from "./UserInfoCard";
 import { CartData } from "./PlaceOrderButton";
-import TermsDialog from "./TermsDialog";
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import TermsDialog, { TermsDialogContent } from "./TermsDialog";
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import type { Policy } from "./TermsDialog";
 
 interface CheckoutClientProps {
     user: UserProfile;
@@ -24,6 +28,33 @@ export default function CheckoutClient({ user, cart, addresses }: CheckoutClient
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("CASH");
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+    const [policies, setPolicies] = useState<Policy[]>([]);
+    const [loadingPolicies, setLoadingPolicies] = useState(false);
+    const [policiesError, setPoliciesError] = useState("");
+    const [activeTab, setActiveTab] = useState("summary");
+
+    const fetchPolicies = async () => {
+        setLoadingPolicies(true);
+        setPoliciesError("");
+        try {
+            const [websitePolicy, privacyPolicy, returnPolicy, shippingPolicy] = await Promise.allSettled([
+                fetch('/api/policies/website').then(res => res.json()),
+                fetch('/api/policies/privacy').then(res => res.json()),
+                fetch('/api/policies/return').then(res => res.json()),
+                fetch('/api/policies/shipping').then(res => res.json())
+            ]);
+            const activePolicies = [];
+            if (websitePolicy.status === 'fulfilled' && websitePolicy.value.isPublished) activePolicies.push(websitePolicy.value);
+            if (privacyPolicy.status === 'fulfilled' && privacyPolicy.value.isPublished) activePolicies.push(privacyPolicy.value);
+            if (returnPolicy.status === 'fulfilled' && returnPolicy.value.isPublished) activePolicies.push(returnPolicy.value);
+            if (shippingPolicy.status === 'fulfilled' && shippingPolicy.value.isPublished) activePolicies.push(shippingPolicy.value);
+            setPolicies(activePolicies);
+        } catch (err) {
+            setPoliciesError('فشل تحميل الشروط والأحكام. يرجى المحاولة لاحقاً');
+        } finally {
+            setLoadingPolicies(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -38,23 +69,93 @@ export default function CheckoutClient({ user, cart, addresses }: CheckoutClient
                         />
                         <ShiftSelectorWrapper selectedShiftId={selectedShiftId} onShiftSelect={setSelectedShiftId} />
                         <PaymentMethodSelector selectedPaymentMethod={selectedPaymentMethod} onSelectPayment={setSelectedPaymentMethod} />
-                        <div className="flex items-center gap-2 mb-2">
-                            <input
-                                type="checkbox"
-                                id="terms"
-                                checked={termsAccepted}
-                                onChange={e => setTermsAccepted(e.target.checked)}
-                                className="accent-feature-commerce h-5 w-5"
-                            />
-                            <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <label htmlFor="terms" className="cursor-pointer text-feature-commerce hover:underline text-base">
-                                        الشروط والأحكام
-                                    </label>
-                                </DialogTrigger>
-                                <TermsDialog />
-                            </Dialog>
-                        </div>
+
+                        {/* Enhanced Terms Acceptance Section */}
+                        <Card className={`border-2 transition-all duration-200 ${termsAccepted ? 'border-green-300 bg-green-50' : 'border-orange-300 bg-orange-50'}`} dir="rtl">
+                            <CardContent className="p-4">
+                                <div className="flex items-start gap-3">
+                                    <div className={`p-2 rounded-full flex-shrink-0 ${termsAccepted ? 'bg-green-200' : 'bg-orange-200'}`}>
+                                        {termsAccepted ? (
+                                            <CheckCircle className="h-5 w-5 text-green-700" />
+                                        ) : (
+                                            <AlertCircle className="h-5 w-5 text-orange-700" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                            <label
+                                                htmlFor="terms"
+                                                className="cursor-pointer font-medium text-base flex items-center gap-2 text-gray-900 flex-wrap"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    id="terms"
+                                                    checked={termsAccepted}
+                                                    onChange={e => setTermsAccepted(e.target.checked)}
+                                                    className="accent-feature-commerce h-5 w-5 flex-shrink-0"
+                                                />
+                                                <span className="break-words">الموافقة على الشروط والأحكام</span>
+                                            </label>
+                                            <Badge variant={termsAccepted ? "default" : "destructive"} className="text-xs font-medium flex-shrink-0">
+                                                {termsAccepted ? 'تمت الموافقة' : 'مطلوب'}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <Dialog open={termsDialogOpen} onOpenChange={(open) => { setTermsDialogOpen(open); if (open) fetchPolicies(); }}>
+                                                <DialogTrigger asChild>
+                                                    <button className="inline-flex items-center gap-1 text-blue-700 hover:text-blue-800 underline text-sm transition-colors font-medium break-words">
+                                                        <FileText className="h-3 w-3 flex-shrink-0" />
+                                                        قراءة الشروط والأحكام
+                                                    </button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-h-[90vh] max-w-4xl" dir="rtl">
+                                                    <TermsDialogContent
+                                                        policies={policies}
+                                                        loading={loadingPolicies}
+                                                        error={policiesError}
+                                                        activeTab={activeTab}
+                                                        setActiveTab={setActiveTab}
+                                                        getPolicyIcon={(title: string) => {
+                                                            switch (title) {
+                                                                case 'سياسة الموقع': return <FileText className="h-4 w-4" />;
+                                                                case 'سياسة الخصوصية': return <AlertCircle className="h-4 w-4" />;
+                                                                case 'سياسة الإرجاع': return <CheckCircle className="h-4 w-4" />;
+                                                                case 'سياسة الشحن': return <AlertCircle className="h-4 w-4" />;
+                                                                default: return <FileText className="h-4 w-4" />;
+                                                            }
+                                                        }}
+                                                        getPolicySummary={(title: string) => {
+                                                            switch (title) {
+                                                                case 'سياسة الموقع': return 'شروط استخدام الموقع وحقوق الملكية الفكرية';
+                                                                case 'سياسة الخصوصية': return 'كيفية جمع وحماية بياناتك الشخصية';
+                                                                case 'سياسة الإرجاع': return 'شروط إرجاع المنتجات واسترداد المبالغ';
+                                                                case 'سياسة الشحن': return 'خدمات التوصيل والرسوم والأوقات';
+                                                                default: return 'سياسة عامة';
+                                                            }
+                                                        }}
+                                                        extractKeyPoints={(content: string) => {
+                                                            const lines = content.split('\n');
+                                                            return lines
+                                                                .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-'))
+                                                                .slice(0, 5)
+                                                                .map(point => point.replace(/^[•\-]\s*/, '').trim());
+                                                        }}
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+
+                                        {!termsAccepted && (
+                                            <p className="text-sm text-red-700 mt-2 font-medium break-words">
+                                                يجب الموافقة على الشروط والأحكام للمتابعة
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         <PlaceOrderButton
                             cart={cart}
                             user={user}

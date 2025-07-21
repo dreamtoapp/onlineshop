@@ -239,7 +239,8 @@ export default function AddressBook({ addresses, onAddressUpdate }: AddressBookP
                                 </p>
                             )}
 
-                            {address.latitude && address.longitude && (
+                            {/* Google Maps Link - Show only when coordinates are available */}
+                            {address.latitude && address.longitude ? (
                                 <GoogleMapsLink
                                     latitude={address.latitude}
                                     longitude={address.longitude}
@@ -248,6 +249,11 @@ export default function AddressBook({ addresses, onAddressUpdate }: AddressBookP
                                     size="sm"
                                     className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs"
                                 />
+                            ) : (
+                                <div className="text-xs text-amber-600 flex items-center gap-1">
+                                    <Icon name="MapPin" size="xs" className="w-3 h-3" />
+                                    لا توجد إحداثيات متاحة
+                                </div>
                             )}
                         </div>
                     ))}

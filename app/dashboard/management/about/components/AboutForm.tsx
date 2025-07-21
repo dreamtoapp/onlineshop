@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import AddImage from '@/components/AddImage';
 
 const aboutSchema = z.object({
@@ -32,63 +33,159 @@ export default function AboutForm({ defaultValues, onSubmit, onCancel }: {
     });
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-                <label htmlFor="heroTitle" className="block font-bold mb-1">العنوان الرئيسي</label>
-                <Input id="heroTitle" {...register('heroTitle')} aria-invalid={!!errors.heroTitle} />
-                {errors.heroTitle && <p className="text-red-500 text-sm mt-1">{errors.heroTitle.message}</p>}
-            </div>
-            <div>
-                <label htmlFor="heroSubtitle" className="block font-bold mb-1">الوصف الرئيسي</label>
-                <Textarea id="heroSubtitle" {...register('heroSubtitle')} aria-invalid={!!errors.heroSubtitle} />
-                {errors.heroSubtitle && <p className="text-red-500 text-sm mt-1">{errors.heroSubtitle.message}</p>}
-            </div>
-            <div>
-                <label htmlFor="heroImageUrl" className="block font-bold mb-1">رابط صورة الهيرو</label>
-                <div className="w-40 h-24">
-                    <AddImage
-                        url={watch('heroImageUrl')}
-                        alt="صورة الهيرو"
-                        recordId={defaultValues?.id || ''}
-                        table="aboutPageContent"
-                        tableField="heroImageUrl"
-                        onUploadComplete={url => setValue('heroImageUrl', url, { shouldValidate: true })}
-                        autoUpload
-                    />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" dir="rtl">
+            {/* Hero Section */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الهيرو</h3>
+
+                <div className="space-y-4">
+                    <div className="text-right">
+                        <Label htmlFor="heroTitle" className="text-sm font-medium text-right block">العنوان الرئيسي</Label>
+                        <Input
+                            id="heroTitle"
+                            {...register('heroTitle')}
+                            className="mt-1 text-right"
+                            placeholder="أدخل العنوان الرئيسي"
+                            dir="rtl"
+                        />
+                        {errors.heroTitle && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.heroTitle.message}</p>
+                        )}
+                    </div>
+
+                    <div className="text-right">
+                        <Label htmlFor="heroSubtitle" className="text-sm font-medium text-right block">الوصف الرئيسي</Label>
+                        <Textarea
+                            id="heroSubtitle"
+                            {...register('heroSubtitle')}
+                            className="mt-1 min-h-[100px] text-right"
+                            placeholder="أدخل الوصف الرئيسي"
+                            dir="rtl"
+                        />
+                        {errors.heroSubtitle && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.heroSubtitle.message}</p>
+                        )}
+                    </div>
+
+                    <div className="text-right">
+                        <Label htmlFor="heroImageUrl" className="text-sm font-medium text-right block">صورة الهيرو</Label>
+                        <div className="mt-1 w-48 h-32 border rounded-md overflow-hidden">
+                            <AddImage
+                                url={watch('heroImageUrl')}
+                                alt="صورة الهيرو"
+                                recordId={defaultValues?.id || ''}
+                                table="aboutPageContent"
+                                tableField="heroImageUrl"
+                                onUploadComplete={url => setValue('heroImageUrl', url, { shouldValidate: true })}
+                                autoUpload
+                            />
+                        </div>
+                        {errors.heroImageUrl && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.heroImageUrl.message}</p>
+                        )}
+                    </div>
                 </div>
-                {errors.heroImageUrl && <p className="text-red-500 text-sm mt-1">{errors.heroImageUrl.message}</p>}
             </div>
-            <div>
-                <label htmlFor="missionTitle" className="block font-bold mb-1">عنوان الرسالة</label>
-                <Input id="missionTitle" {...register('missionTitle')} aria-invalid={!!errors.missionTitle} />
-                {errors.missionTitle && <p className="text-red-500 text-sm mt-1">{errors.missionTitle.message}</p>}
+
+            {/* Mission Section */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الرسالة</h3>
+
+                <div className="space-y-4">
+                    <div className="text-right">
+                        <Label htmlFor="missionTitle" className="text-sm font-medium text-right block">عنوان الرسالة</Label>
+                        <Input
+                            id="missionTitle"
+                            {...register('missionTitle')}
+                            className="mt-1 text-right"
+                            placeholder="أدخل عنوان الرسالة"
+                            dir="rtl"
+                        />
+                        {errors.missionTitle && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.missionTitle.message}</p>
+                        )}
+                    </div>
+
+                    <div className="text-right">
+                        <Label htmlFor="missionText" className="text-sm font-medium text-right block">نص الرسالة</Label>
+                        <Textarea
+                            id="missionText"
+                            {...register('missionText')}
+                            className="mt-1 min-h-[100px] text-right"
+                            placeholder="أدخل نص الرسالة"
+                            dir="rtl"
+                        />
+                        {errors.missionText && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.missionText.message}</p>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div>
-                <label htmlFor="missionText" className="block font-bold mb-1">نص الرسالة</label>
-                <Textarea id="missionText" {...register('missionText')} aria-invalid={!!errors.missionText} />
-                {errors.missionText && <p className="text-red-500 text-sm mt-1">{errors.missionText.message}</p>}
+
+            {/* CTA Section */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الدعوة للعمل</h3>
+
+                <div className="space-y-4">
+                    <div className="text-right">
+                        <Label htmlFor="ctaTitle" className="text-sm font-medium text-right block">عنوان الدعوة</Label>
+                        <Input
+                            id="ctaTitle"
+                            {...register('ctaTitle')}
+                            className="mt-1 text-right"
+                            placeholder="أدخل عنوان الدعوة"
+                            dir="rtl"
+                        />
+                        {errors.ctaTitle && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaTitle.message}</p>
+                        )}
+                    </div>
+
+                    <div className="text-right">
+                        <Label htmlFor="ctaText" className="text-sm font-medium text-right block">نص الدعوة</Label>
+                        <Textarea
+                            id="ctaText"
+                            {...register('ctaText')}
+                            className="mt-1 min-h-[100px] text-right"
+                            placeholder="أدخل نص الدعوة"
+                            dir="rtl"
+                        />
+                        {errors.ctaText && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaText.message}</p>
+                        )}
+                    </div>
+
+                    <div className="text-right">
+                        <Label htmlFor="ctaButtonText" className="text-sm font-medium text-right block">نص زر الدعوة</Label>
+                        <Input
+                            id="ctaButtonText"
+                            {...register('ctaButtonText')}
+                            className="mt-1 text-right"
+                            placeholder="أدخل نص زر الدعوة"
+                            dir="rtl"
+                        />
+                        {errors.ctaButtonText && (
+                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaButtonText.message}</p>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div>
-                <label htmlFor="ctaTitle" className="block font-bold mb-1">عنوان الدعوة</label>
-                <Input id="ctaTitle" {...register('ctaTitle')} aria-invalid={!!errors.ctaTitle} />
-                {errors.ctaTitle && <p className="text-red-500 text-sm mt-1">{errors.ctaTitle.message}</p>}
-            </div>
-            <div>
-                <label htmlFor="ctaText" className="block font-bold mb-1">نص الدعوة</label>
-                <Textarea id="ctaText" {...register('ctaText')} aria-invalid={!!errors.ctaText} />
-                {errors.ctaText && <p className="text-red-500 text-sm mt-1">{errors.ctaText.message}</p>}
-            </div>
-            <div>
-                <label htmlFor="ctaButtonText" className="block font-bold mb-1">نص زر الدعوة</label>
-                <Input id="ctaButtonText" {...register('ctaButtonText')} aria-invalid={!!errors.ctaButtonText} />
-                {errors.ctaButtonText && <p className="text-red-500 text-sm mt-1">{errors.ctaButtonText.message}</p>}
-            </div>
-            <div className="flex gap-4 mt-6">
-                <Button type="submit" disabled={isSubmitting} className="bg-feature-suppliers text-white font-bold px-8 py-2 rounded">
-                    حفظ
+
+            {/* Form Actions */}
+            <div className="flex gap-4 pt-6 border-t justify-end">
+                <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                    {isSubmitting ? 'جاري الحفظ...' : 'حفظ التغييرات'}
                 </Button>
                 {onCancel && (
-                    <Button type="button" variant="outline" onClick={onCancel} className="font-bold px-8 py-2 rounded">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onCancel}
+                    >
                         إلغاء
                     </Button>
                 )}

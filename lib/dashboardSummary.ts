@@ -7,7 +7,8 @@ export async function getDashboardSummary() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const ordersToday = await db.order.count({ where: { createdAt: { gte: today } } });
-  const pendingOrders = await db.order.count({ where: { status: { in: [OrderStatus.PENDING, OrderStatus.ASSIGNED] } } });
+  const pendingOrders = await db.order.count({ where: { status: OrderStatus.PENDING } });
+  const assignedOrders = await db.order.count({ where: { status: OrderStatus.ASSIGNED } });
   const completedOrders = await db.order.count({ where: { status: OrderStatus.DELIVERED } });
   const cancelledOrders = await db.order.count({ where: { status: OrderStatus.CANCELED } });
 
@@ -120,6 +121,7 @@ export async function getDashboardSummary() {
       total: totalOrders,
       today: ordersToday,
       pending: pendingOrders,
+      assigned: assignedOrders,
       completed: completedOrders,
       cancelled: cancelledOrders,
     },

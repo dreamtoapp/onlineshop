@@ -1,12 +1,24 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { z } from 'zod';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 const faqSchema = z.object({
     question: z.string().min(2, 'السؤال مطلوب'),
@@ -109,39 +121,122 @@ export default function FAQTabClient({ aboutPageId }: { aboutPageId: string | nu
     }
 
     return (
-        <Card className="p-6 mb-4">
-            <h2 className="text-xl font-bold mb-4">إدارة الأسئلة الشائعة</h2>
-            <form onSubmit={handleAddOrEdit} className="space-y-4 mb-6">
-                <div>
-                    <label className="block font-bold mb-1">السؤال</label>
-                    <Input value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} />
-                </div>
-                <div>
-                    <label className="block font-bold mb-1">الإجابة</label>
-                    <Textarea value={form.answer} onChange={e => setForm(f => ({ ...f, answer: e.target.value }))} />
-                </div>
-                {error && <p className="text-red-500">{error}</p>}
-                <div className="flex gap-2">
-                    <Button type="submit" disabled={loading}>{editId ? 'تحديث' : 'إضافة'}</Button>
-                    {editId && <Button type="button" variant="outline" onClick={handleCancelEdit}>إلغاء</Button>}
-                </div>
-            </form>
-            <Accordion type="multiple" className="w-full">
-                {faqs.map((faq) => (
-                    <AccordionItem value={faq.id} key={faq.id}>
-                        <AccordionTrigger>{faq.question}</AccordionTrigger>
-                        <AccordionContent>
-                            <div className="flex flex-col gap-2">
-                                <div>{faq.answer}</div>
-                                <div className="flex gap-2 mt-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleEdit(faq)}>تعديل</Button>
-                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(faq.id)}>حذف</Button>
-                                </div>
+        <div className="space-y-6" dir="rtl">
+            {/* Add/Edit Form Card */}
+            <Card>
+                <CardHeader className="text-right">
+                    <CardTitle>{editId ? 'تعديل السؤال' : 'إضافة سؤال جديد'}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-right">
+                    <form onSubmit={handleAddOrEdit} className="space-y-4">
+                        <div>
+                            <Label htmlFor="faqQuestion" className="text-sm font-medium text-right block">السؤال</Label>
+                            <Input
+                                id="faqQuestion"
+                                value={form.question}
+                                onChange={e => setForm(f => ({ ...f, question: e.target.value }))}
+                                className="mt-1 text-right"
+                                placeholder="أدخل السؤال"
+                                dir="rtl"
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="faqAnswer" className="text-sm font-medium text-right block">الإجابة</Label>
+                            <Textarea
+                                id="faqAnswer"
+                                value={form.answer}
+                                onChange={e => setForm(f => ({ ...f, answer: e.target.value }))}
+                                className="mt-1 min-h-[100px] text-right"
+                                placeholder="أدخل الإجابة"
+                                dir="rtl"
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-right">
+                                <p className="text-destructive text-sm">{error}</p>
                             </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                ))}
-            </Accordion>
-        </Card>
+                        )}
+
+                        <div className="flex gap-2 pt-4 justify-end">
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                            >
+                                {loading ? 'جاري الحفظ...' : (editId ? 'تحديث السؤال' : 'إضافة السؤال')}
+                            </Button>
+                            {editId && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCancelEdit}
+                                >
+                                    إلغاء
+                                </Button>
+                            )}
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
+            {/* FAQ List Card */}
+            <Card>
+                <CardHeader className="text-right">
+                    <CardTitle>الأسئلة الشائعة ({faqs.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {faqs.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                            لا توجد أسئلة شائعة مضافة بعد
+                        </div>
+                    ) : (
+                        <Accordion type="multiple" className="w-full" dir="rtl">
+                            {faqs.map((faq) => (
+                                <AccordionItem value={faq.id} key={faq.id}>
+                                    <AccordionTrigger className="text-right">
+                                        {faq.question}
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="space-y-4 text-right">
+                                            <div className="text-sm text-muted-foreground leading-relaxed">
+                                                {faq.answer}
+                                            </div>
+                                            <div className="flex gap-2 pt-2 border-t justify-end">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleEdit(faq)}
+                                                >
+                                                    تعديل
+                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button variant="destructive" size="sm">حذف</Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent dir="rtl">
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                هل أنت متأكد من حذف هذا السؤال؟ لا يمكن التراجع عن هذا الإجراء.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(faq.id)}>حذف</AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     );
 } 

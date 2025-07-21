@@ -27,15 +27,20 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
     }
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">إدارة محتوى صفحة من نحن</h1>
-            <Tabs defaultValue="about" className="w-full">
-                <TabsList className="mb-6">
+        <div className="w-full" dir="rtl">
+            <div className="mb-6 text-right">
+                <h1 className="text-2xl font-bold text-foreground">إدارة محتوى صفحة من نحن</h1>
+                <p className="text-muted-foreground mt-2">قم بتحديث محتوى صفحة من نحن وإدارة الأسئلة الشائعة والمميزات</p>
+            </div>
+
+            <Tabs defaultValue="about" className="w-full" dir="rtl">
+                <TabsList className="mb-6 w-full justify-start" dir="rtl">
                     <TabsTrigger value="about">عن الشركة</TabsTrigger>
                     <TabsTrigger value="features">المميزات</TabsTrigger>
                     <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
                 </TabsList>
-                <TabsContent value="about">
+
+                <TabsContent value="about" className="mt-0" dir="rtl">
                     <AboutTabClient
                         defaultValues={{ ...aboutPage, id: aboutPageId }}
                         onSubmit={handleAboutSubmit}
@@ -43,10 +48,12 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
                         error={error}
                     />
                 </TabsContent>
-                <TabsContent value="features">
+
+                <TabsContent value="features" className="mt-0" dir="rtl">
                     <FeaturesTabClient aboutPageId={aboutPageId} />
                 </TabsContent>
-                <TabsContent value="faq">
+
+                <TabsContent value="faq" className="mt-0" dir="rtl">
                     <FAQTabClient aboutPageId={aboutPageId} />
                 </TabsContent>
             </Tabs>

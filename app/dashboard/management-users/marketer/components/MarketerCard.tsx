@@ -187,8 +187,8 @@ export default function MarketerCard({ marketer }: MarketerCardProps) {
                                     {address.floor && `، طابق ${address.floor}`}
                                     {address.landmark && `، معلم: ${address.landmark}`}
                                 </p>
-                                {address.latitude && address.longitude && (
-                                    <div className='flex items-center gap-2 text-xs text-muted-foreground mr-6'>
+                                <div className='flex items-center gap-2 text-xs text-muted-foreground mr-6'>
+                                    {address.latitude && address.longitude ? (
                                         <GoogleMapsLink
                                             latitude={address.latitude}
                                             longitude={address.longitude}
@@ -197,8 +197,13 @@ export default function MarketerCard({ marketer }: MarketerCardProps) {
                                             size="sm"
                                             className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
                                         />
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="text-xs text-amber-600 flex items-center gap-1">
+                                            <Icon name="MapPin" size="xs" className="w-3 h-3" />
+                                            لا توجد إحداثيات متاحة
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))
                     ) : (

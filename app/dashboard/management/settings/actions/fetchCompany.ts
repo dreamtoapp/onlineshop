@@ -2,8 +2,6 @@
 import db from '@/lib/prisma';
 import { Company } from '@/types/databaseTypes';
 
-;
-
 export const fetchCompany = async (): Promise<Company | null> => {
   try {
     const data = await db.company.findFirst();

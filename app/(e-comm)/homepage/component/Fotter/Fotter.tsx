@@ -6,6 +6,7 @@ import NewsletterClientWrapper from './NewsletterClientWrapper';
 import { Icon } from '@/components/icons/Icon';
 import AppVersion from '../AppVersion';
 import LazyFooterContactIcons from './LazyFooterContactIcons';
+import db from '@/lib/prisma';
 
 interface FooterProps {
   aboutus?: string;
@@ -98,7 +99,27 @@ function CompanyInfo({
 }
 
 // Services Section with enhanced accessibility and mobile UX
-function ServicesSection({ userId }: { userId?: string }) {
+async function ServicesSection({ userId }: { userId?: string }) {
+  // Fetch published policies
+  const [websitePolicy, privacyPolicy, returnPolicy, shippingPolicy] = await Promise.all([
+    db.term.findFirst({
+      where: { type: 'WEBSITE_POLICY', isActive: true, isPublished: true },
+      orderBy: { version: 'desc' }
+    }),
+    db.term.findFirst({
+      where: { type: 'PRIVACY_POLICY', isActive: true, isPublished: true },
+      orderBy: { version: 'desc' }
+    }),
+    db.term.findFirst({
+      where: { type: 'RETURN_POLICY', isActive: true, isPublished: true },
+      orderBy: { version: 'desc' }
+    }),
+    db.term.findFirst({
+      where: { type: 'SHIPPING_POLICY', isActive: true, isPublished: true },
+      orderBy: { version: 'desc' }
+    })
+  ]);
+
   const services = [
     { name: 'المتجر الإلكتروني', href: '/', iconName: 'ShoppingBag', description: 'تصفح منتجاتنا المميزة' },
     { name: 'من نحن', href: '/about', iconName: 'Users', description: 'تعرف على قصتنا' },
@@ -120,13 +141,44 @@ function ServicesSection({ userId }: { userId?: string }) {
       iconName: 'Headset',
       description: 'مساعدة فورية على مدار الساعة'
     },
-    {
-      name: 'شروط الاستخدام وسياسة الإرجاع',
-      href: '/privacy',
-      iconName: 'CheckCircle2',
-      description: 'تعرف على حقوقك وواجباتك'
-    },
   ];
+
+  // Add policy links if they exist
+  if (websitePolicy) {
+    customerService.push({
+      name: 'سياسة الموقع',
+      href: '/policies/website',
+      iconName: 'Globe',
+      description: 'شروط وأحكام استخدام الموقع'
+    });
+  }
+
+  if (privacyPolicy) {
+    customerService.push({
+      name: 'سياسة الخصوصية',
+      href: '/policies/privacy',
+      iconName: 'Shield',
+      description: 'حماية البيانات الشخصية'
+    });
+  }
+
+  if (returnPolicy) {
+    customerService.push({
+      name: 'سياسة الإرجاع',
+      href: '/policies/return',
+      iconName: 'RotateCcw',
+      description: 'شروط الإرجاع والاستبدال'
+    });
+  }
+
+  if (shippingPolicy) {
+    customerService.push({
+      name: 'سياسة الشحن',
+      href: '/policies/shipping',
+      iconName: 'Truck',
+      description: 'سياسة التوصيل والشحن'
+    });
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -229,7 +281,7 @@ function EnhancedContact({
 }
 
 // Main Footer Component - Server Component following Next.js 15+ best practices
-const Footer = ({
+const Footer = async ({
   aboutus,
   email,
   phone,

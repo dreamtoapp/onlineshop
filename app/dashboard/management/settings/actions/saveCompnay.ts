@@ -42,8 +42,8 @@ export async function saveCompany(rawData: unknown) {
         data: dataWithoutId,
       });
       revalidateTag('company');
-      revalidatePath('/dashboard/management/settings')
-      revalidatePath('/')
+      revalidatePath('/dashboard/management/settings');
+      revalidatePath('/');
     }
 
     return { success: true, company };

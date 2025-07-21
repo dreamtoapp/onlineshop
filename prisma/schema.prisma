@@ -349,26 +349,49 @@ model Changelog {
   updatedAt DateTime @updatedAt // Timestamp of last update
 }
 
+// Enhanced Term model for policy management
 model Term {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String     @default("") // Policy title
+  type        TermType   @default(GENERIC) // Policy type
+  content     String     @default("") // Policy content
+  version     Int        @default(1) // Version number
+  isActive    Boolean    @default(true) // Active status
+  isPublished Boolean    @default(false) // Published status
+  metadata    Json?      // Additional metadata (compliance info, etc.)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   translations TermTranslation[] // Relation to term translations
 
   @@map("terms")
+  @@index([type, isActive]) // Index for efficient queries
+  @@index([isPublished]) // Index for published policies
 }
 
-// Model for Term Translations
+// Policy types enum
+enum TermType {
+  WEBSITE_POLICY    // سياسة الموقع
+  RETURN_POLICY     // سياسة الإرجاع
+  PRIVACY_POLICY    // سياسة الخصوصية
+  SHIPPING_POLICY   // سياسة الشحن
+  TERMS_OF_SERVICE  // شروط الخدمة
+  GENERAL_TERMS     // الشروط العامة
+  GENERIC           // Generic terms (backward compatibility)
+}
+
+// Enhanced Term Translation model
 model TermTranslation {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   termId         String   @db.ObjectId
   term           Term     @relation(fields: [termId], references: [id], onDelete: Cascade)
   languageCode   String   // e.g., "en", "ar-SA"
+  title          String   @default("") // Translated title
   content        String   // Translated term content
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  
   @@unique([termId, languageCode])
+  @@index([languageCode]) // Index for language-based queries
 }
 
 model GlobalSEO {
