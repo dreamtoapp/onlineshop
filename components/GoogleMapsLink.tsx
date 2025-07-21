@@ -21,8 +21,8 @@ export default function GoogleMapsLink({
     className = '',
     variant = 'outline',
     size = 'default',
-    showIcon = true,
-    showExternalIcon = true,
+    showIcon = false,
+    showExternalIcon = false,
 }: GoogleMapsLinkProps) {
     const handleOpenMaps = () => {
         const lat = typeof latitude === 'string' ? parseFloat(latitude) : latitude;
@@ -44,7 +44,7 @@ export default function GoogleMapsLink({
             variant={variant}
             size={size}
             onClick={handleOpenMaps}
-            className={`inline-flex items-center gap-2 ${className}`}
+            className={`flex items-center gap-2 ${className}`}
         >
             {showIcon && <MapPin className="h-4 w-4" />}
             {label}

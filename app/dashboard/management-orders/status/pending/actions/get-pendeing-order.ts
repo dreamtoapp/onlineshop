@@ -92,6 +92,7 @@ export async function fetchOrders({
         OR: [
           { orderNumber: { contains: search, mode: 'insensitive' } },
           { customer: { name: { contains: search, mode: 'insensitive' } } },
+          { customer: { phone: { contains: search, mode: 'insensitive' } } },
         ],
       };
     }

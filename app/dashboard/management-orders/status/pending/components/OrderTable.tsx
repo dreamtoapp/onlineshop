@@ -1,13 +1,9 @@
 // app/dashboard/orders-management/status/pending/components/OrderTable.tsx
 'use client';
 
-import { formatDistanceToNow } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import {
   ChevronLeft,
   ChevronRight,
-  Search,
-  Calendar,
   DollarSign,
   User,
   CreditCard,
@@ -17,6 +13,10 @@ import {
   Package,
   Clock,
   MousePointerBan,
+  Home,
+  Building2,
+  Landmark,
+  ClipboardCopy,
 } from 'lucide-react';
 
 import Link from '@/components/link';
@@ -34,6 +34,7 @@ import { Order } from '@/types/databaseTypes';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 import AssignToDriver from './AssignToDriver';
 import CancelOrderDialog from './CancelOrderDialog';
@@ -179,10 +180,35 @@ export default function OrderTable({
               <span className="text-sm text-foreground font-medium">{order.customer.phone}</span>
               <Phone className="h-4 w-4 text-status-high-value" />
             </div>
-            <div className="flex flex-row-reverse items-center gap-2 justify-end">
-              <span className="text-xs text-foreground font-medium">{order.address?.label || 'العنوان غير متوفر'}</span>
-              <span className="text-xs text-muted-foreground">{order.address?.district || 'المدينة غير محددة'}</span>
+            {/* Address Row with Details Button */}
+            <div className="flex flex-row-reverse items-center gap-2 justify-end mt-2">
+
+              {order.address?.district && (
+                <span className="text-xs text-muted-foreground">{order.address.district}</span>
+              )}
+              {order.address?.street && (
+                <span className="text-xs text-muted-foreground">· {order.address.street}</span>
+              )}
+              {order.address?.label && (
+                <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold">{order.address.label}</span>
+              )}
               <MapPin className="h-4 w-4 text-feature-analytics" />
+
+            </div>
+            <div className="flex  items-center gap-2  justify-center">
+
+
+              {order.address?.latitude && order.address?.longitude && (
+                <GoogleMapsLink
+                  latitude={order.address.latitude}
+                  longitude={order.address.longitude}
+                  label="عرض على الخريطة"
+                  variant="outline"
+                  size="sm"
+                  showExternalIcon={true}
+                  className=" text-feature-analytics"
+                />
+              )}
             </div>
           </div>
 
@@ -246,6 +272,88 @@ export default function OrderTable({
             <AssignToDriver orderId={order.id} />
             <CancelOrderDialog orderId={order.id} />
           </div>
+          {/* Address Details Button and Dialog */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs text-primary hover:underline">
+                <MapPin className="h-4 w-4" />
+                تفاصيل العنوان
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>تفاصيل عنوان التوصيل</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 text-sm">
+                {/* Main Address Block */}
+                <div className="flex items-center gap-2 mb-2">
+                  <Home className="h-4 w-4 text-primary" />
+                  <span className="font-bold">{order.address?.label || '—'}</span>
+                  {/* Copy Address Button */}
+                  <button
+                    className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                    onClick={() => {
+                      const fullAddress = [
+                        order.address?.label,
+                        order.address?.district,
+                        order.address?.street,
+                        order.address?.buildingNumber,
+                        order.address?.floor && `دور: ${order.address.floor}`,
+                        order.address?.apartmentNumber && `شقة: ${order.address.apartmentNumber}`,
+                        order.address?.landmark && `علامة: ${order.address.landmark}`
+                      ].filter(Boolean).join(', ');
+                      navigator.clipboard.writeText(fullAddress);
+                    }}
+                    title="نسخ العنوان"
+                  >
+                    <ClipboardCopy className="h-4 w-4" />
+                    نسخ
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span><span className="font-semibold">الحي:</span> {order.address?.district || '—'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  <span><span className="font-semibold">الشارع:</span> {order.address?.street || '—'}</span>
+                  <span className="mx-2">|</span>
+                  <span><span className="font-semibold">مبنى:</span> {order.address?.buildingNumber || '—'}</span>
+                  {order.address?.floor && <span className="mx-2">|</span>}
+                  {order.address?.floor && <span><span className="font-semibold">دور:</span> {order.address.floor}</span>}
+                  {order.address?.apartmentNumber && <span className="mx-2">|</span>}
+                  {order.address?.apartmentNumber && <span><span className="font-semibold">شقة:</span> {order.address.apartmentNumber}</span>}
+                </div>
+                {order.address?.landmark && (
+                  <div className="flex items-center gap-2">
+                    <Landmark className="h-4 w-4 text-primary" />
+                    <span><span className="font-semibold">علامة مميزة:</span> {order.address.landmark}</span>
+                  </div>
+                )}
+                {order.address?.deliveryInstructions && (
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span><span className="font-semibold">تعليمات:</span> {order.address.deliveryInstructions}</span>
+                  </div>
+                )}
+                {/* Coordinates and Google Maps Link */}
+                {(order.address?.latitude && order.address?.longitude) && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span className="font-semibold">الإحداثيات:</span>
+                    <span>{order.address.latitude}, {order.address.longitude}</span>
+                    <GoogleMapsLink
+                      latitude={order.address.latitude}
+                      longitude={order.address.longitude}
+                      label="عرض على الخريطة"
+                      variant="ghost"
+                      size="sm"
+                    />
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
     );
