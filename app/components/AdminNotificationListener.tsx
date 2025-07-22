@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface AdminNotificationListenerProps {
@@ -9,16 +10,10 @@ interface AdminNotificationListenerProps {
 
 export default function AdminNotificationListener({ showToast = true }: AdminNotificationListenerProps) {
     const { data: session } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
-        console.log('🔍 [DASHBOARD] AdminNotificationListener mounted', {
-            userId: session?.user?.id,
-            role: session?.user?.role,
-            isAdmin: session?.user?.role && ['ADMIN', 'MARKETER'].includes(session.user.role)
-        });
-
         if (!session?.user?.id || !['ADMIN', 'MARKETER'].includes(session.user.role)) {
-            console.log('❌ [DASHBOARD] Not an admin user, skipping initialization');
             return;
         }
 
@@ -35,17 +30,48 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
 
                 // Listen for new orders (dashboard feedback only)
                 channel.bind('new-order', (data: any) => {
-                    console.log('📊 [DASHBOARD] New order received:', data);
+                    const type = data.type || 'new';
 
-                    if (showToast) {
-                        toast.success('طلب جديد', {
-                            description: `طلب #${data.orderId} من ${data.customer} - ${data.total?.toFixed(2)} ر.س`,
-                            action: {
-                                label: 'عرض',
-                                onClick: () => window.location.href = '/dashboard/management-orders'
-                            },
-                            duration: 5000,
-                        });
+                    if (type === 'cancelled') {
+                        // Handle cancelled order
+                        if (showToast) {
+                            toast.error('❌ تم إلغاء الطلب', {
+                                description: `طلب #${data.orderNumber} أُلغي بواسطة السائق ${data.driverName || ''}${data.reson ? ' - السبب: ' + data.reson : ''}`,
+                                action: {
+                                    label: 'عرض',
+                                    onClick: () => window.location.href = '/dashboard/management-orders?status=canceled'
+                                },
+                                duration: 7000,
+                                style: {
+                                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                    color: 'white',
+                                    border: '1px solid #dc2626',
+                                },
+                                className: 'border-red-500 bg-red-500 text-white',
+                            });
+                        }
+                        // Refresh admin dashboard data
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        // Handle new order (existing behavior)
+                        if (showToast) {
+                            toast.success('🆕 طلب جديد', {
+                                description: `طلب #${data.orderId} من ${data.customer} - ${data.total?.toFixed(2)} ر.س`,
+                                action: {
+                                    label: 'عرض',
+                                    onClick: () => window.location.href = '/dashboard/management-orders'
+                                },
+                                duration: 5000,
+                                style: {
+                                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                    color: 'white',
+                                    border: '1px solid #16a34a',
+                                },
+                                className: 'border-green-500 bg-green-500 text-white',
+                            });
+                        }
                     }
 
                     // Optionally refresh dashboard data
@@ -54,8 +80,6 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
 
                 // Listen for support alerts
                 channel.bind('support-alert', (data: any) => {
-                    console.log('📞 [DASHBOARD] Support alert received:', data);
-
                     if (showToast) {
                         toast.warning('طلب دعم', {
                             description: data.message,
@@ -68,17 +92,28 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
                     }
                 });
 
+                // Listen for order cancelled events
+                channel.bind('order-cancelled', (data: any) => {
+                    if (showToast) {
+                        toast.error('تم إلغاء الطلب', {
+                            description: `طلب #${data.orderNumber} أُلغي بواسطة السائق ${data.driverName || ''}${data.reson ? ' - السبب: ' + data.reson : ''}`,
+                            action: {
+                                label: 'عرض',
+                                onClick: () => window.location.href = '/dashboard/management-orders?status=canceled'
+                            },
+                            duration: 7000,
+                        });
+                    }
+                });
+
                 // Connection event handlers
                 pusher.connection.bind('connected', () => {
-                    console.log('✅ [DASHBOARD] Pusher connected');
                 });
 
                 pusher.connection.bind('disconnected', () => {
-                    console.log('❌ [DASHBOARD] Pusher disconnected');
                 });
 
                 pusher.connection.bind('failed', () => {
-                    console.log('❌ [DASHBOARD] Pusher connection failed');
                 });
 
             } catch (error) {
@@ -92,6 +127,7 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
             if (channel) {
                 channel.unbind('new-order');
                 channel.unbind('support-alert');
+                channel.unbind('order-cancelled');
                 pusher?.unsubscribe(`admin-${session.user.id}`);
             }
             if (pusher?.connection) {

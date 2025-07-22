@@ -25,7 +25,7 @@ interface CancelOrderProps {
   driverName: string;
 }
 
-function CancelOrder({ orderId, orderNumber, driverId, driverName }: CancelOrderProps) {
+function CancelOrder({ orderId, orderNumber, }: CancelOrderProps) {
   const router = useRouter();
   const [reason, setReason] = React.useState('');
   const [invoiceDigits, setInvoiceDigits] = React.useState('');
@@ -39,7 +39,7 @@ function CancelOrder({ orderId, orderNumber, driverId, driverName }: CancelOrder
   const handleConfirm = async () => {
     if (isReasonValid && isDigitsValid) {
       await cancelOrder(orderId, reason);
-      router.push(`/driver-trip/driver?driverId=${driverId}&status=InWay&name=${driverName}`);
+      router.refresh();
 
       setIsOpen(false);
       setReason('');
