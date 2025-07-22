@@ -4,7 +4,7 @@ import {
   OrderStatus,
 } from '@/constant/order-status';
 
-import db from '../../../../lib/prisma';
+import db from '@/lib/prisma';
 
 export async function getOrderByStatus(driverId: string, status: OrderStatus) {
   try {
@@ -23,6 +23,7 @@ export async function getOrderByStatus(driverId: string, status: OrderStatus) {
             productId: true,
             quantity: true,
             price: true,
+            product: { select: { name: true } },
           },
         },
         customer: {

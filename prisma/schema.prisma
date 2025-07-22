@@ -252,7 +252,7 @@ model OrderInWay {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   orderId     String   @unique @db.ObjectId // أضفنا @unique هنا
   order       Order    @relation(fields: [orderId], references: [id])
-  driverId    String   @unique @db.ObjectId // Reference to User (was Driver)
+  driverId    String   @db.ObjectId // Reference to User (was Driver)
   driver      User     @relation("OrderInWayDriver", fields: [driverId], references: [id]) // Updated to User, explicit relation name
   orderNumber String?
   latitude    String?

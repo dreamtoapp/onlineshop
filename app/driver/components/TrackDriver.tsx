@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import { updateDriverLocation } from '../action/trackDriver';
+import { updateDriverLocation } from '../actions/trackDriver';
 
 interface DriverTrackerProps {
   driverId: string;

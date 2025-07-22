@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Button } from '../../../../components/ui/button';
-import { startTrip } from '../action/startTrip';
+import { Button } from '../../../components/ui/button';
+import { startTrip } from '../actions/startTrip';
 import { Icon } from '@/components/icons/Icon';
 
 interface Props {
@@ -52,9 +52,9 @@ function StartTrip({ orderId, driverId, latitude, longitude, driverName }: Props
   };
 
   return (
-    <Button onClick={handleStartTrip} className='flex h-12 w-1/2 items-center gap-4'>
-      <p>ابداء الرحلة</p>
+    <Button variant='default' size="icon" onClick={handleStartTrip} className='flex items-center justify-center gap-4'>
       <Icon name="Rocket" size="xl" className="text-white" />
+
     </Button>
   );
 }

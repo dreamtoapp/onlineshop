@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../../../components/ui/dialog';
-import { deleverOrder } from '../action/deleverOrder';
+} from '../../../components/ui/dialog';
+import { deleverOrder } from '../actions/deleverOrder';
 
 interface DeleverOrderProps {
   orderId: string;
