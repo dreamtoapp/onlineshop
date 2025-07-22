@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardHeader, CardFooter, CardTitle } from '../../../components/ui/card';
+import { Card, CardHeader, CardFooter } from '../../../components/ui/card';
 import { Icon } from '@/components/icons/Icon';
 import StartTrip from '../components/StartTrip';
 import CancelOrder from '../components/CancelOrder';
