@@ -1,7 +1,8 @@
 'use server';
 import db from '@/lib/prisma';
 import { OrderInWay } from '@prisma/client';
-import { createOrderNotification, ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
+import { createOrderNotification } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
+import { ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
 
 type Result<T = OrderInWay> =
   | { success: true; data: T }

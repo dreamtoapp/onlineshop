@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Icon } from '@/components/icons/Icon';
-import { Settings, Clock, Truck, Shield, Bell, Globe } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import SettingsLayout from '../components/SettingsLayout';
 import { fetchCompany } from '../actions/fetchCompany';

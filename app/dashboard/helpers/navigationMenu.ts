@@ -28,6 +28,7 @@ export const navigationItems = [
     children: [
       { label: 'جميع الطلبات', href: '/dashboard/management-orders', icon: 'ClipboardList' },
       { label: 'قيد المراجعة', href: '/dashboard/management-orders/status/pending', icon: 'Clock' },
+      { label: 'مخصصة للسائقين', href: '/dashboard/management-orders/status/assigned', icon: 'UserCheck' },
       { label: 'قيد التوصيل', href: '/dashboard/management-orders/status/in-way', icon: 'Truck' },
       { label: 'مكتملة', href: '/dashboard/management-orders/status/delivered', icon: 'CheckCircle' },
       { label: 'ملغاة', href: '/dashboard/management-orders/status/canceled', icon: 'XCircle' },

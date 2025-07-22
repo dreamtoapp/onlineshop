@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -332,7 +332,7 @@ export default function ShippingPolicyPage() {
                         <div className="text-destructive font-semibold mt-2">ملاحظة: لإظهار النقاط الموجزة للعملاء في صفحة الدفع، ابدأ كل نقطة موجزة في السياسة بـ [*] في بداية السطر.</div>
                         <div className="mt-2 text-xs text-muted-foreground space-y-1">
                             <div><strong>نصائح:</strong></div>
-                            <div>• استخدم "تحميل قالب" للحصول على قالب شامل لسياسة الشحن</div>
+                            <div>• استخدم &quot;تحميل قالب&quot; للحصول على قالب شامل لسياسة الشحن</div>
                             <div>• قم بتخصيص المعلومات بين الأقواس المربعة [...]</div>
                             <div>• تأكد من تحديث رسوم الشحن والمناطق بدقة</div>
                         </div>

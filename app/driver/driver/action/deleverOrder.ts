@@ -5,7 +5,8 @@ import {
 } from '@/constant/order-status';
 
 import db from '@/lib/prisma';
-import { createOrderNotification, ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
+import { createOrderNotification } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
+import { ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
 
 export const deleverOrder = async (orderId: string) => {
   const existingOrder = await db.order.update({

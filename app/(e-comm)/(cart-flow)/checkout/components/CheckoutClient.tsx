@@ -9,7 +9,7 @@ import PlaceOrderButton from "./PlaceOrderButton";
 import { AddressWithDefault } from "./AddressBook";
 import { UserProfile } from "./UserInfoCard";
 import { CartData } from "./PlaceOrderButton";
-import TermsDialog, { TermsDialogContent } from "./TermsDialog";
+import { TermsDialogContent } from "./TermsDialog";
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, AlertCircle, FileText } from 'lucide-react';

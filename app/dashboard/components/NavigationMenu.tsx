@@ -24,12 +24,32 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
     const pathname = usePathname();
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-    const isActive = (href: string) => {
-        if (href === '/dashboard') {
-            return pathname === '/dashboard';
+    // Helper to find the best (deepest) match for the current pathname
+    function getBestMatch(items: NavigationItem[], pathname: string): { item: NavigationItem; child?: NavigationChild } | null {
+        let best: { item: NavigationItem; child?: NavigationChild } | null = null;
+        let bestLength = 0;
+        for (const item of items) {
+            if (pathname === item.href || pathname.startsWith(item.href)) {
+                if (item.href.length > bestLength) {
+                    best = { item };
+                    bestLength = item.href.length;
+                }
+            }
+            if (item.children) {
+                for (const child of item.children) {
+                    if (pathname === child.href || pathname.startsWith(child.href)) {
+                        if (child.href.length > bestLength) {
+                            best = { item, child };
+                            bestLength = child.href.length;
+                        }
+                    }
+                }
+            }
         }
-        return pathname.startsWith(href);
-    };
+        return best;
+    }
+
+    const bestMatch = getBestMatch(navigationItems, pathname);
 
     const handleDropdownOpen = (label: string) => {
         setActiveDropdown(label);
@@ -42,7 +62,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
     return (
         <nav className="hidden md:flex items-center space-x-1 space-x-reverse">
             {navigationItems.map((item) => {
-                const isItemActive = isActive(item.href);
+                const isItemActive = bestMatch && bestMatch.item === item && !bestMatch.child;
                 const hasChildren = item.children && item.children.length > 0;
 
                 if (hasChildren) {
@@ -84,7 +104,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                                 sideOffset={8}
                             >
                                 {item.children?.map((child: NavigationChild, index) => {
-                                    const isChildActive = isActive(child.href);
+                                    const isChildActive = bestMatch && bestMatch.item === item && bestMatch.child === child;
 
                                     // Handle divider
                                     if (child.label === '---') {

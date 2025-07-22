@@ -36,7 +36,8 @@ export const approveDriverToOrder = async (orderId: string, driverId: string) =>
   // Send notifications to customer
   try {
     console.log('🚀 Starting notification process for approved driver...');
-    const { createOrderNotification, ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
+    const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
+    const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes');
     const { PushNotificationService } = await import('@/lib/push-notification-service');
     
     // Use the ORDER_SHIPPED template (since this is also a shipping event)

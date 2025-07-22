@@ -13,6 +13,7 @@ export const menuGroups = [
     items: [
       { title: 'جميع الطلبات', url: '/dashboard/management-orders', icon: 'ClipboardList' },
       { title: 'قيد المراجعة', url: '/dashboard/management-orders/status/pending', icon: 'Clock' },
+      { title: 'مخصصة للسائقين', url: '/dashboard/management-orders/status/assigned', icon: 'UserCheck' },
       { title: 'قيد التوصيل', url: '/dashboard/management-orders/status/in-way', icon: 'Truck' },
       { title: 'مكتملة', url: '/dashboard/management-orders/status/delivered', icon: 'CheckCircle' },
       { title: 'ملغاة', url: '/dashboard/management-orders/status/canceled', icon: 'XCircle' },

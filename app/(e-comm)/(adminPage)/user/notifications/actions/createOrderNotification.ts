@@ -2,7 +2,6 @@
 
 import db from '@/lib/prisma';
 import { pusherServer } from '@/lib/pusherServer';
-import { ORDER_NOTIFICATION_TEMPLATES } from '../types/notificationTypes';
 
 interface CreateOrderNotificationParams {
   userId: string;
@@ -71,5 +70,5 @@ export async function createOrderNotification({
   }
 }
 
-// Export the templates for use in other files
-export { ORDER_NOTIFICATION_TEMPLATES }; 
+// Note: ORDER_NOTIFICATION_TEMPLATES should be imported directly from types/notificationTypes.ts
+// Server actions can only export async functions 

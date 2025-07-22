@@ -138,8 +138,12 @@ export default function AppSidebar() {
                 style={{ direction: 'rtl' }}
               >
                 {group.items.map((item: MenuItem) => {
-                  const isActive = pathname === item.url;
-                  const isFavorite = favorites.includes(item.url);
+                  // Find the most specific (longest) matching item for the current pathname
+                  const allItems = [item, ...(item.children || [])];
+                  const bestMatch = allItems.reduce((best, curr) =>
+                    pathname.startsWith(curr.url) && curr.url.length > (best?.url.length || 0) ? curr : best, null as MenuItem | null
+                  );
+                  const isActive = bestMatch && bestMatch.url === item.url && pathname.startsWith(item.url);
 
                   return (
                     <React.Fragment key={item.url}>
@@ -173,36 +177,35 @@ export default function AppSidebar() {
                               toggleFavorite(item.url);
                             }}
                           >
-                            <Icon name="Star" size="xs" className={`h-3 w-3 icon-enhanced ${isFavorite ? 'fill-feature-commerce text-feature-commerce' : 'text-muted-foreground'}`} />
+                            <Icon name="Star" size="xs" className={`h-3 w-3 icon-enhanced ${favorites.includes(item.url) ? 'fill-feature-commerce text-feature-commerce' : 'text-muted-foreground'}`} />
                           </Button>
                         </div>
                       </li>
 
                       {/* Enhanced Sub-menu */}
-                      {item.children && item.children.length > 0 && (
-                        <ul className='space-y-1 py-1 pr-4'>
-                          {item.children.map((child) => {
-                            const isChildActive = pathname === child.url;
-                            return (
-                              <li key={child.url}>
-                                <Link
-                                  href={child.url}
-                                  className={`
-                                    flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium 
-                                    ${isChildActive
-                                      ? `${colors.bg} ${colors.text} ${colors.border} border-r-4 font-bold shadow`
-                                      : ''
-                                    }
-                                  `}
-                                >
-                                  <Icon name={child.icon} size="md" className={`h-4 w-4 icon-enhanced ${isChildActive ? colors.text : 'text-muted-foreground'}`} />
-                                  <span className='flex-1'>{child.title}</span>
-                                </Link>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
+                      <ul className='space-y-1 py-1 pr-4'>
+                        {(item.children || []).map((child) => {
+                          // Only highlight the child if it is the best match
+                          const isChildActive = bestMatch && bestMatch.url === child.url && pathname.startsWith(child.url);
+                          return (
+                            <li key={child.url}>
+                              <Link
+                                href={child.url}
+                                className={`
+                                  flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium 
+                                  ${isChildActive
+                                    ? `${colors.bg} ${colors.text} ${colors.border} border-r-4 font-bold shadow`
+                                    : ''
+                                  }
+                                `}
+                              >
+                                <Icon name={child.icon} size="md" className={`h-4 w-4 icon-enhanced ${isChildActive ? colors.text : 'text-muted-foreground'}`} />
+                                <span className='flex-1'>{child.title}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
                     </React.Fragment>
                   );
                 })}

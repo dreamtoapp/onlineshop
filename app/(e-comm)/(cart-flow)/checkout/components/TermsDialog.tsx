@@ -39,7 +39,7 @@ interface TermsDialogContentProps {
   extractKeyPoints: (content: string) => string[];
 }
 
-export function TermsDialogContent({ policies, loading, getPolicyIcon, getPolicySummary, extractKeyPoints, ...rest }: TermsDialogContentProps) {
+export function TermsDialogContent({ policies, loading, getPolicyIcon, getPolicySummary, extractKeyPoints }: TermsDialogContentProps) {
   return (
     <div>
       <div className="flex flex-row-reverse items-center justify-between gap-x-2 mb-4">
@@ -63,7 +63,7 @@ export function TermsDialogContent({ policies, loading, getPolicyIcon, getPolicy
               <Alert dir="rtl">
                 <CheckCircle className="h-4 w-4 flex-shrink-0" />
                 <AlertDescription className="break-words text-right">
-                  هذا ملخص سريع للشروط المهمة. يمكنك الاطلاع على التفاصيل الكاملة في تبويب "التفاصيل الكاملة"
+                  هذا ملخص سريع للشروط المهمة. يمكنك الاطلاع على التفاصيل الكاملة في تبويب &quot;التفاصيل الكاملة&quot;
                 </AlertDescription>
               </Alert>
               <div className="grid gap-4">

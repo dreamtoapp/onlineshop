@@ -5,15 +5,12 @@ import { PageProps } from '@/types/commonTypes';
 import { OrderStatus } from '@prisma/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TabsContent } from '@/components/ui/tabs';
 
 import {
   fetchAnalytics,
-  fetchAssignedAnalytics,
   fetchOrders,
 } from './actions/get-pendeing-order';
 import PendingOrdersView from './components/PendingOrdersView';
-import TabsWrapper from './components/TabsWrapper';
 
 export default async function PendingOrdersPage({
   searchParams,
@@ -46,7 +43,7 @@ export default async function PendingOrdersPage({
     const orderStatus = activeTab === 'assigned' ? [OrderStatus.ASSIGNED] : [OrderStatus.PENDING];
 
     // Fetch data in parallel using server actions
-    const [orders, pendingAnalytics, assignedAnalytics] = await Promise.all([
+    const [orders, pendingAnalytics] = await Promise.all([
       fetchOrders({
         status: orderStatus,
         page: currentPage,
@@ -56,7 +53,6 @@ export default async function PendingOrdersPage({
         search: searchTerm,
       }),
       fetchAnalytics(), // PENDING orders count
-      fetchAssignedAnalytics(), // ASSIGNED orders count
     ]);
 
     return (
@@ -76,138 +72,53 @@ export default async function PendingOrdersPage({
           {/* Status Badge */}
           <Badge variant="outline" className="bg-status-pending-soft text-status-pending border-status-pending gap-2">
             <Icon name="Clock" className="h-4 w-4" />
-            الإجمالي: {pendingAnalytics + assignedAnalytics}
+            الإجمالي: {pendingAnalytics}
           </Badge>
         </div>
 
-        {/* Tabs System */}
-        <TabsWrapper pendingCount={pendingAnalytics} assignedCount={assignedAnalytics}>
-          {/* Pending Orders Tab */}
-          <TabsContent value="pending" className="space-y-4">
-            {/* Status Overview Card for Pending */}
-            <Card className="shadow-lg border-l-4 border-l-status-pending">
-              <CardHeader className="pb-3">
-                <div className="flex flex-wrap items-center gap-2 justify-between" dir="rtl">
-                  <CardTitle className="flex items-center gap-2 text-lg mb-0">
-                    <Icon name="MousePointerBan" className="h-5 w-5 text-status-pending" />
-                    الطلبات قيد الانتظار
-                  </CardTitle>
-                  {/* Compact badges row beside the title */}
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-status-pending-soft text-status-pending border-status-pending min-w-[90px]">
-                      <Icon name="MousePointerBan" className="h-4 w-4" />
-                      <span>العدد الإجمالي</span>
-                      <span className="font-bold">{pendingAnalytics}</span>
-                    </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-feature-analytics-soft text-feature-analytics border-feature-analytics min-w-[90px]">
-                      <Icon name="Clock" className="h-4 w-4" />
-                      <span>في الصفحة الحالية</span>
-                      <span className="font-bold">{activeTab === 'pending' ? orders.orders.length : 0}</span>
-                    </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-status-urgent-soft text-status-urgent border-status-urgent min-w-[90px]">
-                      <Icon name="MousePointerBan" className="h-4 w-4" />
-                      <span>تحتاج معالجة فورية</span>
-                      <span className="font-bold">{Math.ceil(pendingAnalytics * 0.4)}</span>
-                    </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-neutral-soft-background text-neutral-foreground border-neutral-foreground min-w-[90px]">
-                      <span>الصفحة الحالية</span>
-                      <span className="font-bold">{currentPage}</span>
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-
-              </CardContent>
-            </Card>
-
+        {/* Pending Orders Overview Card */}
+        <Card className="shadow-lg border-l-4 border-l-status-pending">
+          <CardHeader className="pb-3">
+            <div className="flex flex-wrap items-center gap-2 justify-between" dir="rtl">
+              <CardTitle className="flex items-center gap-2 text-lg mb-0">
+                <Icon name="MousePointerBan" className="h-5 w-5 text-status-pending" />
+                الطلبات قيد الانتظار
+              </CardTitle>
+              {/* Compact badges row beside the title */}
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-status-pending-soft text-status-pending border-status-pending min-w-[90px]">
+                  <Icon name="MousePointerBan" className="h-4 w-4" />
+                  <span>العدد الإجمالي</span>
+                  <span className="font-bold">{pendingAnalytics}</span>
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-feature-analytics-soft text-feature-analytics border-feature-analytics min-w-[90px]">
+                  <Icon name="Clock" className="h-4 w-4" />
+                  <span>في الصفحة الحالية</span>
+                  <span className="font-bold">{orders.orders.length}</span>
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-status-urgent-soft text-status-urgent border-status-urgent min-w-[90px]">
+                  <Icon name="MousePointerBan" className="h-4 w-4" />
+                  <span>تحتاج معالجة فورية</span>
+                  <span className="font-bold">{Math.ceil(pendingAnalytics * 0.4)}</span>
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 text-xs bg-neutral-soft-background text-neutral-foreground border-neutral-foreground min-w-[90px]">
+                  <span>الصفحة الحالية</span>
+                  <span className="font-bold">{currentPage}</span>
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
             {/* Orders Management for Pending */}
-            {activeTab === 'pending' && (
-              <PendingOrdersView
-                orders={orders.orders}
-                pendingCount={pendingAnalytics}
-                currentPage={currentPage}
-                pageSize={pageSize}
-                orderType="pending"
-              />
-            )}
-          </TabsContent>
-
-          {/* Assigned Orders Tab */}
-          <TabsContent value="assigned" className="space-y-4">
-            {/* Status Overview Card for Assigned */}
-            <Card className="shadow-lg border-l-4 border-l-feature-analytics">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Icon name="UserCheck" className="h-5 w-5 text-feature-analytics" />
-                  الطلبات المُخصصة للسائقين - جاهزة للتوصيل
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-feature-analytics-soft rounded-lg p-4 border border-feature-analytics">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-feature-analytics">العدد الإجمالي</p>
-                        <p className="text-2xl font-bold text-feature-analytics">{assignedAnalytics}</p>
-                      </div>
-                      <Icon name="UserCheck" className="h-8 w-8 text-feature-analytics" />
-                    </div>
-                  </div>
-
-                  <div className="bg-success-soft-background rounded-lg p-4 border border-success-fg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-success-fg">في الصفحة الحالية</p>
-                        <p className="text-2xl font-bold text-success-fg">{activeTab === 'assigned' ? orders.orders.length : 0}</p>
-                      </div>
-                      <Icon name="Clock" className="h-8 w-8 text-success-fg" />
-                    </div>
-                  </div>
-
-                  <div className="bg-info-soft-background rounded-lg p-4 border border-info-fg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-info-fg">جاهزة للانطلاق</p>
-                        <p className="text-2xl font-bold text-info-fg">{assignedAnalytics}</p>
-                      </div>
-                      <Icon name="UserCheck" className="h-8 w-8 text-info-fg" />
-                    </div>
-                  </div>
-
-                  <div className="bg-neutral-soft-background rounded-lg p-4 border border-neutral-foreground">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-neutral-foreground">الصفحة الحالية</p>
-                        <p className="text-2xl font-bold text-neutral-foreground">{currentPage}</p>
-                      </div>
-                      <div className="h-8 w-8 rounded-full bg-neutral-foreground flex items-center justify-center text-white font-bold">
-                        {currentPage}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 p-3 bg-info-soft-background border border-info-fg rounded-lg">
-                  <p className="text-sm text-info-fg">
-                    <strong>معلومة:</strong> هذه الطلبات مُخصصة بالفعل لسائقين وجاهزة للانطلاق. يمكن للسائقين تحديث حالة الطلب إلى &quot;في الطريق&quot;.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Orders Management for Assigned */}
-            {activeTab === 'assigned' && (
-              <PendingOrdersView
-                orders={orders.orders}
-                pendingCount={assignedAnalytics}
-                currentPage={currentPage}
-                pageSize={pageSize}
-                orderType="assigned"
-              />
-            )}
-          </TabsContent>
-        </TabsWrapper>
+            <PendingOrdersView
+              orders={orders.orders}
+              pendingCount={pendingAnalytics}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              orderType="pending"
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   } catch (error) {

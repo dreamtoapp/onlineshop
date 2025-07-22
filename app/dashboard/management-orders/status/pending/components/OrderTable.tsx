@@ -32,13 +32,11 @@ import {
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/databaseTypes';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
 
 import AssignToDriver from './AssignToDriver';
 import CancelOrderDialog from './CancelOrderDialog';
-import UnassignDriver from './UnassignDriver';
 
 interface OrderTableProps {
   orders: Order[];
@@ -124,7 +122,6 @@ export default function OrderTable({
     // Calculate order age for priority
     const orderAge = Date.now() - new Date(order.createdAt).getTime();
     const isUrgent = orderAge > 24 * 60 * 60 * 1000; // older than 24 hours
-    const isHighValue = order.amount > 500; // high value order
 
     return (
       <Card className={cn(
