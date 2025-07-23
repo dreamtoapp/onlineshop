@@ -44,7 +44,7 @@ export type LocationHistory = PrismaLocationHistory;
 export type NewLetter = PrismaNewLetter;
 export type UserNotification = PrismaUserNotification;
 // export type Order = PrismaOrder;
-// export type OrderInWay = PrismaOrderInWay;
+// export type ActiveTrip = PrismaActiveTrip;
 export type OrderItem = PrismaOrderItem;
 export type Product = PrismaProduct;
 export type ProductTranslation = PrismaProductTranslation;
@@ -79,7 +79,7 @@ export type Order = Prisma.OrderGetPayload<{
   include: typeof orderIncludeRelation;
 }>;
 
-export const orderInWayIncludeRelation = {
+export const activeTripIncludeRelation = {
   order: {
     include: {
       items: {
@@ -93,10 +93,10 @@ export const orderInWayIncludeRelation = {
     },
   },
   driver: true,
-} satisfies Prisma.OrderInWayInclude;
+} satisfies Prisma.ActiveTripInclude;
 
-export type OrderInWay = Prisma.OrderInWayGetPayload<{
-  include: typeof orderInWayIncludeRelation;
+export type ActiveTrip = Prisma.ActiveTripGetPayload<{
+  include: typeof activeTripIncludeRelation;
 }>;
 
 

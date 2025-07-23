@@ -1,174 +1,199 @@
 'use client';
-import {
-  useEffect,
-  useState,
-} from 'react';
-
-import { formatDistanceToNow } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Icon } from '@/components/icons/Icon';
 import { Order } from '@/types/databaseTypes';
 
-import {
-  startTrip,
-  updateCoordinates,
-} from '../action/startTrip';
+import { setOrderInTransit, startTrip } from '../actions/startTrip';
 
-export default function DriverOrderCard({ order }: { order: Order }) {
-  const UPDATE_INTERVAL = 300;
-  const [isTracking, setIsTracking] = useState(false);
-  const [countdown, setCountdown] = useState(UPDATE_INTERVAL);
-  const driverId = order.driver?.id;
-
-  const handleStartTrip = async () => {
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
-
-      if (!driverId) {
-        toast.error('لا يوجد سائق لهذا الطلب');
-        return;
-      }
-
-      const result = await startTrip(
-        order.id,
-        driverId,
-        position.coords.latitude.toString(),
-        position.coords.longitude.toString(),
-      );
-
-      if (result.success) {
-        setIsTracking(true);
-        setCountdown(UPDATE_INTERVAL);
-        toast.success('تم بدء الرحلة بنجاح');
-      } else {
-        toast.error(result.error || 'فشل غير معروف');
-      }
-    } catch (error) {
-      let errorMessage = 'فشل في الحصول على الموقع';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        errorMessage = error;
-      }
-      toast.error(errorMessage);
-    }
+export default function DriverOrderCard({ order, activeTrip }: { order: Order, activeTrip: boolean }) {
+  // Helper: Status badge
+  const statusBadge = (status: string) => {
+    let color = 'bg-yellow-500';
+    let label = 'مخصص للتسليم';
+    if (status === 'IN_TRANSIT') { color = 'bg-blue-600'; label = 'جاري التوصيل'; }
+    if (status === 'DELIVERED') { color = 'bg-green-600'; label = 'تم التسليم'; }
+    if (status === 'CANCELED') { color = 'bg-red-600'; label = 'ملغي'; }
+    return <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${color}`}>{label}</span>;
   };
 
-  useEffect(() => {
-    if (!isTracking) return;
-
-    const timer = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown === 1) {
-          navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              try {
-                if (!driverId) {
-                  toast.error('لا يوجد سائق لهذا الطلب');
-                  return;
-                }
-                await updateCoordinates(
-                  order.id,
-                  driverId,
-                  position.coords.latitude.toString(),
-                  position.coords.longitude.toString(),
-                );
-                setCountdown(UPDATE_INTERVAL);
-              } catch {
-                toast.error('فشل تحديث الإحداثيات');
-                setCountdown(UPDATE_INTERVAL);
-              }
-            },
-            () => {
-              toast.error('خطأ في الحصول على الموقع');
-              setCountdown(UPDATE_INTERVAL);
-            },
-          );
-          return UPDATE_INTERVAL;
-        }
-        return prevCountdown - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isTracking, order.id, driverId]);
-
-  const minutes = Math.floor(countdown / 60);
-  const seconds = countdown % 60;
-
-  return (
-    <Card className='bg-background shadow-sm'>
-      <CardHeader className='space-y-3 p-4'>
-        <div className='flex justify-between text-xs text-muted-foreground'>
-          <div className='flex items-center gap-1'>
-            <Icon name="Calendar" size="xs" />
-            <span>
-              {formatDistanceToNow(new Date(order.createdAt), {
-                addSuffix: true,
-                locale: ar,
-              })}
-            </span>
-          </div>
-          <div className='flex items-center gap-1'>
-            <Icon name="RefreshCw" size="xs" />
-            <span>
-              {formatDistanceToNow(new Date(order.updatedAt), {
-                addSuffix: true,
-                locale: ar,
-              })}
-            </span>
-          </div>
-        </div>
-
-        <CardTitle className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Icon name="List" size="sm" />
-            <span>{order.orderNumber}</span>
-          </div>
-          <span className='text-lg font-semibold text-primary'>{order.amount.toFixed(2)} SAR</span>
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent className='space-y-2 p-4'>
-        <div className='grid grid-cols-2 gap-2 text-sm'>
-          <div className='flex items-center gap-2'>
-            <Icon name="User" size="xs" />
-            <span>{order.customer.name || 'عميل غير معروف'}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Icon name="Phone" size="xs" />
-            <span>{order.customer.phone}</span>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className='p-4'>
-        <Button className='w-full' onClick={handleStartTrip} disabled={isTracking}>
-          <Icon name="Car" size="xs" className="ml-2" />
-          {isTracking ? (
-            <div className='flex w-full items-center'>
-              <span>تتبع الرحلة</span>
-              <span className='mt-1 text-xs text-muted-foreground'>
-                التحديث التالي: {minutes}:{seconds < 10 ? '0' : ''}
-                {seconds}
-              </span>
-            </div>
-          ) : (
-            'الانطلاق للعميل'
-          )}
+  // Helper: Address section
+  const addressSection = (
+    <div className='flex items-center gap-2 bg-muted rounded p-2 my-2'>
+      <Icon name="MapPin" size="sm" />
+      <span className='font-bold'>العنوان:</span>
+      <span className='truncate'>{order.address?.label || 'غير متوفر'}</span>
+      {order.address?.latitude && order.address?.longitude && (
+        <Button
+          size='sm'
+          variant='secondary'
+          className='ml-auto'
+          onClick={() => {
+            const lat = order.address.latitude;
+            const lng = order.address.longitude;
+            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank', 'noopener,noreferrer');
+          }}
+        >
+          <Icon name="Navigation" size="xs" /> توجيه
         </Button>
+      )}
+    </div>
+  );
+
+  // Helper: Customer section
+  const customerSection = (
+    <div className='flex items-center gap-2 my-2'>
+      <Icon name="User" size="sm" />
+      <span className='font-bold'>{order.customer.name || 'عميل غير معروف'}</span>
+      {order.customer.phone && (
+        <Button
+          size='sm'
+          variant='secondary'
+          className='ml-auto'
+          onClick={() => window.open(`tel:${order.customer.phone}`)}
+        >
+          <Icon name="Phone" size="xs" /> اتصل بالعميل
+        </Button>
+      )}
+    </div>
+  );
+
+  // Helper: Product list
+  const productList = (
+    <div className='bg-muted rounded p-2 my-2 max-h-32 overflow-y-auto'>
+      <div className='flex items-center gap-2 mb-2'>
+        <Icon name="Package" size="sm" />
+        <span className='font-bold'>المنتجات</span>
+      </div>
+      {order.items.map((item, idx) => (
+        <div key={item.id || idx} className='flex justify-between items-center border-b border-border py-1'>
+          <span>{item.product?.name}</span>
+          <span className='text-muted-foreground'>x{item.quantity}</span>
+          <span className='font-bold'>{item.price} ريال</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Helper: Notes
+  const notes = (order as any).notes && (
+    <div className='bg-yellow-100 text-yellow-800 rounded p-2 my-2 flex items-center gap-2'>
+      <Icon name="Info" size="sm" />
+      <span>{(order as any).notes}</span>
+    </div>
+  );
+
+  // Helper: Total
+  const total = (
+    <div className='flex justify-between items-center mt-2'>
+      <span className='font-bold text-lg'>الإجمالي</span>
+      <span className='font-bold text-primary text-xl'>{order.amount.toFixed(2)} ريال</span>
+    </div>
+  );
+
+  // Header
+  const header = (
+    <div className='flex items-center justify-between mb-2'>
+      <div className='flex items-center gap-2'>
+        <span className='font-bold text-base'>طلب #{order.orderNumber}</span>
+        <Button size='icon' variant='ghost' onClick={() => navigator.clipboard.writeText(order.orderNumber)} title='نسخ رقم الطلب'>
+          <Icon name="Copy" size="xs" />
+        </Button>
+      </div>
+      {statusBadge(order.status)}
+    </div>
+  );
+
+  // ASSIGNED
+  if (order.status === 'ASSIGNED') {
+    return (
+      <Card className='bg-background shadow-md p-4 mb-4'>
+        {header}
+        {customerSection}
+        {addressSection}
+        {productList}
+        {notes}
+        {total}
+        <CardFooter className='mt-4 flex flex-col gap-2'>
+          <Button size='lg' className='w-full text-lg' variant='default' onClick={async () => {
+            const res = await setOrderInTransit(order.id);
+            if (res.success) toast.success('تم تحديث حالة الطلب');
+            else toast.error(res.error);
+          }}>
+            <Icon name="Rocket" size="sm" className="ml-2" /> بدء الرحلة
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  // IN_TRANSIT (no ActiveTrip)
+  if (order.status === 'IN_TRANSIT' && !activeTrip) {
+    return (
+      <Card className='bg-background shadow-md p-4 mb-4'>
+        {header}
+        {customerSection}
+        {addressSection}
+        {productList}
+        {notes}
+        {total}
+        <CardFooter className='mt-4 flex flex-col gap-2'>
+          <Button size='lg' className='w-full text-lg' variant='default' onClick={async () => {
+            const res = await startTrip(
+              order.id,
+              order.driver?.id ?? '',
+              order.address?.latitude ?? '',
+              order.address?.longitude ?? ''
+            );
+            if (res.success) toast.success('تم بدء التتبع');
+            else toast.error(res.error);
+          }}>
+            <Icon name="CheckCircle" size="sm" className="ml-2" /> تأكيد بدء التتبع
+          </Button>
+          <span className='text-xs text-muted-foreground text-center'>لن يبدأ التتبع إلا بعد التأكيد</span>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  // IN_TRANSIT (with ActiveTrip)
+  if (order.status === 'IN_TRANSIT' && activeTrip) {
+    return (
+      <Card className='bg-background shadow-md p-4 mb-4'>
+        {header}
+        {customerSection}
+        {addressSection}
+        {productList}
+        {notes}
+        {total}
+        <CardFooter className='mt-4 flex gap-2'>
+          <Button size='lg' className='flex-1' variant='default'>
+            <Icon name="Check" size="sm" className="ml-2" /> تسليم الطلب
+          </Button>
+          <Button size='lg' className='flex-1' variant='destructive'>
+            <Icon name="X" size="sm" className="ml-2" /> إلغاء الطلب
+          </Button>
+        </CardFooter>
+        {/* Tracking logic will be implemented here later */}
+      </Card>
+    );
+  }
+
+  // DELIVERED/CANCELED
+  return (
+    <Card className='bg-background shadow-md p-4 mb-4 opacity-60'>
+      {header}
+      {customerSection}
+      {addressSection}
+      {productList}
+      {notes}
+      {total}
+      <CardFooter className='mt-4'>
+        <span className='text-muted-foreground w-full text-center'>تمت المعالجة</span>
       </CardFooter>
     </Card>
   );

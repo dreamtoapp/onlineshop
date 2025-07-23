@@ -13,7 +13,7 @@ export const deleverOrder = async (orderId: string) => {
     where: { id: orderId },
     data: { status: ORDER_STATUS.DELIVERED },
   });
-  await db.orderInWay.delete({
+      await db.activeTrip.delete({
     where: { orderId: orderId },
   });
   // 🔔 CREATE NOTIFICATION FOR CUSTOMER

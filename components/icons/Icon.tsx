@@ -10,7 +10,7 @@ import {
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, Menu, LocateFixed, Tag, Share2, Flame, Star, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
     ShoppingCart, ShoppingBag, CreditCard, LogOut, BookOpen, Settings, Grid3X3, Shield, BarChart3, Megaphone, Database, MousePointerBan,
-    Building2, MapPin, Cog, Palette, RotateCcw, Undo
+    Building2, MapPin, Cog, Palette, RotateCcw, Undo,
 } from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)

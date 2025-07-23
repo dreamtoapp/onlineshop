@@ -14,19 +14,19 @@ export const cancelOrder = async (orderId: string, reson: string) => {
     where: { id: orderId },
     data: { status: ORDER_STATUS.CANCELED, resonOfcancel: reson },
   });
-  // Safely delete OrderInWay record if it exists
-  const existingOrderInWay = await db.orderInWay.findUnique({
-    where: { orderId: orderId },
-  });
-  
-  if (existingOrderInWay) {
-    await db.orderInWay.delete({
+      // Safely delete ActiveTrip record if it exists
+    const existingActiveTrip = await db.activeTrip.findUnique({
       where: { orderId: orderId },
     });
-    console.log('✅ [CANCEL] OrderInWay record deleted successfully');
-  } else {
-    console.log('ℹ️ [CANCEL] OrderInWay record not found (order was never in transit)');
-  }
+
+    if (existingActiveTrip) {
+      await db.activeTrip.delete({
+        where: { orderId: orderId },
+      });
+      console.log('✅ [CANCEL] ActiveTrip record deleted successfully');
+    } else {
+      console.log('ℹ️ [CANCEL] ActiveTrip record not found (order was never in transit)');
+    }
 
   const order = await db.order.findUnique({
     where: { id: orderId },

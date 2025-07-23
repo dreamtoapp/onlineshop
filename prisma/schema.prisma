@@ -176,7 +176,7 @@ model User {
   // Relations for orders as customer and as driver
   customerOrders Order[] @relation("OrderCustomer")
   driverOrders   Order[] @relation("OrderDriver")
-  driverInWays   OrderInWay[] @relation("OrderInWayDriver")
+  activeTrips   ActiveTrip[] @relation("ActiveTripDriver")
   addresses      Address[]
   orderRatings   OrderRating[] // Ratings submitted by this user
 }
@@ -227,7 +227,7 @@ model Order {
   deliveredAt   DateTime? // Date when the order was delivered
 
   items         OrderItem[]
-  orderInWay    OrderInWay? // علاقة واحد لواحد (طلبية واحدة ← تتبع واحد)
+  activeTrip    ActiveTrip? // علاقة واحد لواحد (طلبية واحدة ← تتبع واحد)
   shiftId       String      @db.ObjectId // Ensure this matches Shift.id's native type
   shift         Shift       @relation(fields: [shiftId], references: [id])
   createdAt     DateTime    @default(now())
@@ -248,12 +248,12 @@ model OrderItem {
   product   Product? @relation(fields: [productId], references: [id]) // Link to Product
 }
 
-model OrderInWay {
+model ActiveTrip {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   orderId     String   @unique @db.ObjectId // أضفنا @unique هنا
   order       Order    @relation(fields: [orderId], references: [id])
   driverId    String   @db.ObjectId // Reference to User (was Driver)
-  driver      User     @relation("OrderInWayDriver", fields: [driverId], references: [id]) // Updated to User, explicit relation name
+  driver      User     @relation("ActiveTripDriver", fields: [driverId], references: [id]) // Updated to User, explicit relation name
   orderNumber String?
   latitude    String?
   longitude   String?

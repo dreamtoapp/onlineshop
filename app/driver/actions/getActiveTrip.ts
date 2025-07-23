@@ -6,7 +6,7 @@ import db from '@/lib/prisma';
 import { orderIncludeRelation } from '@/types/databaseTypes';
 
 export async function getActiveTrip(driverId: string) {
-  const getOrderId = await db.orderInWay.findFirst({
+  const getOrderId = await db.activeTrip.findFirst({
     where: {
       driverId: driverId, // تأكد من أن driverId معرّف
     },

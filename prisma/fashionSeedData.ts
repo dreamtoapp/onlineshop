@@ -40,7 +40,7 @@ function logStockStatus(productName: string, inStock: boolean) {
 async function clearAllData() {
   logBanner('🧹 Clearing all data');
   await db.orderItem.deleteMany({});
-  await db.orderInWay.deleteMany({});
+  await db.activeTrip.deleteMany({});
   await db.orderRating.deleteMany({});
   await db.review.deleteMany({});
   await db.wishlistItem.deleteMany({});

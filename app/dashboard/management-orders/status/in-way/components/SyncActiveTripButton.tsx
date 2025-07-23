@@ -3,16 +3,16 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icons/Icon';
-import { syncOrderInWay } from '@/utils/syncOrderInWay';
+import { syncActiveTrip } from '@/utils/syncActiveTrip';
 import { toast } from 'sonner';
 
-export default function SyncOrderInWayButton() {
+export default function SyncActiveTripButton() {
   const [syncing, setSyncing] = useState(false);
 
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await syncOrderInWay();
+      await syncActiveTrip();
       toast.success('تم تحديث الطلبات بنجاح');
     } catch (e) {
       toast.error('فشل في تحديث الطلبات');

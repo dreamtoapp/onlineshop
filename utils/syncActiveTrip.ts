@@ -3,17 +3,17 @@
 import db from '@/lib/prisma';
 import { ActionError } from '@/types/commonType';
 
-export async function syncOrderInWay() {
+export async function syncActiveTrip() {
   try {
-    // console.log('🔄 Syncing OrderInWay table with orders where status=IN_TRANSIT...');
+    // console.log('🔄 Syncing ActiveTrip table with orders where status=IN_TRANSIT...');
     const tripOrders = await db.order.findMany({ where: { status: 'IN_TRANSIT' } });
     // console.log(tripOrders.length, 'orders found with status=IN_TRANSIT');
     let addedCount = 0;
     for (const order of tripOrders) {
       if (!order.driverId) continue;
-      const existing = await db.orderInWay.findUnique({ where: { driverId: order.driverId } });
+      const existing = await db.activeTrip.findUnique({ where: { driverId: order.driverId } });
       if (!existing) {
-        await db.orderInWay.create({
+                  await db.activeTrip.create({
           data: {
             orderId: order.id,
             driverId: order.driverId,
@@ -25,13 +25,13 @@ export async function syncOrderInWay() {
         addedCount++;
       }
     }
-    // console.log(`✅ Sync complete. Added ${addedCount} missing OrderInWay records.`);
+    // console.log(`✅ Sync complete. Added ${addedCount} missing ActiveTrip records.`);
     return { success: true, addedCount };
   } catch (error) {
     const err: ActionError =
       typeof error === 'object' && error && 'message' in error
         ? { message: (error as ActionError).message, code: (error as ActionError).code }
-        : { message: 'فشل في مزامنة بيانات OrderInWay.' };
+        : { message: 'فشل في مزامنة بيانات ActiveTrip.' };
     return { success: false, error: err.message };
   }
 }

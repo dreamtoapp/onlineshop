@@ -1,36 +1,31 @@
-import { OrderStatus } from '@prisma/client';
-
+import getSession from '@/lib/getSession';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from '@/components/ui/alert';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Icon } from '@/components/icons/Icon';
-
-import DriverHeader from './components/DriverHeader';
-import MenuList from './components/MenuList';
-
+import { getOrderByStatus } from './actions/getOrderByStatus';
+import { ORDER_STATUS } from '@/constant/order-status';
 import ActiveTrip from './components/ActiveTrip';
-import { getActiveTrip } from './actions/getActiveTrip';
-import { getOrderCount } from './actions/getOrderCount';
-import { useRouter } from 'next/navigation';
-import FooterTabs from './components/FooterTabs';
-import getSession from '@/lib/getSession';
 
 const NoActiveOrder = () => (
-  <Card className='mx-auto mt-8 w-full max-w-md'>
-    <CardHeader className='text-center'>
-      <Icon name="Rocket" className='mx-auto h-12 w-12 text-primary' />
-      <CardTitle>لا يوجد رحلة نشطة</CardTitle>
-      <CardDescription>سيتم عرض تفاصيل الرحلة هنا عندما تصبح متاحة</CardDescription>
-    </CardHeader>
-  </Card>
+  <div className='flex min-h-screen w-full flex-col items-center justify-center bg-background'>
+    <div className='bg-card rounded-xl shadow-lg p-8 flex flex-col items-center max-w-md w-full border border-border'>
+      <div className='bg-muted rounded-full p-4 mb-4'>
+        <Icon name="Info" className="text-primary" size="xl" />
+      </div>
+      <h2 className='text-2xl font-bold text-primary mb-2'>لا توجد رحلة نشطة حالياً</h2>
+      <p className='text-base text-muted-foreground text-center mb-2'>
+        لا يوجد لديك أي طلبات قيد التوصيل في الوقت الحالي.<br />
+        ستظهر تفاصيل الرحلة هنا عندما يتم تعيين طلب جديد لك.
+      </p>
+      <div className='mt-4 text-sm text-muted-foreground text-center'>
+        <Icon name="Rocket" className="inline-block mr-1 text-primary" />
+        تأكد من تحديث الصفحة عند استلام طلب جديد.
+      </div>
+    </div>
+  </div>
 );
 
 async function Page() {
@@ -46,54 +41,28 @@ async function Page() {
       );
     }
     const driverId = user.id;
-    const drivername = user.name || 'السائق';
-    const avatarUrl = user.image || undefined;
-    const [activeTrip, orderCount] = await Promise.all([
-      getActiveTrip(driverId),
-      getOrderCount(driverId),
-    ]);
-    if (activeTrip && activeTrip.status) {
-      switch (activeTrip.status) {
-        case OrderStatus.PENDING:
-          activeTrip.status = OrderStatus.PENDING;
-          break;
-        case OrderStatus.IN_TRANSIT:
-          activeTrip.status = OrderStatus.IN_TRANSIT;
-          break;
-        case OrderStatus.DELIVERED:
-          activeTrip.status = OrderStatus.DELIVERED;
-          break;
-        case OrderStatus.CANCELED:
-          activeTrip.status = OrderStatus.CANCELED;
-          break;
-        default:
-          activeTrip.status = OrderStatus.PENDING;
-      }
+    const { ordersToShip } = await getOrderByStatus(driverId, ORDER_STATUS.IN_TRANSIT);
+    if (!ordersToShip || ordersToShip.length === 0) {
+      return <NoActiveOrder />;
     }
-    const totalCount =
-      (orderCount.counts?.inWay || 0) +
-      (orderCount.counts?.canceled || 0) +
-      (orderCount.counts?.delivered || 0);
+    // Multiple IN_TRANSIT orders: show warning and disable actions except revert
+    if (ordersToShip.length > 1) {
+      return (
+        <div className='flex flex-col gap-4 p-4'>
+          <div className='bg-warning-soft-background text-warning-foreground rounded-lg p-4 text-center font-bold mb-4'>
+            يوجد أكثر من طلب جاري التوصيل. يرجى إرجاع الطلبات الزائدة إلى قائمة التعيين.
+          </div>
+          {ordersToShip.map((order: any) => (
+            <ActiveTrip key={order.id} order={order} disableAllActions={true} />
+          ))}
+        </div>
+      );
+    }
+    // Single IN_TRANSIT order
+    const order = ordersToShip[0];
     return (
-      <div className='flex min-h-screen w-full flex-col items-center justify-center'>
-        <DriverHeader
-          orderCount={totalCount}
-          drivername={drivername}
-          avatarUrl={avatarUrl}
-          inWayOrders={orderCount.counts?.inWay || 0}
-          assignedOrders={orderCount.counts?.assigned || 0}
-          canceledOrders={orderCount.counts?.canceled || 0}
-          deliveredOrders={orderCount.counts?.delivered || 0}
-          driverId={driverId}
-        />
-        {activeTrip ? <ActiveTrip order={activeTrip} /> : <NoActiveOrder />}
-        <FooterTabs
-          inWayOrders={orderCount.counts?.inWay || 0}
-          assignedOrders={orderCount.counts?.assigned || 0}
-          deliveredOrders={orderCount.counts?.delivered || 0}
-          canceledOrders={orderCount.counts?.canceled || 0}
-          driverId={driverId}
-        />
+      <div className='flex flex-col gap-4 p-4'>
+        <ActiveTrip order={order} disableAllActions={false} />
       </div>
     );
   } catch {
@@ -105,7 +74,5 @@ async function Page() {
     );
   }
 }
-
-// Add loading state skeleton
 
 export default Page;

@@ -1,10 +1,10 @@
 'use server';
 import db from '@/lib/prisma';
-import { OrderInWay } from '@prisma/client';
+import { ActiveTrip } from '@prisma/client';
 import { createOrderNotification } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
 import { ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
 
-type Result<T = OrderInWay> =
+type Result<T = ActiveTrip> =
   | { success: true; data: T }
   | { success: false; error: string };
 
@@ -22,7 +22,7 @@ export const startTrip = async (
 
   try {
     // Check if driver already has an active trip
-    const existingTrip = await db.orderInWay.findFirst({
+    const existingTrip = await db.activeTrip.findFirst({
       where: { driverId },
     });
 
@@ -51,7 +51,7 @@ export const startTrip = async (
     }
 
     // Create trip record
-    const record = await db.orderInWay.create({
+    const record = await db.activeTrip.create({
       data: {
         orderId,
         driverId,
@@ -59,12 +59,6 @@ export const startTrip = async (
         longitude,
         orderNumber: order.orderNumber, // Add order number to track
       },
-    });
-
-    // Update order status to IN_TRANSIT when trip starts
-    await db.order.update({
-      where: { id: orderId },
-      data: { status: 'IN_TRANSIT' },
     });
 
     // 🚨 CREATE REAL-TIME NOTIFICATION FOR CUSTOMER
@@ -117,31 +111,6 @@ export const startTrip = async (
     return {
       success: false,
       error: error instanceof Error ? error.message : 'فشل بدء الرحلة'
-    };
-  }
-};
-
-export const updateCoordinates = async (
-  orderId: string,
-  driverId: string,
-  latitude: string,
-  longitude: string,
-): Promise<Result> => {
-  if (!isValidId(orderId) || !isValidId(driverId)) {
-    return { success: false, error: 'Invalid ID format' };
-  }
-
-  try {
-    const updated = await db.orderInWay.update({
-      where: { orderId_driverId: { orderId, driverId } },
-      data: { latitude, longitude },
-    });
-
-    return { success: true, data: updated };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Update failed'
     };
   }
 };

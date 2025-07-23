@@ -10,7 +10,7 @@ import {
   fetchOrders,
 } from './actions/get-inWay-order';
 import InWayOrdersView from './components/InWayOrdersView';
-import SyncOrderInWayButton from './components/SyncOrderInWayButton';
+import SyncActiveTripButton from './components/SyncActiveTripButton';
 
 export const metadata: Metadata = {
   title: 'الطلبات في الطريق | لوحة التحكم',
@@ -36,7 +36,7 @@ function PageHeader({ analytics, showActions = false }: PageHeaderProps) {
 
       {showActions && analytics !== undefined && (
         <div className="flex items-center gap-3 flex-shrink-0">
-          <SyncOrderInWayButton />
+          <SyncActiveTripButton />
           <div className="flex items-center gap-2">
             <Icon name="Truck" className="h-5 w-5 text-feature-commerce" />
             <span className="rounded-lg bg-feature-commerce-soft border border-feature-commerce px-4 py-2 text-feature-commerce font-semibold text-sm shadow-sm whitespace-nowrap">
