@@ -79,8 +79,9 @@ const ResumeTripButton: React.FC<ResumeTripButtonProps> = ({ order, driverId, di
                 <div className='w-full px-4'>
                     <Progress value={progressPercent} className='w-full h-3' />
                     <div className='text-xs text-center mt-1 text-muted-foreground flex items-center justify-between'>
-                        <div>
+                        <div className='flex items-center gap-2'>
                             {secondsElapsed} / {INTERVAL_SECONDS} ثانية حتى التحديث التالي
+                            <span className='ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800'>استئناف</span>
                         </div>
                         <div className='flex items-center justify-center'>{(tripLoading || backendUpdating) && <Loader2 className='animate-spin h-5 w-5 text-primary-foreground/50' />}</div>
                     </div>
