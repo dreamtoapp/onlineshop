@@ -14,6 +14,11 @@ import WhatsappShareButton from '@/components/WhatsappShareButton';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { startTrip } from '../actions/startTrip';
+import StartNewTripButton from './StartNewTripButton';
+import ResumeTripButton from './ResumeTripButton';
+import { getActiveTrip } from '../actions/getActiveTrip';
+import { useEffect } from 'react';
 // Small components for clarity
 function OrderSummary({ order }: { order: Order }) {
   return (
@@ -195,15 +200,7 @@ function RevertButton({ onRevert }: { onRevert: () => void }) {
   );
 }
 
-function DisabledActions() {
-  return (
-    <div className='w-full flex flex-col gap-2 mt-4 opacity-50 pointer-events-none'>
-      <Button variant='default' disabled>تسليم الطلب</Button>
-      <Button variant='default' disabled>إلغاء الطلب</Button>
-      <Button variant='default' disabled>بدء التتبع</Button>
-    </div>
-  );
-}
+
 
 function PreTripActions({ onStartTrip, onRevert }: {
   onStartTrip: () => void,
@@ -221,45 +218,28 @@ function PreTripActions({ onStartTrip, onRevert }: {
   );
 }
 
-function ActionButtons({ mode, onRevert, onStartTracking, onDeliver, onCancel, inActiveTrip }: {
-  mode: 'multi' | 'single',
-  onRevert?: () => void,
-  onStartTracking?: () => void,
-  onDeliver?: () => void,
-  onCancel?: () => void,
-  inActiveTrip?: boolean,
-}) {
-  if (mode === 'multi') {
-    return <RevertButton onRevert={onRevert!} />;
-  }
-  if (!inActiveTrip) {
-    return (
-      <div className='w-full flex flex-col gap-2 mt-4'>
-        <Button variant='default' className='w-full' onClick={onStartTracking}>بدء التتبع الفعلي</Button>
-        <DisabledActions />
-      </div>
-    );
-  }
-  return (
-    <div className='w-full flex flex-col gap-2 mt-4'>
-      <Button variant='default' className='w-full' onClick={onDeliver}>تسليم الطلب</Button>
-      <Button variant='destructive' className='w-full' onClick={onCancel}>إلغاء الطلب</Button>
-    </div>
-  );
-}
 
-export default function ActiveTrip({ order, disableAllActions = false }: { order: Order, disableAllActions?: boolean }) {
+
+export default function ActiveTrip({ order, disableAllActions = false, driverId }: { order: Order, disableAllActions?: boolean, driverId: string }) {
   const customerLocation = '24.7136,46.6753';
   const googleMapsLink = `https://www.google.com/maps?q=${customerLocation}`;
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // TODO: Replace with real check for ActiveTrip existence
-  const inActiveTrip = false; // Simulate: not in ActiveTrip
+  const [inActiveTrip, setInActiveTrip] = useState<boolean | null>(null);
+  const [tripLoading, setTripLoading] = useState(false);
+  const [tripError, setTripError] = useState<string | null>(null);
+  const [tripStarted, setTripStarted] = useState(false);
+
+  useEffect(() => {
+    async function checkActiveTrip() {
+      const active = await getActiveTrip(driverId);
+      setInActiveTrip(!!active);
+    }
+    checkActiveTrip();
+  }, [driverId]);
+
   const handleRevert = async () => {
-    setLoading(true);
     const res = await revertOrderToAssigned(order.id);
-    setLoading(false);
     if (res.success) {
       setError(null);
       router.refresh();
@@ -267,8 +247,19 @@ export default function ActiveTrip({ order, disableAllActions = false }: { order
       setError(res.error || 'فشل في إرجاع الطلب');
     }
   };
-  const handleStartTrip = () => { /* TODO: implement start trip logic */ };
-  const whatsappMessage = `طلبك قيد التوصيل! يمكنك تتبع السائق عبر هذا الرابط: https://yourapp.com/track/${order.id}`;
+
+  const handleStartTrip = async () => {
+    setTripError(null);
+    setTripLoading(true);
+    const res = await startTrip(order.id, driverId, '24.7136', '46.6753'); // Mock coordinates for now
+    setTripLoading(false);
+    if (!res.success) {
+      setTripError(res.error);
+    } else {
+      setTripStarted(true);
+      setTripError(null);
+    }
+  };
   return (
     <div className={`flex flex-col items-center justify-center gap-2 bg-background p-2 ${disableAllActions ? 'opacity-60' : ''}`}>
       {error && (
@@ -277,16 +268,33 @@ export default function ActiveTrip({ order, disableAllActions = false }: { order
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+      {tripError && (
+        <Alert variant='destructive' className='mb-2 w-full max-w-md'>
+          <AlertTitle>خطأ</AlertTitle>
+          <AlertDescription>{tripError}</AlertDescription>
+        </Alert>
+      )}
       <OrderSummary order={order} />
       <AddressSection order={order} />
       <ProductList order={order} />
       {disableAllActions ? (
         <RevertButton onRevert={handleRevert} />
-      ) : !inActiveTrip ? (
-        <PreTripActions
-          onStartTrip={handleStartTrip}
-          onRevert={handleRevert}
-        />
+      ) : inActiveTrip === false ? (
+        // Minimal UI: Start trip
+        <div className='w-full flex flex-col gap-2 mt-4'>
+          <StartNewTripButton order={order} driverId={driverId} disabled={tripStarted} />
+          <Button variant='destructive' className='w-full mt-2' onClick={handleRevert}>
+            إرجاع الطلب
+          </Button>
+        </div>
+      ) : inActiveTrip === true ? (
+        // Minimal UI: Resume trip
+        <div className='w-full flex flex-col gap-2 mt-4'>
+          <ResumeTripButton order={order} driverId={driverId} disabled={tripStarted} />
+          <Button variant='destructive' className='w-full mt-2' onClick={handleRevert}>
+            إرجاع الطلب
+          </Button>
+        </div>
       ) : null}
       {/* Sticky Status Bar */}
       <div className='fixed bottom-0 left-0 right-0 flex items-center justify-around border-t border-border bg-muted p-2 shadow-lg'>

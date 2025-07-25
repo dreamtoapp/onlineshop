@@ -62,7 +62,7 @@ async function Page() {
     const order = ordersToShip[0];
     return (
       <div className='flex flex-col gap-4 p-4'>
-        <ActiveTrip order={order} disableAllActions={false} />
+        <ActiveTrip order={order} disableAllActions={false} driverId={driverId} />
       </div>
     );
   } catch {

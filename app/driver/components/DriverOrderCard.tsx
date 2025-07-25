@@ -8,7 +8,8 @@ import {
 import { Icon } from '@/components/icons/Icon';
 import { Order } from '@/types/databaseTypes';
 
-import { setOrderInTransit, startTrip } from '../actions/startTrip';
+import { startTrip } from '../actions/startTrip';
+import { setOrderInTransit } from '../actions/setOrderInTransit';
 
 export default function DriverOrderCard({ order, activeTrip }: { order: Order, activeTrip: boolean }) {
   // Helper: Status badge
@@ -120,7 +121,7 @@ export default function DriverOrderCard({ order, activeTrip }: { order: Order, a
         {total}
         <CardFooter className='mt-4 flex flex-col gap-2'>
           <Button size='lg' className='w-full text-lg' variant='default' onClick={async () => {
-            const res = await setOrderInTransit(order.id);
+            const res = await setOrderInTransit(order.id, order.driver?.id ?? '');
             if (res.success) toast.success('تم تحديث حالة الطلب');
             else toast.error(res.error);
           }}>

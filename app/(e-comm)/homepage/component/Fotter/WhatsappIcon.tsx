@@ -4,6 +4,7 @@ const WHATSAPP_GREEN = '#25D366';
 
 const WhatsappIcon = ({
     fill = WHATSAPP_GREEN,
+    className,
     ...props
 }: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -12,6 +13,7 @@ const WhatsappIcon = ({
         xmlns="http://www.w3.org/2000/svg"
         fill={fill}
         aria-label="WhatsApp"
+        className={className}
         {...props}
     >
         <title>WhatsApp</title>

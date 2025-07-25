@@ -27,7 +27,7 @@ interface Props {
   driverName: string;
 }
 
-function StartTrip({ orderId, driverId, latitude, longitude, driverName }: Props) {
+function StartTrip({ orderId, driverId, latitude, longitude }: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);

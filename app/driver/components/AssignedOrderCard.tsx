@@ -5,7 +5,7 @@ import CancelOrder from '../components/CancelOrder';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { setOrderInTransit } from '../actions/setOrderInTransit';
-import { toast } from 'sonner';
+
 import {
     AlertDialog,
     AlertDialogContent,

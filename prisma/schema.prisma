@@ -161,8 +161,7 @@ model User {
   cart          Cart?          // User's cart
   UserNotification  UserNotification[]
   errorLogs     ErrorLog[]
-  pushSubscription PushSubscription?
-
+  pushSubscriptions PushSubscription[] // Change to one-to-many
   // Driver-specific fields
   vehicleType       VehicleType? // Type of vehicle for drivers
   vehiclePlateNumber String?     // Vehicle plate number
@@ -257,6 +256,7 @@ model ActiveTrip {
   orderNumber String?
   latitude    String?
   longitude   String?
+  updateCount Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -793,13 +793,15 @@ enum ErrorStatus {
 
 model PushSubscription {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @unique @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  endpoint  String
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  userName  String?
+  role      String?  // Store the user's role (ADMIN, DRIVER, etc.)
+  endpoint  String   @unique
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("push_subscriptions")
+  // @@map("push_subscriptions")
 }

@@ -13,7 +13,7 @@ const getInitial = (name?: string) => {
   return name.trim().charAt(0).toUpperCase();
 };
 
-const DriverHeader = ({ drivername = 'السائق', driverId, avatarUrl }: DriverHeaderProps) => {
+const DriverHeader = ({ drivername = 'السائق', avatarUrl }: DriverHeaderProps) => {
   return (
     <header className="fixed top-0 z-50 w-full bg-background/98 backdrop-blur-md border-b border-border h-14 flex items-center justify-center">
       <div className="flex w-full max-w-md h-full items-center justify-between px-4">

@@ -4,7 +4,7 @@ import {
 } from '@/constant/order-status';
 
 import { getOrderByStatus } from '../actions/getOrderByStatus';
-import { getActiveTrip } from '../actions/getActiveTrip';
+
 import AssignedOrderCard from '../components/AssignedOrderCard';
 
 async function page({
@@ -41,7 +41,6 @@ async function page({
       normalizedStatus = ORDER_STATUS.ASSIGNED;
   }
   const orders = await getOrderByStatus(driverId, normalizedStatus);
-  const activeTrip = await getActiveTrip(driverId);
   let title = '';
   if (status === ORDER_STATUS.IN_TRANSIT) {
     title = '    📦 قائمة التسليم ';
@@ -72,7 +71,6 @@ async function page({
             key={order.id}
             order={order}
             driverId={driverId}
-            activeTrip={activeTrip}
           />
         ))
       ) : (
