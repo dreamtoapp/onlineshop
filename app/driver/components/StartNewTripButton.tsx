@@ -12,15 +12,17 @@ interface StartNewTripButtonProps {
     order: Order;
     driverId: string;
     disabled?: boolean;
+    tripStarted: boolean;
+    setTripStarted: (started: boolean) => void;
+    onTripStarted: () => void;
 }
 
 const INTERVAL_SECONDS = 30;
 
-const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId, disabled }) => {
+const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId, disabled, tripStarted, setTripStarted, onTripStarted }) => {
     const { getLocation, loading } = useDriverGeolocation();
     const [tripLoading, setTripLoading] = useState(false);
     const [tripError, setTripError] = useState<string | null>(null);
-    const [tripStarted, setTripStarted] = useState(false);
     const [secondsElapsed, setSecondsElapsed] = useState(0);
     const [progressPercent, setProgressPercent] = useState(0);
     const [backendUpdating, setBackendUpdating] = useState(false);
@@ -73,7 +75,7 @@ const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId
                 setTripLoading(false);
                 return;
             }
-            setTripStarted(true);
+            onTripStarted();
         } catch (err: any) {
             setTripError(err.message || 'تعذر تحديد الموقع');
         }
@@ -82,7 +84,6 @@ const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId
 
     return (
         <div className='w-full'>
-            {/* SOLD badge removed */}
             <div className='mb-4 flex items-center gap-2' style={{ opacity: tripStarted ? 1 : 0.3 }}>
                 <div className='w-full px-4'>
                     <Progress value={progressPercent} className='w-full h-3' />

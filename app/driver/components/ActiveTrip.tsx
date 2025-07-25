@@ -19,6 +19,10 @@ import StartNewTripButton from './StartNewTripButton';
 import ResumeTripButton from './ResumeTripButton';
 import { getActiveTrip } from '../actions/getActiveTrip';
 import { useEffect } from 'react';
+import { RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { deleverOrder } from '../actions/deleverOrder';
+import CancelOrder from './CancelOrder';
 // Small components for clarity
 function OrderSummary({ order }: { order: Order }) {
   return (
@@ -229,6 +233,7 @@ export default function ActiveTrip({ order, disableAllActions = false, driverId 
   const [tripLoading, setTripLoading] = useState(false);
   const [tripError, setTripError] = useState<string | null>(null);
   const [tripStarted, setTripStarted] = useState(false);
+  const [tripResumed, setTripResumed] = useState(false);
 
   useEffect(() => {
     async function checkActiveTrip() {
@@ -260,6 +265,19 @@ export default function ActiveTrip({ order, disableAllActions = false, driverId 
       setTripError(null);
     }
   };
+
+  const handleDeliver = async () => {
+    await deleverOrder(order.id);
+    if (typeof window !== 'undefined') {
+      const Swal = (await import('sweetalert2')).default;
+      await Swal.fire({
+        icon: 'success',
+        title: 'تم التسليم بنجاح!',
+        text: 'يمكنك الآن اختيار طلب جديد. شكراً لجهودك!'
+      });
+      window.location.reload();
+    }
+  };
   return (
     <div className={`flex flex-col items-center justify-center gap-2 bg-background p-2 ${disableAllActions ? 'opacity-60' : ''}`}>
       {error && (
@@ -282,18 +300,118 @@ export default function ActiveTrip({ order, disableAllActions = false, driverId 
       ) : inActiveTrip === false ? (
         // Minimal UI: Start trip
         <div className='w-full flex flex-col gap-2 mt-4'>
-          <StartNewTripButton order={order} driverId={driverId} disabled={tripStarted} />
-          <Button variant='destructive' className='w-full mt-2' onClick={handleRevert}>
-            إرجاع الطلب
-          </Button>
+          <StartNewTripButton order={order} driverId={driverId} disabled={tripStarted} tripStarted={tripStarted} setTripStarted={setTripStarted} onTripStarted={() => setTripStarted(true)} />
+          <div className='flex flex-row gap-2 w-full mt-2'>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className='flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300'>
+                  <RotateCcw className='h-5 w-5' /> إرجاع الطلب
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>تأكيد إرجاع الطلب</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    سيعود الطلب إلى قائمة الطلبات قيد التوصيل، ولن يتم حذفه أو إلغاء ارتباطه بك مباشرة. هل أنت متأكد أنك تريد إرجاع الطلب؟
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className='flex flex-row gap-4 mt-4'>
+                  <AlertDialogCancel className='flex-1 flex items-center justify-center gap-2 bg-gray-800 text-white hover:bg-gray-900'>
+                    <XCircle className='h-5 w-5' /> إلغاء
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild onClick={handleRevert}>
+                    <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700'>
+                      <CheckCircle2 className='h-5 w-5' /> نعم، إرجاع الطلب
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700' disabled={!tripStarted}>
+                  <CheckCircle2 className='h-5 w-5' /> تسليم
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>تأكيد تسليم الطلب</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    هل وصلت بالسلامة الحمدلله للعميل {order.customer?.name || ''}؟
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className='flex flex-row gap-4 mt-4'>
+                  <AlertDialogCancel className='flex-1 flex items-center justify-center gap-2 bg-gray-800 text-white hover:bg-gray-900'>
+                    <XCircle className='h-5 w-5' /> إلغاء
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700' onClick={handleDeliver}>
+                      <CheckCircle2 className='h-5 w-5' /> نعم، أرغب بتسليم
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <CancelOrder orderId={order.id} orderNumber={order.orderNumber} driverId={driverId} driverName={order.driver?.name || ''} />
+          </div>
         </div>
       ) : inActiveTrip === true ? (
         // Minimal UI: Resume trip
         <div className='w-full flex flex-col gap-2 mt-4'>
-          <ResumeTripButton order={order} driverId={driverId} disabled={tripStarted} />
-          <Button variant='destructive' className='w-full mt-2' onClick={handleRevert}>
-            إرجاع الطلب
-          </Button>
+          <ResumeTripButton order={order} driverId={driverId} />
+          <div className='flex flex-row gap-2 w-full mt-2'>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className='flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300'>
+                  <RotateCcw className='h-5 w-5' /> إرجاع الطلب
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>تأكيد إرجاع الطلب</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    سيعود الطلب إلى قائمة الطلبات قيد التوصيل، ولن يتم حذفه أو إلغاء ارتباطه بك مباشرة. هل أنت متأكد أنك تريد إرجاع الطلب؟
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className='flex flex-row gap-4 mt-4'>
+                  <AlertDialogCancel className='flex-1 flex items-center justify-center gap-2 bg-gray-800 text-white hover:bg-gray-900'>
+                    <XCircle className='h-5 w-5' /> إلغاء
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild onClick={handleRevert}>
+                    <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700'>
+                      <CheckCircle2 className='h-5 w-5' /> نعم، إرجاع الطلب
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700'>
+                  <CheckCircle2 className='h-5 w-5' /> تسليم
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>تأكيد تسليم الطلب</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    هل وصلت بالسلامة الحمدلله للعميل {order.customer?.name || ''}؟
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className='flex flex-row gap-4 mt-4'>
+                  <AlertDialogCancel className='flex-1 flex items-center justify-center gap-2 bg-gray-800 text-white hover:bg-gray-900'>
+                    <XCircle className='h-5 w-5' /> إلغاء
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button className='flex-1 flex items-center justify-center gap-2 bg-green-600 text-white hover:bg-green-700' onClick={handleDeliver}>
+                      <CheckCircle2 className='h-5 w-5' /> نعم، أرغب بتسليم
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <CancelOrder orderId={order.id} orderNumber={order.orderNumber} driverId={driverId} driverName={order.driver?.name || ''} />
+          </div>
         </div>
       ) : null}
       {/* Sticky Status Bar */}

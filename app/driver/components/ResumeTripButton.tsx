@@ -19,12 +19,12 @@ const ResumeTripButton: React.FC<ResumeTripButtonProps> = ({ order, driverId, di
     const { getLocation, loading } = useDriverGeolocation();
     const [tripLoading, setTripLoading] = useState(false);
     const [tripError, setTripError] = useState<string | null>(null);
-    const [tripResumed, setTripResumed] = useState(false);
     const [secondsElapsed, setSecondsElapsed] = useState(0);
     const [progressPercent, setProgressPercent] = useState(0);
     const [backendUpdating, setBackendUpdating] = useState(false);
     const progressRef = useRef<NodeJS.Timeout | null>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [tripResumed, setTripResumed] = useState(false);
 
     useEffect(() => {
         if (tripResumed) {
