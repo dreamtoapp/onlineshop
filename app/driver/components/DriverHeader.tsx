@@ -1,5 +1,6 @@
 'use client';
 import { Icon } from '@/components/icons/Icon';
+import { signOut } from 'next-auth/react';
 
 interface DriverHeaderProps {
   drivername?: string;
@@ -32,15 +33,17 @@ const DriverHeader = ({ drivername = 'السائق', avatarUrl }: DriverHeaderPr
           <span className="text-lg font-bold text-primary-foreground">{drivername}</span>
         </div>
         <button
-          className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/80 text-primary focus:outline-none"
+          className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/80 text-destructive focus:outline-none"
           onClick={() => {
-            if (window.confirm('هل تريد تسجيل الخروج؟')) {
-              window.location.href = '/api/auth/signout';
+            if (typeof signOut === 'function') {
+              signOut({ callbackUrl: '/' });
+            } else {
+              window.location.href = '/api/auth/signout?callbackUrl=/';
             }
           }}
           aria-label="تسجيل الخروج"
         >
-          <Icon name="LogOut" className="h-5 w-5" />
+          <Icon name="LogOut" className="h-6 w-6" />
         </button>
       </div>
     </header>

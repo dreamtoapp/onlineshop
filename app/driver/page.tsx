@@ -53,7 +53,7 @@ async function Page() {
             يوجد أكثر من طلب جاري التوصيل. يرجى إرجاع الطلبات الزائدة إلى قائمة التعيين.
           </div>
           {ordersToShip.map((order: any) => (
-            <ActiveTrip key={order.id} order={order} disableAllActions={true} />
+            <ActiveTrip key={order.id} order={order} disableAllActions={true} driverId={driverId} />
           ))}
         </div>
       );

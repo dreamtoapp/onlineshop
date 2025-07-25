@@ -135,12 +135,13 @@ function AssignedOrderAddress({ order }: any) {
 function AssignedOrderFooter({ order, driverId }: any) {
     return (
         <CardFooter className='w-full flex justify-between items-center gap-4'>
-            <CancelOrder
+            {order.status === 'ASSIGNED' && (<CancelOrder
                 orderId={order.id}
                 orderNumber={order.orderNumber ?? ''}
                 driverId={driverId}
                 driverName={order.customerName ?? ''}
-            />
+            />)}
+
             <div className='flex gap-2 items-center'>
                 {order.customer?.phone && (
                     <a href={`tel:${order.customer.phone}`} className='flex items-center justify-center rounded-lg bg-muted/80 text-primary h-9 w-9  '>

@@ -1,6 +1,6 @@
 "use client";
 import { Icon } from '@/components/icons/Icon';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FooterTabsProps {
     assignedOrders: number;
