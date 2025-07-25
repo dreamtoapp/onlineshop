@@ -7,7 +7,7 @@ import {
 import db from '@/lib/prisma';
 
 export const deleverOrder = async (orderId: string) => {
-  const existingOrder = await db.order.update({
+  await db.order.update({
     where: { id: orderId },
     data: { status: ORDER_STATUS.DELIVERED },
   });

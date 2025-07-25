@@ -1,6 +1,5 @@
 import {
   ORDER_STATUS,
-  OrderStatus,
 } from '@/constant/order-status';
 
 import { getOrderByStatus } from '../actions/getOrderByStatus';

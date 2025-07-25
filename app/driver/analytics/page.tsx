@@ -9,7 +9,6 @@ interface MonthlyData { month: string; count: number; }
 export default function DriverAnalyticsPage() {
     const [delivered, setDelivered] = useState<number>(0);
     const [canceled, setCanceled] = useState<number>(0);
-    const [assigned, setAssigned] = useState<number>(0);
     const [revenue, setRevenue] = useState<number>(0);
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
     const [monthly, setMonthly] = useState<MonthlyData[]>([]);
@@ -21,12 +20,10 @@ export default function DriverAnalyticsPage() {
             const driverId = new URLSearchParams(window.location.search).get("driverId") || "";
             const deliveredRes = await getOrderByStatus(driverId, "DELIVERED");
             const canceledRes = await getOrderByStatus(driverId, "CANCELED");
-            const assignedRes = await getOrderByStatus(driverId, "ASSIGNED");
             const deliveredOrders = deliveredRes.ordersToShip || [];
             const canceledOrders = canceledRes.ordersToShip || [];
             setDelivered(deliveredOrders.length);
             setCanceled(canceledOrders.length);
-            setAssigned((assignedRes.ordersToShip || []).length);
             setRevenue(deliveredOrders.reduce((sum, o) => sum + (o.amount || 0), 0));
             setRecentOrders([
                 ...deliveredOrders.slice(0, 3).map((o: Order) => ({ ...o, status: "DELIVERED" })),
@@ -69,7 +66,7 @@ export default function DriverAnalyticsPage() {
                 <h2 className="text-base font-semibold mb-2 flex items-center gap-2"><Icon name="BarChart3" className="h-5 w-5 text-info" />تسليمات الشهر</h2>
                 <div className="flex items-end gap-2 h-24">
                     {monthly.length === 0 && <span className="text-xs text-muted-foreground">لا يوجد بيانات</span>}
-                    {monthly.map((m, i) => (
+                    {monthly.map((m) => (
                         <div key={m.month} className="flex flex-col items-center justify-end">
                             <div className="bg-primary/70 rounded w-6" style={{ height: `${Math.max(10, m.count * 12)}px` }} />
                             <span className="text-[10px] mt-1">{m.month.split('-')[1]}/{m.month.split('-')[0]}</span>
@@ -81,7 +78,7 @@ export default function DriverAnalyticsPage() {
                 <h2 className="text-base font-semibold mb-2 flex items-center gap-2"><Icon name="UserCheck" className="h-5 w-5 text-info" />آخر الطلبات</h2>
                 <ul className="flex flex-col gap-2">
                     {recentOrders.length === 0 && <li className="text-xs text-muted-foreground">لا يوجد طلبات حديثة</li>}
-                    {recentOrders.map((o, i) => (
+                    {recentOrders.map((o) => (
                         <li key={o.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent">
                             <Icon name={o.status === "DELIVERED" ? "CheckCircle" : "XCircle"} className={`h-5 w-5 ${o.status === "DELIVERED" ? "text-success" : "text-destructive"}`} />
                             <span className="text-xs font-bold">{o.orderNumber}</span>

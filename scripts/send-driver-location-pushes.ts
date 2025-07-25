@@ -14,12 +14,12 @@ webpush.setVapidDetails(VAPID_CONFIG.subject, VAPID_CONFIG.publicKey, VAPID_CONF
 async function sendLocationUpdatePushes() {
   // 1. Find all active trips with driver and push subscription
   const activeTrips = await db.activeTrip.findMany({
-    include: { driver: { include: { pushSubscription: true } } }
+    include: { driver: { include: { pushSubscriptions: true } } }
   });
 
   console.log(`DEBUG: Found ${activeTrips.length} active trips`);
   for (const trip of activeTrips) {
-    const subscription = trip.driver?.pushSubscription;
+    const subscription = trip.driver?.pushSubscriptions?.[0];
     if (!subscription) {
       console.log(`DEBUG: No push subscription for driver ${trip.driverId}`);
       continue;

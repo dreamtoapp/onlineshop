@@ -18,9 +18,9 @@ interface StartNewTripButtonProps {
     isResume?: boolean;
 }
 
-const INTERVAL_SECONDS = 30;
+const INTERVAL_SECONDS = 600; // 10 minutes
 
-const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId, disabled, tripStarted, setTripStarted = () => { }, onTripStarted = () => { }, isResume = false }) => {
+const StartNewTripButton: React.FC<StartNewTripButtonProps> = ({ order, driverId, disabled, tripStarted, onTripStarted = () => { }, isResume = false }) => {
     const { getLocation, loading } = useDriverGeolocation();
     const [tripLoading, setTripLoading] = useState(false);
     const [tripError, setTripError] = useState<string | null>(null);

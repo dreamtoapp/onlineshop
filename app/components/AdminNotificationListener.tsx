@@ -1,7 +1,6 @@
 'use client';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface AdminNotificationListenerProps {
@@ -10,7 +9,6 @@ interface AdminNotificationListenerProps {
 
 export default function AdminNotificationListener({ showToast = true }: AdminNotificationListenerProps) {
     const { data: session } = useSession();
-    const router = useRouter();
 
     useEffect(() => {
         if (!session?.user?.id || !['ADMIN', 'MARKETER'].includes(session.user.role)) {

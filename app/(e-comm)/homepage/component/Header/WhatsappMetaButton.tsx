@@ -3,15 +3,12 @@ import { Button, ButtonProps } from '../../../../../components/ui/button';
 import * as React from 'react';
 import CustomSvgIcon from '../Fotter/CustomSvgIcon';
 
-const WHATSAPP_GREEN = '#25D366';
-const MAX_LENGTH = 1000;
-
 interface WhatsappMetaButtonProps extends Omit<ButtonProps, 'onClick'> {
     phone?: string; // Optional: allow custom phone number
     defaultMessage?: string;
 }
 
-const WhatsappMetaButton: React.FC<WhatsappMetaButtonProps> = ({ phone = '', defaultMessage = '', ...props }) => {
+const WhatsappMetaButton: React.FC<WhatsappMetaButtonProps> = ({ phone = '', defaultMessage = '' }) => {
     // Compose WhatsApp URL
     const handleClick = () => {
         const base = phone ? `https://wa.me/${phone}` : 'https://wa.me/';

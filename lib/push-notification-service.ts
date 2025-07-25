@@ -40,7 +40,7 @@ export class PushNotificationService {
     try {
       // Get user's push subscription
       const subscription = await db.pushSubscription.findUnique({
-        where: { userId }
+        where: { id: userId }
       });
 
       if (!subscription) {
@@ -71,7 +71,7 @@ export class PushNotificationService {
       // If subscription is invalid, remove it
       if (error instanceof Error && error.message.includes('410')) {
         await db.pushSubscription.delete({
-          where: { userId }
+          where: { id: userId }
         });
         console.log(`🗑️ Removed invalid subscription for user ${userId}`);
       }

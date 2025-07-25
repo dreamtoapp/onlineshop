@@ -11,7 +11,7 @@ export async function syncActiveTrip() {
     let addedCount = 0;
     for (const order of tripOrders) {
       if (!order.driverId) continue;
-      const existing = await db.activeTrip.findUnique({ where: { driverId: order.driverId } });
+      const existing = await db.activeTrip.findUnique({ where: { orderId_driverId: { orderId: order.id, driverId: order.driverId } } });
       if (!existing) {
                   await db.activeTrip.create({
           data: {

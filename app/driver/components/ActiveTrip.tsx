@@ -14,15 +14,14 @@ import WhatsappShareButton from '@/components/WhatsappShareButton';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
-import { startTrip } from '../actions/startTrip';
-import StartNewTripButton from './StartNewTripButton';
-import ResumeTripButton from './ResumeTripButton';
 import { getActiveTrip } from '../actions/getActiveTrip';
 import { useEffect } from 'react';
 import { RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { deleverOrder } from '../actions/deleverOrder';
 import CancelOrder from './CancelOrder';
+import StartNewTripButton from './StartNewTripButton';
+import ResumeTripButton from './ResumeTripButton';
 // Small components for clarity
 function OrderSummary({ order }: { order: Order }) {
   return (
@@ -206,34 +205,13 @@ function RevertButton({ onRevert }: { onRevert: () => void }) {
 
 
 
-function PreTripActions({ onStartTrip, onRevert }: {
-  onStartTrip: () => void,
-  onRevert: () => void,
-}) {
-  return (
-    <div className='w-full flex flex-col gap-2 mt-4'>
-      <Button variant='default' className='w-full h-16' onClick={onStartTrip}>ابدء رحلتك</Button>
-      <div className='flex items-center justify-center gap-2'>
-        <Button variant='destructive' className='w-full' onClick={onRevert}>
-          <Icon name="Undo" className="ml-2" /> إرجاع الطلب
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-
-
 export default function ActiveTrip({ order, disableAllActions = false, driverId }: { order: Order, disableAllActions?: boolean, driverId: string }) {
   const customerLocation = '24.7136,46.6753';
   const googleMapsLink = `https://www.google.com/maps?q=${customerLocation}`;
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [inActiveTrip, setInActiveTrip] = useState<boolean | null>(null);
-  const [tripLoading, setTripLoading] = useState(false);
-  const [tripError, setTripError] = useState<string | null>(null);
   const [tripStarted, setTripStarted] = useState(false);
-  const [tripResumed, setTripResumed] = useState(false);
 
   useEffect(() => {
     async function checkActiveTrip() {
@@ -250,19 +228,6 @@ export default function ActiveTrip({ order, disableAllActions = false, driverId 
       router.refresh();
     } else {
       setError(res.error || 'فشل في إرجاع الطلب');
-    }
-  };
-
-  const handleStartTrip = async () => {
-    setTripError(null);
-    setTripLoading(true);
-    const res = await startTrip(order.id, driverId, '24.7136', '46.6753'); // Mock coordinates for now
-    setTripLoading(false);
-    if (!res.success) {
-      setTripError(res.error);
-    } else {
-      setTripStarted(true);
-      setTripError(null);
     }
   };
 
@@ -286,12 +251,12 @@ export default function ActiveTrip({ order, disableAllActions = false, driverId 
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      {tripError && (
+      {/* Remove: tripError && (
         <Alert variant='destructive' className='mb-2 w-full max-w-md'>
           <AlertTitle>خطأ</AlertTitle>
           <AlertDescription>{tripError}</AlertDescription>
         </Alert>
-      )}
+      ) */}
       <OrderSummary order={order} />
       <AddressSection order={order} />
       <ProductList order={order} />

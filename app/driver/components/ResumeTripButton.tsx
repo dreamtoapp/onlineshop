@@ -13,7 +13,7 @@ interface ResumeTripButtonProps {
     disabled?: boolean;
 }
 
-const INTERVAL_SECONDS = 30;
+const INTERVAL_SECONDS = 600; // 10 minutes
 
 const ResumeTripButton: React.FC<ResumeTripButtonProps> = ({ order, driverId, disabled }) => {
     const { getLocation, loading } = useDriverGeolocation();
