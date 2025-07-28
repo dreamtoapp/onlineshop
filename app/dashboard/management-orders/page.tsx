@@ -1,6 +1,6 @@
 
-import { fetchOrdersAction } from '../management-dashboard/action/fetchOrders';
 import { getOrderCounts } from './actions/get-order-counts';
+import { fetchOrdersAction } from './actions/getAllOrders';
 import OrderManagementView from './components/OrderManagementView';
 
 export default async function OrdersManagementPage({

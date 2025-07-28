@@ -32,16 +32,19 @@ export default async function CategoriesPage() {
                         className="group relative col-span-1 h-80 overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-lg sm:col-span-2 lg:col-span-8 lg:h-[500px]"
                     >
                         {/* Featured category background */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 flex items-center justify-center w-full">
+
                             {categories[0].imageUrl ? (
-                                <Image
-                                    src={categories[0].imageUrl}
-                                    alt={categories[0].name}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 66vw"
-                                    priority
-                                />
+                                <div className="relative h-[400px] w-[400px]">
+                                    <Image
+                                        src={categories[0].imageUrl}
+                                        alt={categories[0].name}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 66vw"
+                                        priority
+                                    />
+                                </div>
                             ) : (
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/80" />
                             )}
@@ -79,13 +82,13 @@ export default async function CategoriesPage() {
                             key={category.id}
                             className="group flex aspect-square flex-col overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md"
                         >
-                            <div className="relative flex-1 overflow-hidden">
+                            <div className="relative w-full h-full overflow-hidden">
                                 {category.imageUrl ? (
                                     <Image
                                         src={category.imageUrl}
                                         alt={category.name}
                                         fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="object-cover transition-transform duration-500 group-hover:scale-105 p-2"
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 25vw, 16vw"
                                     />
                                 ) : (
@@ -131,7 +134,7 @@ export default async function CategoriesPage() {
                                     )}
                                 </div>
 
-                                <div className="flex flex-col bg-card p-3">
+                                <div className="bg-card p-3">
                                     <h3 className="font-medium">{category.name}</h3>
                                     <span className="mt-1 text-xs text-muted-foreground">
                                         {category.productCount} منتج

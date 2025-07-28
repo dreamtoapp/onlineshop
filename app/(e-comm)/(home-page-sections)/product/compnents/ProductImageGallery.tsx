@@ -31,16 +31,18 @@ export default function ProductImageGallery({
   };
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 h-full w-full max-h-[400px] max-w-[400px]'>
       <div className='relative aspect-square overflow-hidden rounded-lg bg-muted'>
         <div className='h-full w-full cursor-pointer' onClick={() => setIsFullscreen(true)}>
-          <Image
-            src={allImages[currentImage]}
-            alt='صورة المنتج'
-            fill
-            priority
-            className='object-cover object-center'
-          />
+          <div className='relative h-full w-full max-h-[400px] max-w-[400px]'>
+            <Image
+              src={allImages[currentImage]}
+              alt='صورة المنتج'
+              fill
+              priority
+              className='object-cover object-center'
+            />
+          </div>
         </div>
 
         {allImages.length > 1 && (
@@ -73,8 +75,8 @@ export default function ProductImageGallery({
           className='absolute bottom-2 right-2 h-8 w-8 rounded-full bg-background/80 shadow-sm'
           onClick={() => setIsFullscreen(true)}
         >
-          <Icon name="Expand" size="xs" className={iconVariants({ size: 'xs' })} />
-          <span className='sr-only'>تكبير</span>
+          <Icon name="Expand" size="xs" />
+          {/* <span className='sr-only'>تكبير</span> */}
         </Button>
       </div>
 

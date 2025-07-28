@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, CheckCircle } from "lucide-react";
-import InfoTooltip from '@/components/ui/InfoTooltip';
+import InfoTooltip from '@/components/InfoTooltip';
 import { createDraftOrder } from '../actions/orderActions';
 import { UserProfile } from './UserInfoCard';
 import { AddressWithDefault } from "./AddressBook";
@@ -106,7 +106,7 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
                 </Button>
                 {!isValid && (
                     <InfoTooltip
-                        message={<>{infoMessage}</>}
+                        content={infoMessage}
                     />
                 )}
             </div>

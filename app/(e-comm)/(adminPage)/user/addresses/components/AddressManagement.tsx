@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Plus, MapPin, Edit, Trash2, Star, Home, Building, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -13,6 +13,8 @@ import AddressForm from './AddressForm';
 import { getAddresses, deleteAddress, setDefaultAddress } from '../actions/addressActions';
 import { toast } from 'sonner';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
+import Link from '@/components/link';
+import { Icon } from '@/components/icons/Icon';
 
 interface Address {
     id: string;
@@ -169,10 +171,21 @@ export default function AddressManagement({ userId }: AddressManagementProps) {
                     <h1 className="text-2xl font-bold text-foreground">إدارة العناوين</h1>
                     <p className="text-muted-foreground">أضف أو عدّل عناوين التوصيل الخاصة بك</p>
                 </div>
-                <Button onClick={handleAddAddress} className="btn-add">
-                    <Plus className="h-4 w-4 ml-2" />
-                    إضافة عنوان
-                </Button>
+                <div className="flex items-center gap-2">
+
+                    <Link href="/" className={buttonVariants({ variant: "default" })}>
+                        <Icon name='ShoppingBag' className="h-4 w-4 ml-2" />
+                        تسوق الان
+                    </Link>
+
+
+
+                    <Button onClick={handleAddAddress} className="btn-add">
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة عنوان
+                    </Button>
+
+                </div>
             </div>
 
             {/* Addresses List */}

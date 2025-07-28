@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Search, Grid3X3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import Link from '@/components/link';
 
 export default function EmptyWishlist() {
@@ -15,18 +15,16 @@ export default function EmptyWishlist() {
                     لم تقم بإضافة أي منتجات إلى المفضلة بعد. تصفح متجرنا واكتشف المنتجات الرائعة وأضفها إلى مفضلتك!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button asChild className="btn-add">
-                        <Link href='/'>
-                            <Search className="w-4 h-4 mr-2" />
-                            تصفح المنتجات
-                        </Link>
-                    </Button>
-                    <Button variant="outline" asChild className="btn-view-outline">
-                        <Link href='/categories'>
-                            <Grid3X3 className="w-4 h-4 mr-2" />
-                            عرض الفئات
-                        </Link>
-                    </Button>
+                    <Link href='/' className={buttonVariants({
+                        variant: "default",
+                        className: "btn-add flex items-center gap-2 px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-200"
+                    })}>
+                        <Search className="w-4 h-4 mr-2" />
+                        تصفح المنتجات
+                    </Link>
+
+
+
                 </div>
             </CardContent>
         </Card>

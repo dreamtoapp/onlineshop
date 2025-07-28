@@ -12,7 +12,7 @@ export default function ProductQuantity({ product }: { product: Product }) {
   const isInCart = cartQuantity > 0;
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 flex  items-center justify-between w-full'>
       {isInCart ? (
         <div className="flex items-center justify-center">
           <CartQuantityControls productId={product.id} size="md" />
@@ -25,7 +25,7 @@ export default function ProductQuantity({ product }: { product: Product }) {
           size='lg'
         />
       )}
-      <div className='flex flex-wrap gap-3 pt-2'>
+      <div className='flex flex-wrap gap-3 border border-primary rounded-full p-2'>
         <WishlistButton productId={product.id} className='p-2' size='lg' showBackground={true} />
       </div>
     </div>

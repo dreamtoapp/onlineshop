@@ -1,39 +1,55 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import {
+  Award,
+  Camera,
+  CheckCircle,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  Phone,
+  Settings,
+  Shield,
+  User,
+} from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import {
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTheme } from 'next-themes';
-import { useSession } from 'next-auth/react';
-import {
-  User,
-  Mail,
-  Phone,
-  Lock,
-  MapPin,
-  CheckCircle,
-  Shield,
-  Camera,
-  Award,
-  Settings,
-  LogOut,
-} from 'lucide-react';
-import Image from 'next/image';
 
 import FormError from '@/components/form-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ActionAlert } from './ActionAlert';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { updateUserProfile } from '../action/update-user-profile';
 import { handleLogout } from '../action/logout';
-import { UserFormData, UserSchema } from '../helper/userZodAndInputs';
+import { updateUserProfile } from '../action/update-user-profile';
+import {
+  UserFormData,
+  UserSchema,
+} from '../helper/userZodAndInputs';
+import { ActionAlert } from './ActionAlert';
 
 // Circular Profile Image Component
 function CircularProfileImage({
@@ -170,11 +186,11 @@ function ProfileHeader({ userData }: { userData: UserFormData }) {
             </div>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-1">
-              <Badge className="bg-feature-users/10 text-feature-users border-feature-users/20 text-xs">
+              <Badge className=" border-feature-users/20 text-xs" variant={'outline'}>
                 <Shield className="h-3 w-3 ml-1" />
                 حساب محقق
               </Badge>
-              <Badge className="bg-feature-products/10 text-feature-products border-feature-products/20 text-xs">
+              <Badge className="bg-feature-products/10 text-feature-products border-feature-products/20 text-xs " variant={'outline'}>
                 <Award className="h-3 w-3 ml-1" />
                 عضو ذهبي
               </Badge>
@@ -265,6 +281,7 @@ function PersonalInfoCard({ register, errors, isSubmitting }: {
                 type="email"
                 placeholder="example@email.com"
                 disabled={isSubmitting}
+                autoComplete="off"  // ← Add this line here
                 className="pl-10 h-10 sm:h-11 border-2 focus:border-feature-products transition-colors"
               />
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -603,12 +620,14 @@ export default function UserProfileForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect');
+
   const { update } = useSession();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setError,
   } = useForm<UserFormData>({
     resolver: zodResolver(UserSchema),
     mode: 'onChange',
@@ -622,6 +641,8 @@ export default function UserProfileForm({
     },
   });
 
+  // console.log("[DEBUG ] User data:", userData.email);
+
   const onSubmit = async (formData: UserFormData) => {
     try {
       const result = await updateUserProfile({ ...formData });
@@ -634,6 +655,18 @@ export default function UserProfileForm({
           return;
         }
       } else {
+        // Handle validation errors
+        if (result.errors && Object.keys(result.errors).length > 0) {
+          // Set form errors for specific fields
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            if (messages && messages.length > 0) {
+              setError(field as keyof UserFormData, {
+                type: 'server',
+                message: messages[0],
+              });
+            }
+          });
+        }
         toast.error(result.msg || 'حدث خطأ يرجى المحاولة لاحقاً');
       }
     } catch (err) {

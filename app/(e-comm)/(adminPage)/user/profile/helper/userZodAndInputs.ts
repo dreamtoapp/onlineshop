@@ -9,7 +9,7 @@ import { z } from 'zod';
 // Validation schema
 export const UserSchema = z.object({
   name: z.string().trim().nonempty('الاسم مطلوب'),
-  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة'),
+  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة').optional().or(z.literal('')),
   phone: z.string().trim().nonempty('رقم الهاتف مطلوب'),
   id: z.string(),
   image: z.string(),

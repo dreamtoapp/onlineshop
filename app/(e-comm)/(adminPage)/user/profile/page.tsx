@@ -19,6 +19,7 @@ async function ProfilePage() {
   const hasDefaultAddress = !!defaultAddressRes.address;
   const defaultAddress = defaultAddressRes.address || null;
 
+
   if (!userData) {
     return <EmptyState message='لم يتم العثور على بيانات المستخدم' />;
   }

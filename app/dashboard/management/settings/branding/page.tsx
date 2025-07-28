@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Palette } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -264,9 +265,11 @@ export default function BrandingPage() {
                             <div className="flex items-center gap-4 p-4 bg-muted/10 rounded-lg">
                                 {brandingData.logo && (
                                     <div className="w-16 h-16 rounded overflow-hidden bg-white">
-                                        <img
+                                        <Image
                                             src={brandingData.logo}
                                             alt="Logo"
+                                            width={64}
+                                            height={64}
                                             className="w-full h-full object-contain"
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';

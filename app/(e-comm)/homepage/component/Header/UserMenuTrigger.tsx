@@ -57,13 +57,13 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
             description: "تصفح مشترياتك",
             badge: userStats?.totalOrders && userStats.totalOrders > 0 ? userStats.totalOrders.toString() : undefined
         },
-        {
-            href: `/user/wishlist/${user.id ?? ''}`,
-            label: "المفضلة",
-            icon: "Heart",
-            description: "المنتجات المحفوظة",
-            badge: userStats?.wishlistCount && userStats?.wishlistCount > 0 ? userStats.wishlistCount.toString() : undefined
-        },
+        // {
+        //     href: `/user/wishlist/${user.id ?? ''}`,
+        //     label: "المفضلة",
+        //     icon: "Heart",
+        //     description: "المنتجات المحفوظة",
+        //     badge: userStats?.wishlistCount && userStats?.wishlistCount > 0 ? userStats.wishlistCount.toString() : undefined
+        // },
         {
             href: `/user/statement/${user.id ?? ''}`,
             label: "الحركات المالية",
@@ -77,12 +77,12 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
             description: "إدارة التقييمات",
             badge: userStats?.reviewsCount && userStats.reviewsCount > 0 ? userStats.reviewsCount.toString() : undefined
         },
-        {
-            href: `/user/notifications`,
-            label: "الإشعارات",
-            icon: "Bell",
-            description: "إدارة التنبيهات"
-        }
+        // {
+        //     href: `/user/notifications`,
+        //     label: "الإشعارات",
+        //     icon: "Bell",
+        //     description: "إدارة التنبيهات"
+        // }
     ] : [];
 
     const handleLogout = async () => {
@@ -212,7 +212,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                 {/* Enhanced Analytics - Professional UI */}
                 {userStats && (
                     <div className="mt-3 px-2">
-                        <div className="flex items-center justify-between text-[11px] font-medium">
+                        <div className="flex items-center justify-around text-[11px] font-medium">
                             <div className="flex items-center gap-1">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                                 <span className="text-blue-600 font-semibold tabular-nums">{userStats.totalOrders}</span>
@@ -233,12 +233,12 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                 )}
 
                 {/* Scrollable Navigation Items */}
-                <div className="py-1 max-h-64 overflow-y-auto">
+                <div className="py-1 max-h-72 overflow-y-auto">
                     {userNavItems.map((item, index) => (
                         <DropdownMenuItem key={index} asChild className="p-0 mx-1">
                             <Link
                                 href={item.href}
-                                className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 cursor-pointer group"
+                                className="flex items-center gap-2.5 px-2 py-3 rounded-md hover:bg-accent/50 transition-colors duration-200 cursor-pointer group"
                             >
                                 <div className="p-1 rounded bg-muted/30 group-hover:bg-muted/50 transition-colors">
                                     <Icon name={item.icon} className="w-3.5 h-3.5 text-muted-foreground" />

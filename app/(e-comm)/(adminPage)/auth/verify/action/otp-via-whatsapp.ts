@@ -84,7 +84,7 @@ export const otpViaWhatsApp = async () => {
     });
 
     // In development mode, always return fake OTP for testing
-    if (process.env.NODE_ENV === 'development' || !process.env.WHATSAPP_ACCESS_TOKEN) {
+    if (process.env.NODE_ENV === 'development' || !process.env.WHATSAPP_PERMANENT_TOKEN) {
       return {
         success: true,
         message: 'تم إرسال رمز التحقق (وهمي)',

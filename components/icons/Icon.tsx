@@ -10,7 +10,7 @@ import {
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, Menu, LocateFixed, Tag, Share2, Flame, Star, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
     ShoppingCart, ShoppingBag, CreditCard, LogOut, BookOpen, Settings, Grid3X3, Shield, BarChart3, Megaphone, Database, MousePointerBan,
-    Building2, MapPin, Cog, Palette, RotateCcw, Undo,
+    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand
 } from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)
@@ -59,7 +59,7 @@ const iconMap = {
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, LocateFixed, Tag, Menu, Star, Share2, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
     ShoppingCart, ShoppingBag, CreditCard, LogOut, Grid3X3, Settings, BookOpen, Shield, BarChart3, Megaphone, Database, MousePointerBan,
-    Building2, MapPin, Cog, Palette, RotateCcw, Undo
+    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand
 };
 
 // Types for size and variant based on iconVariants

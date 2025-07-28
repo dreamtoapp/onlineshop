@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { getUnreadNotificationCount } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/getUserNotifications';
+import { getUnreadNotificationCount } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/getUnreadNotificationCount';
 
 // 🔔 Get current unread notification count
 export async function GET() {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({
         success: false,

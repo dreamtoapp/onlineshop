@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { Icon } from '@/components/icons/Icon';
 import { signOut } from 'next-auth/react';
 
@@ -20,9 +21,11 @@ const DriverHeader = ({ drivername = 'السائق', avatarUrl }: DriverHeaderPr
       <div className="flex w-full max-w-md h-full items-center justify-between px-4">
         <div className="flex items-center gap-3">
           {avatarUrl ? (
-            <img
+            <Image
               src={avatarUrl}
               alt={drivername}
+              width={40}
+              height={40}
               className="h-10 w-10 rounded-full object-cover border-2 border-border bg-background"
             />
           ) : (

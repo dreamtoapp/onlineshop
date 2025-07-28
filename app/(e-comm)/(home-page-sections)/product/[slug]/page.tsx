@@ -1,254 +1,27 @@
+import React from 'react';
 import {
   Metadata
 } from 'next';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 import { auth } from '@/auth';
-import ProductImageGallery from '@/app/(e-comm)/(home-page-sections)/product/compnents/ProductImageGallery';
-import RelatedProducts from '@/app/(e-comm)/(home-page-sections)/product/compnents/RelatedProducts';
-import RateProductButton from '../compnents/RateProductButton';
-import RatingDisplay from '../../../(adminPage)/user/ratings/components/RatingDisplay';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import {
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { iconVariants } from '@/lib/utils';
-import { Icon } from '@/components/icons/Icon';
-import ReviewsTabsWrapper from '@/app/(e-comm)/(home-page-sections)/product/compnents/ReviewsTabsWrapper';
 import IncrementPreviewOnView from '../compnents/IncrementPreviewOnView';
+import { Separator } from '@/components/ui/separator';
+
+// Import all separated components
+import ProductImageSection from '../compnents/ProductImageSection';
+import ProductInfoSection from '../compnents/ProductInfoSection';
+import ProductPriceSection from '../compnents/ProductPriceSection';
+import ProductDescription from '../compnents/ProductDescription';
+import ProductActionsSection from '../compnents/ProductActionsSection';
+import ProductTabs from '../compnents/ProductTabs';
+import RelatedProductsSection from '../compnents/RelatedProductsSection';
 
 import {
   getProductBySlug,
   getProductReviews,
 } from '../actions/actions';
-import ProductQuantity from '../compnents/ProductQuantity';
 import { PageProps } from '@/types/commonTypes';
-
-// --- Small Components ---
-
-function ProductImageSection({ mainImage, additionalImages }: { mainImage: string, additionalImages: string[] }) {
-  return (
-    <div className='relative'>
-      <ProductImageGallery mainImage={mainImage} additionalImages={additionalImages} />
-    </div>
-  );
-}
-
-function ProductDetailsSection({ product }: { product: any }) {
-  return (
-    <div className='space-y-6'>
-      <div>
-        <h1 className='text-2xl font-bold'>{product.name}</h1>
-        <div className='mt-2 flex items-center gap-2'>
-          <RatingDisplay
-            rating={product.rating || 0}
-            reviewCount={product.reviewCount || 0}
-            productId={product.id}
-            productSlug={product.slug}
-          />
-          {!product.outOfStock ? (
-            <Badge variant='outline' className='border-green-200 bg-green-50 text-green-700'>
-              <Icon name="Check" size="xs" className={iconVariants({ size: 'xs', className: 'mr-1' })} />
-              متوفر
-            </Badge>
-          ) : (
-            <Badge variant='outline' className='border-red-200 bg-red-50 text-red-700'>
-              غير متوفر
-            </Badge>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ProductPriceSection({ formattedPrice, formattedSalePrice, discountPercentage }: { formattedPrice: string, formattedSalePrice: string | null, discountPercentage: number }) {
-  return (
-    <div className='flex items-baseline gap-2'>
-      {formattedSalePrice ? (
-        <>
-          <span className='text-2xl font-bold text-primary'>{formattedSalePrice}</span>
-          <span className='text-lg text-muted-foreground line-through'>{formattedPrice}</span>
-          <Badge className='bg-red-500'>{discountPercentage}% خصم</Badge>
-        </>
-      ) : (
-        <span className='text-2xl font-bold'>{formattedPrice}</span>
-      )}
-    </div>
-  );
-}
-
-function ProductInfoSection({ product }: { product: any }) {
-  return (
-    <div className='space-y-4'>
-      <p className='text-muted-foreground'>{product.details === null ? product.name : product.details}</p>
-    </div>
-  );
-}
-
-function ProductQuantitySection({ product }: { product: any }) {
-  return (
-    <div className='pt-4'>
-      <ProductQuantity product={product} />
-    </div>
-  );
-}
-
-function ProductShippingInfo() {
-  return (
-    <div className='flex items-center gap-2 pt-2 text-sm text-muted-foreground'>
-      <Icon name="Info" size="sm" className={iconVariants({ size: 'sm' })} />
-      <span>الشحن خلال 3-5 أيام عمل</span>
-    </div>
-  );
-}
-
-function ProductTabsSection({ product, reviews, session, mainImage }: { product: any, reviews: any[], session: any, mainImage: string }) {
-  return (
-    <div className='mt-12'>
-      <ReviewsTabsWrapper>
-        <TabsList className='w-full justify-start'>
-          <TabsTrigger value='details'>التفاصيل</TabsTrigger>
-          <TabsTrigger value='reviews'>التقييمات ({reviews.length})</TabsTrigger>
-        </TabsList>
-        <TabsContent value='details' className='py-4'>
-          <div className='prose prose-sm max-w-none'>
-            <h3>معلومات المنتج</h3>
-            <p>{product.details || product.name}</p>
-            <div className='mt-6 grid grid-cols-1 gap-8 md:grid-cols-2'>
-              <div>
-                <h4>المواصفات</h4>
-                <ul>
-                  <li>المورد: {product.supplier?.name || 'غير محدد'}</li>
-                  <li>رمز المنتج: {product.productCode || product.id.substring(0, 8)}</li>
-                  {product.size && <li>المقاس: {product.size}</li>}
-                  {product.material && <li>الخامة: {product.material}</li>}
-                  {product.brand && <li>الماركة: {product.brand}</li>}
-                  {product.features && product.features.length > 0 && (
-                    <li>
-                      المميزات:
-                      <ul className='ml-4 mt-1 list-inside list-disc'>
-                        {product.features.map((feature: string, index: number) => (
-                          <li key={index}>{feature}</li>
-                        ))}
-                      </ul>
-                    </li>
-                  )}
-                  {product.careInstructions && (
-                    <li>تعليمات العناية: {product.careInstructions}</li>
-                  )}
-                </ul>
-              </div>
-              <div>
-                <h4>الشحن والإرجاع</h4>
-                <ul>
-                  <li>الشحن خلال {product.shippingDays || '3-5'} أيام عمل</li>
-                  <li>إمكانية الإرجاع خلال {product.returnPeriodDays || 14} يوم</li>
-                  {product.hasQualityGuarantee !== false && <li>ضمان الجودة</li>}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value='reviews' id='reviews' className='py-4'>
-          <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-medium'>تقييمات المنتج</h3>
-              {session?.user && (
-                <RateProductButton
-                  productId={product.id}
-                  productName={product.name}
-                  productImage={mainImage}
-                />
-              )}
-            </div>
-            {reviews.length === 0 ? (
-              <div className='rounded-lg bg-muted/30 py-12 text-center'>
-                <Icon name="Star" size="xl" className={iconVariants({ size: 'xl', className: 'mx-auto mb-4 text-amber-400' })} />
-                <h3 className='mb-2 text-lg font-medium'>لا توجد تقييمات بعد</h3>
-                <p className='mb-6 text-muted-foreground'>كن أول من يقيم هذا المنتج وشارك تجربتك مع الآخرين</p>
-                {session?.user ? (
-                  <RateProductButton
-                    productId={product.id}
-                    productName={product.name}
-                    productImage={mainImage}
-                    variant='default'
-                    size='lg'
-                    showIcon
-                    buttonText='إضافة تقييم'
-                  />
-                ) : (
-                  <Button asChild>
-                    <a href={`/auth/login?redirect=/product/${product.slug}`}>تسجيل الدخول لإضافة تقييم</a>
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className='space-y-6'>
-                {reviews.map((review: any) => (
-                  <div key={review.id} className='border-b border-border pb-6 last:border-0'>
-                    <div className='flex items-start gap-4'>
-                      <div className='relative h-10 w-10 overflow-hidden rounded-full bg-muted'>
-                        {review.user?.image ? (
-                          <Image
-                            src={review.user.image}
-                            alt={review.user.name || 'مستخدم'}
-                            fill
-                            className='object-cover'
-                          />
-                        ) : (
-                          <span className='flex h-full w-full items-center justify-center text-xl font-medium'>
-                            {(review.user?.name || 'م')[0]}
-                          </span>
-                        )}
-                      </div>
-                      <div className='flex-1'>
-                        <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-                          <div>
-                            <h4 className='font-medium'>{review.user?.name || 'مستخدم'}</h4>
-                            <div className='mt-1 flex items-center gap-2'>
-                              <RatingDisplay rating={review.rating} showCount={false} size='sm' />
-                              {review.isVerified && (
-                                <Badge
-                                  variant='outline'
-                                  className='border-green-300 bg-green-100 text-green-800'
-                                >
-                                  مشتري مؤكد
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            {new Date(review.createdAt).toLocaleDateString('ar-SA')}
-                          </div>
-                        </div>
-                        <p className='mt-3 text-muted-foreground'>{review.comment}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </ReviewsTabsWrapper>
-    </div>
-  );
-}
-
-function RelatedProductsSection({ product }: { product: any }) {
-  return (
-    <div className='mt-16'>
-      <h2 className='mb-6 text-xl font-bold'>منتجات مشابهة</h2>
-      <RelatedProducts currentProductId={product.id} supplierId={product.supplierId} />
-    </div>
-  );
-}
 
 // --- Metadata ---
 export async function generateMetadata({ params }: PageProps<{ slug: string }>): Promise<Metadata> {
@@ -293,23 +66,37 @@ export default async function ProductPage({ params }: PageProps<{ slug: string }
   const formattedSalePrice = null;
   const mainImage = product.imageUrl || '/fallback/product-fallback.avif';
   const additionalImages = product.images?.filter((img: string) => img !== mainImage) || [];
+
   return (
     <>
       <IncrementPreviewOnView productId={product.id} />
-      <div className='container py-8'>
-        <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
-          <ProductImageSection mainImage={mainImage} additionalImages={additionalImages} />
-          <div className='space-y-6'>
-            <ProductDetailsSection product={product} />
-            <ProductPriceSection formattedPrice={formattedPrice} formattedSalePrice={formattedSalePrice} discountPercentage={discountPercentage} />
-            <Separator />
+      <div className='container mx-auto px-4 py-8 max-w-7xl'>
+        {/* Main Product Section */}
+        <div className='grid grid-cols-1 mx-auto lg:grid-cols-2 gap-8 lg:gap-12 items-start justify-items-center lg:justify-items-start'>
+          {/* Product Image */}
+          <div className='sticky top-4 w-full max-w-md lg:max-w-none'>
+            <ProductImageSection mainImage={mainImage} additionalImages={additionalImages} />
+          </div>
+
+          {/* Product Details */}
+          <div className='space-y-8 w-full max-w-md lg:max-w-none text-center lg:text-start'>
             <ProductInfoSection product={product} />
-            <ProductQuantitySection product={product} />
-            <ProductShippingInfo />
+            <ProductPriceSection formattedPrice={formattedPrice} formattedSalePrice={formattedSalePrice} discountPercentage={discountPercentage} />
+            <Separator className='my-6' />
+            <ProductDescription product={product} />
+            <ProductActionsSection product={product} />
           </div>
         </div>
-        <ProductTabsSection product={product} reviews={reviews} session={session} mainImage={mainImage} />
-        <RelatedProductsSection product={product} />
+
+        {/* Product Tabs */}
+        <div className='mt-16'>
+          <ProductTabs product={product} reviews={reviews} session={session} mainImage={mainImage} />
+        </div>
+
+        {/* Related Products */}
+        <div className='mt-20'>
+          <RelatedProductsSection product={product} />
+        </div>
       </div>
     </>
   );

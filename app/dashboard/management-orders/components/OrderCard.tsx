@@ -247,7 +247,7 @@ const OrderItemsPreview = ({ items }: { items: any[] }) => {
             <CollapsibleContent className="space-y-1 p-2">
                 {items.map((item, index) => (
                     <div key={index} className="flex items-center justify-between text-xs">
-                        <span className="truncate flex-1">{item.name || `منتج ${index + 1}`}</span>
+                        <span className="truncate flex-1">{item.product.name || `منتج ${index + 1}`}</span>
                         <span className="text-muted-foreground ml-2">
                             {item.quantity || 1} × {item.price || 0} ر.س
                         </span>

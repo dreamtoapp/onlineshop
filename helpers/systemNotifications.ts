@@ -1,5 +1,3 @@
-"use server";
-
 import db from '@/lib/prisma';
 
 interface SystemNotificationParams {
@@ -51,9 +49,9 @@ export async function createSystemNotification({
     return { success: true, notification };
   } catch (error) {
     console.error('Error creating system notification:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to create system notification' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create system notification'
     };
   }
 } 

@@ -44,7 +44,5 @@ next-env.d.ts
 
 # E2E testing artifacts
 /test-results/
-/playwright-report/
 /blob-report/
-/playwright/.cache/
 /tests/screenshots/

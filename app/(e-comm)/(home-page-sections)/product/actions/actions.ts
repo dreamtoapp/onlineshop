@@ -2,14 +2,12 @@
 
 import db from '@/lib/prisma';
 
-import { verifyUserPurchase } from './rating';
-
 /**
  * Get product details by slug
  */
 export async function getProductBySlug(slug: string) {
   console.log('slug', slug);
-  
+
   try {
     // Decode the URL-encoded slug
     const decodedSlug = decodeURIComponent(slug);
@@ -90,15 +88,4 @@ export async function getProductReviews(productId: string) {
   }
 }
 
-/**
- * Check if the current user has purchased this product
- */
-export async function checkUserPurchase(productId: string) {
-  try {
-    const hasPurchased = await verifyUserPurchase(productId);
-    return { hasPurchased };
-  } catch (error) {
-    console.error('Error checking purchase:', error);
-    return { hasPurchased: false };
-  }
-}
+

@@ -38,6 +38,11 @@ export const CompanySchema = z.object({
     'خط الطول غير صالح'
   ).optional().or(z.literal('')).nullable(),
 
+  // Platform Settings
+  workingHours: z.string().trim().optional().or(z.literal('')),
+  shippingFee: z.number().min(0, 'رسوم التوصيل يجب أن تكون 0 أو أكثر').optional(),
+  minShipping: z.number().min(0, 'حد التوصيل المجاني يجب أن يكون 0 أو أكثر').optional(),
+  taxPercentage: z.number().min(0, 'نسبة الضريبة يجب أن تكون 0 أو أكثر').max(100, 'نسبة الضريبة يجب أن تكون 100 أو أقل').optional(),
 
 });
 

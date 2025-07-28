@@ -40,6 +40,26 @@ export async function updateUserProfile(formData: UserFormData) {
       };
     }
 
+    // ✅ التحقق من عدم تكرار البريد الإلكتروني مع مستخدم آخر
+    if (data.email && data.email !== existingUser.email) {
+      const existingUserWithEmail = await db.user.findFirst({
+        where: {
+          email: data.email,
+          NOT: {
+            id: existingUser.id, // استثناء المستخدم الحالي
+          },
+        },
+      });
+
+      if (existingUserWithEmail) {
+        return {
+          ok: false,
+          msg: 'البريد الإلكتروني مستخدم بالفعل من قبل مستخدم آخر',
+          errors: { email: ['البريد الإلكتروني مستخدم بالفعل'] },
+        };
+      }
+    }
+
     // ✅ استخرج القيم الفعلية فقط للتحديث
     const updateData: any = {
       name: data.name || undefined,

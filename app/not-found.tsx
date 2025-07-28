@@ -26,12 +26,12 @@ export default function NotFound() {
                 <div className="h-24 w-24 rounded-full bg-feature-settings-soft flex items-center justify-center animate-pulse">
                   <Icon name="AlertTriangle" className="h-12 w-12 text-feature-settings icon-enhanced" />
                 </div>
-                <Badge
+                {/* <Badge
                   variant="destructive"
                   className="absolute -top-2 -right-2 text-xs font-bold animate-bounce"
                 >
                   404
-                </Badge>
+                </Badge> */}
               </div>
 
               <div className="space-y-2">
@@ -48,11 +48,11 @@ export default function NotFound() {
 
 
             {/* Action Buttons */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex  items-center justify-center gap-4 w-full ">
               {/* Primary Actions */}
-              <Card className="shadow-md border-l-4 border-l-feature-analytics card-hover-effect">
+              <Card className="shadow-md border-l-4 border-l-feature-analytics card-hover-effect w-full">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
+                  <CardTitle className="flex items-center gap-2 text-lg w-full">
                     <Icon name="Home" className="h-5 w-5 text-feature-analytics icon-enhanced" />
                     العودة للرئيسية
                   </CardTitle>

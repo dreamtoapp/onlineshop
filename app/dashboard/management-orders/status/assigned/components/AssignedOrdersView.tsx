@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from 'next/image';
 import { Icon } from '@/components/icons/Icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,7 +67,7 @@ export default function AssignedOrdersView({ drivers }: { drivers: any[] }) {
                 {localDrivers.filter(d => d.driverOrders.length).map(driver => (
                     <Card key={driver.id} className="shadow-lg border-l-4 border-l-feature-analytics">
                         <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                            {driver.image && <img src={driver.image} alt={driver.name} className="w-10 h-10 rounded-full object-cover border" />}
+                            {driver.image && <Image src={driver.image} alt={driver.name} width={40} height={40} className="w-10 h-10 rounded-full object-cover border" />}
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <Icon name="UserCheck" className="h-5 w-5 text-feature-analytics" />
                                 {driver.name || 'سائق بدون اسم'}

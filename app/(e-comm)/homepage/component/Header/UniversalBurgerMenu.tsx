@@ -28,17 +28,18 @@ const universalNavItems: UniversalNavItem[] = [
         icon: "Grid3x3",
         description: "تصفح جميع الفئات"
     },
+
+    {
+        href: "/offers",
+        label: "العروض",
+        icon: "Tag",
+        description: "أحدث العروض والخصومات"
+    },
     {
         href: "/bestsellers",
         label: "الأكثر مبيعاً",
         icon: "TrendingUp",
         description: "المنتجات الأكثر طلباً"
-    },
-    {
-        href: "/#offers",
-        label: "العروض",
-        icon: "Tag",
-        description: "أحدث العروض والخصومات"
     },
 
     // Support & Info
@@ -55,11 +56,24 @@ const universalNavItems: UniversalNavItem[] = [
         description: "معلومات عن شركتنا"
     },
     {
-        href: "/privacy",
+        href: "/policies/privacy",
         label: "سياسة الخصوصية",
         icon: "Shield",
         description: "شروط الاستخدام والخصوصية"
-    }
+    },
+    {
+        href: "/policies/terms",
+        label: "الشروط والأحكام",
+        icon: "File",
+        description: "الشروط والأحكام الخاصة بالموقع"
+    },
+    {
+        href: "/policies/refund",
+        label: "سياسة الاسترجاع",
+        icon: "Undo",
+        description: "سياسة الاسترجاع والاستبدال"
+    },
+
 ];
 
 export default function UniversalBurgerMenu() {
@@ -96,7 +110,7 @@ export default function UniversalBurgerMenu() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="group flex items-center gap-4 p-3 rounded-lg transition-all duration-200 hover:bg-accent/50 active:bg-accent/70"
+                            className="group flex items-center gap-4 p-1 rounded-lg transition-all duration-200 hover:bg-accent/50 active:bg-accent/70"
                             onClick={() => setIsOpen(false)}
                             style={{ animationDelay: `${index * 30}ms` }}
                         >
@@ -104,7 +118,7 @@ export default function UniversalBurgerMenu() {
                                 <Icon name={item.icon} className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                             </div>
                             <div className="flex-1 text-right min-w-0">
-                                <div className="font-medium text-foreground group-hover:text-foreground transition-colors duration-200 truncate">
+                                <div className="font-medium text-foreground group-hover:text-foreground transition-colors duration-200 truncate text-sm">
                                     {item.label}
                                 </div>
                                 {item.description && (
