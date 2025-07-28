@@ -62,7 +62,7 @@ export const navigationItems = [
       { label: 'المشرفون', href: '/dashboard/management-users/admin', icon: 'Shield' },
       // { label: 'التسويق', href: '/dashboard/management-users/marketer', icon: 'Megaphone' },
       { label: 'السائقون', href: '/dashboard/management-users/drivers', icon: 'Truck' },
-     
+
     ]
   },
   {
@@ -72,7 +72,7 @@ export const navigationItems = [
     children: [
       { label: 'معلومات الشركة', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
       { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
-      { label: 'المعلومات الضريبية', href: '/dashboard/management/settings/tax-info', icon: 'Receipt' },
+      // { label: 'المعلومات الضريبية', href: '/dashboard/management/settings/tax-info', icon: 'Receipt' },
       { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
       { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
       { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
