@@ -104,7 +104,17 @@ function CartItemsList({ items }: { items: (ServerCartItem | GuestCartItem)[] })
 
 
 // Main Cart Page View Component
-export default function CartPageView() {
+interface PlatformSettings {
+    taxPercentage: number;
+    shippingFee: number;
+    minShipping: number;
+}
+
+interface CartPageViewProps {
+    platformSettings: PlatformSettings;
+}
+
+export default function CartPageView({ platformSettings }: CartPageViewProps) {
     const { isAuthenticated, isLoading } = useCheckIsLogin();
     const { cart } = useCartStore();
     const [loading, setLoading] = useState(false);
@@ -112,11 +122,11 @@ export default function CartPageView() {
     const router = useRouter();
     const [showLoginDialog, setShowLoginDialog] = useState(false);
 
-    // Cart calculations
+    // Cart calculations using platform settings
     const items = Object.values(cart);
     const subtotal = items.reduce((sum, item) => sum + ((item.product?.price || 0) * (item.quantity || 1)), 0);
-    const shipping = subtotal > 200 ? 0 : 25; // ❌ Should be >= 200
-    const tax = subtotal * 0.15; // ✅ CORRECT: Tax on subtotal only
+    const shipping = subtotal >= platformSettings.minShipping ? 0 : platformSettings.shippingFee;
+    const tax = subtotal * (platformSettings.taxPercentage / 100);
     const total = subtotal + shipping + tax;
 
     // Reusable checkout handler for consistent authentication logic
@@ -175,6 +185,7 @@ export default function CartPageView() {
                             shipping={shipping}
                             tax={tax}
                             total={total}
+                            taxPercentage={platformSettings.taxPercentage}
                             onCheckout={handleCheckout}
                             showLoginDialog={showLoginDialog}
                             setShowLoginDialog={setShowLoginDialog}

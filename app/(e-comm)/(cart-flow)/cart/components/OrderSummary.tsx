@@ -14,6 +14,7 @@ interface OrderSummaryProps {
   shipping: number;
   tax: number;
   total: number;
+  taxPercentage: number;
   onCheckout: () => void;
   showLoginDialog: boolean;
   setShowLoginDialog: (show: boolean) => void;
@@ -35,12 +36,14 @@ function OrderDetails({
   items,
   subtotal,
   shipping,
-  tax
+  tax,
+  taxPercentage
 }: {
   items: (ServerCartItem | GuestCartItem)[];
   subtotal: number;
   shipping: number;
   tax: number;
+  taxPercentage: number;
 }) {
   return (
     <div className="space-y-3 text-sm">
@@ -51,7 +54,7 @@ function OrderDetails({
       </div>
 
       <div className="flex justify-between">
-        <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
+        <span className="text-muted-foreground">ضريبة القيمة المضافة ({taxPercentage}%)</span>
         <span className="font-medium text-foreground">{tax.toFixed(2)} ر.س</span>
       </div>
 
@@ -156,6 +159,7 @@ export default function OrderSummary({
   shipping,
   tax,
   total,
+  taxPercentage,
   onCheckout,
   showLoginDialog,
   setShowLoginDialog
@@ -172,6 +176,7 @@ export default function OrderSummary({
             subtotal={subtotal}
             shipping={shipping}
             tax={tax}
+            taxPercentage={taxPercentage}
           />
           <TotalAmount total={total} />
           <ActionButtons

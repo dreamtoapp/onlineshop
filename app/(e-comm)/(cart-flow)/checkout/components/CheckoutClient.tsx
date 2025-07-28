@@ -16,13 +16,20 @@ import { CheckCircle, AlertCircle, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { Policy } from "./TermsDialog";
 
+interface PlatformSettings {
+    taxPercentage: number;
+    shippingFee: number;
+    minShipping: number;
+}
+
 interface CheckoutClientProps {
     user: UserProfile;
     cart: CartData;
     addresses: AddressWithDefault[];
+    platformSettings: PlatformSettings;
 }
 
-export default function CheckoutClient({ user, cart, addresses }: CheckoutClientProps) {
+export default function CheckoutClient({ user, cart, addresses, platformSettings }: CheckoutClientProps) {
     const [selectedAddress, setSelectedAddress] = useState<AddressWithDefault | null>(addresses.find(addr => addr.isDefault) || addresses[0] || null);
     const [selectedShiftId, setSelectedShiftId] = useState("");
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("CASH");
@@ -166,7 +173,7 @@ export default function CheckoutClient({ user, cart, addresses }: CheckoutClient
                         />
                     </div>
                     <div className="space-y-6">
-                        <MiniCartSummary />
+                        <MiniCartSummary platformSettings={platformSettings} />
                     </div>
                 </div>
             </div>

@@ -12,17 +12,26 @@ import { formatCurrency } from '../../../../../lib/formatCurrency';
 import CartItemsToggle from './client/CartItemsToggle';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
-export default function MiniCartSummary() {
+interface PlatformSettings {
+  taxPercentage: number;
+  shippingFee: number;
+  minShipping: number;
+}
+
+interface MiniCartSummaryProps {
+  platformSettings: PlatformSettings;
+}
+
+export default function MiniCartSummary({ platformSettings }: MiniCartSummaryProps) {
   // Use Zustand cart for live updates
   const { cart: zustandCart } = useCartStore();
   const items = Object.values(zustandCart);
   const subtotal = items.reduce((sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1), 0);
-  const deliveryFee = subtotal >= 200 ? 0 : 25; // Free delivery over 200 SAR
-  const taxRate = 0.15;
-  const taxAmount = (subtotal + deliveryFee) * taxRate;
+  const deliveryFee = subtotal >= platformSettings.minShipping ? 0 : platformSettings.shippingFee;
+  const taxAmount = subtotal * (platformSettings.taxPercentage / 100); // Tax on subtotal only
   const total = subtotal + deliveryFee + taxAmount;
-  const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  const savings = subtotal >= 200 ? 25 : 0; // Show savings if free delivery
+  const totalItems = items.length; // Count unique products, not total quantity
+  const savings = subtotal >= platformSettings.minShipping ? platformSettings.shippingFee : 0; // Show savings if free delivery
 
   // Handle empty cart
   if (!items.length) {
@@ -102,15 +111,20 @@ export default function MiniCartSummary() {
           {deliveryFee > 0 && (
             <div className="text-xs text-muted-foreground p-3 bg-muted/30 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span>أضف {formatCurrency(200 - subtotal)} للتوصيل المجاني</span>
+                <div className="flex items-center gap-2">
+                  <span>أضف {formatCurrency(platformSettings.minShipping - subtotal)}</span>
+                  <Badge variant="outline" className="text-xs px-2 py-1 border-blue-600 text-blue-700 whitespace-nowrap">
+                    {formatCurrency(platformSettings.minShipping)} الحد الأدنى
+                  </Badge>
+                </div>
                 <span className="text-feature-commerce font-medium">
-                  {Math.round((subtotal / 200) * 100)}%
+                  {Math.round((subtotal / platformSettings.minShipping) * 100)}%
                 </span>
               </div>
               <div className="w-full bg-muted h-2 rounded-full">
                 <div
                   className="bg-feature-commerce h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min((subtotal / 200) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((subtotal / platformSettings.minShipping) * 100, 100)}%` }}
                 ></div>
               </div>
             </div>
@@ -120,7 +134,7 @@ export default function MiniCartSummary() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Percent className="h-4 w-4" />
-              <span className="text-sm">ضريبة القيمة المضافة (15%)</span>
+              <span className="text-sm">ضريبة القيمة المضافة ({platformSettings.taxPercentage}%)</span>
             </div>
             <span className="font-medium">{formatCurrency(taxAmount)}</span>
           </div>
