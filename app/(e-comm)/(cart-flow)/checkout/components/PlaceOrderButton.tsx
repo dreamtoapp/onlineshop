@@ -6,6 +6,7 @@ import InfoTooltip from '@/components/InfoTooltip';
 import { createDraftOrder } from '../actions/orderActions';
 import { UserProfile } from './UserInfoCard';
 import { AddressWithDefault } from "./AddressBook";
+import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
 export interface CartItem {
     id: string;
@@ -22,22 +23,47 @@ export interface CartData {
 }
 
 interface PlaceOrderButtonProps {
-    cart: CartData;
+    cart?: CartData;
     user: UserProfile;
     selectedAddress: AddressWithDefault | null;
     shiftId: string;
     paymentMethod: string;
     termsAccepted: boolean;
+    platformSettings?: {
+        taxPercentage: number;
+        shippingFee: number;
+        minShipping: number;
+    };
 }
 
-export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId, paymentMethod, termsAccepted }: PlaceOrderButtonProps) {
+export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId, paymentMethod, termsAccepted, platformSettings }: PlaceOrderButtonProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const items = cart?.items || [];
+
+    // Use Zustand cart for real-time updates and discounts
+    const { cart: zustandCart } = useCartStore();
+    const zustandItems = Object.values(zustandCart);
+
+    // Use Zustand cart if available, otherwise fall back to props cart
+    const items = zustandItems.length > 0 ? zustandItems : (cart?.items || []);
     const hasItems = items.length > 0;
-    const subtotal = items.reduce((sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1), 0);
+
+    // Calculate subtotal using effective price (includes discounts)
+    const subtotal = items.reduce((sum, item) => {
+        if (!item.product) return sum;
+        const effectivePrice = 'discountedPrice' in item.product ? (item.product as any).discountedPrice : item.product.price || 0;
+        return sum + effectivePrice * (item.quantity || 1);
+    }, 0);
+
     const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+    // Calculate total amount with delivery fee and tax (consistent with MiniCartSummary)
+    const defaultSettings = { taxPercentage: 15, shippingFee: 25, minShipping: 200 };
+    const settings = platformSettings || defaultSettings;
+    const deliveryFee = subtotal >= settings.minShipping ? 0 : settings.shippingFee;
+    const taxAmount = subtotal * (settings.taxPercentage / 100); // Tax on subtotal only
+    const total = subtotal + deliveryFee + taxAmount;
 
     // Validation: all 3 conditions
     const isAccountActivated = user.isOtp === true;
@@ -51,6 +77,23 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
     else if (!termsAccepted) infoMessage = 'يجب الموافقة على الشروط والأحكام';
     else if (!hasItems) infoMessage = 'يجب إضافة منتجات للسلة أولاً';
 
+    // Simple sync function
+    const syncZustandToDatabase = async () => {
+        try {
+            const { syncZustandQuantityToDatabase } = await import('@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions');
+
+            // Sync all Zustand items to database (replaces quantities, doesn't add)
+            for (const [productId, item] of Object.entries(zustandCart)) {
+                await syncZustandQuantityToDatabase(productId, item.quantity);
+            }
+
+            console.log('✅ Zustand cart synced to database');
+        } catch (error) {
+            console.error('❌ Failed to sync Zustand to database:', error);
+            throw new Error('فشل في مزامنة السلة مع قاعدة البيانات');
+        }
+    };
+
     const handlePlaceOrder = async () => {
         setLoading(true);
         setError(null);
@@ -62,6 +105,9 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
             return;
         }
         try {
+            // Simple sync: Update database cart with Zustand data
+            await syncZustandToDatabase();
+
             const formData = new FormData();
             formData.append('fullName', user.name || '');
             formData.append('phone', user.phone || '');
@@ -69,6 +115,7 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
             formData.append('shiftId', shiftId);
             formData.append('paymentMethod', paymentMethod);
             formData.append('termsAccepted', termsAccepted ? 'true' : 'false');
+
             const orderNumber = await createDraftOrder(formData);
             router.push(`/happyorder?orderid=${orderNumber}`);
         } catch (err: any) {
@@ -91,7 +138,7 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
                     <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
                 <div className="text-sm text-muted-foreground">
-                    {totalItems} منتج • إجمالي {subtotal.toFixed(2)} ريال
+                    {totalItems} منتج • إجمالي {total.toFixed(2)} ريال
                 </div>
             </div>
             {/* Place Order Button with Info Tooltip */}

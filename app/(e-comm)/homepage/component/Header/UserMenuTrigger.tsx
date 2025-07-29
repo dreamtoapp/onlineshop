@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { signOut } from 'next-auth/react';
+import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 import { Icon } from '@/components/icons/Icon';
 import { usePusherConnectionStatus } from '@/app/(e-comm)/(adminPage)/user/notifications/components/RealtimeNotificationListener';
 import PushNotificationSetup from '@/app/components/PushNotificationSetup';
@@ -88,6 +89,11 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
+            // Clear cart on logout
+            const { clearCart } = useCartStore.getState();
+            clearCart();
+            console.log('🛒 Cart cleared on logout');
+
             await signOut({
                 callbackUrl: '/',
                 redirect: true

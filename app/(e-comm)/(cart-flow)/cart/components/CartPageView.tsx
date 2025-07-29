@@ -1,17 +1,11 @@
 "use client";
 
-import { getCart } from "@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-import Link from '@/components/link';
 import Image from "next/image";
 import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 import { useCartStore } from '../cart-controller/cartStore';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
 import CartQuantityControls from '../cart-controller/CartQuantityControls';
 import CartPageSkeleton from './CartPageSkeleton';
 import EmptyCart from './EmptyCart';
@@ -27,10 +21,6 @@ type ServerCartItem = { id: string; product: any; quantity: number };
 function isServerItem(item: ServerCartItem | GuestCartItem): item is ServerCartItem {
     return (item as ServerCartItem).id !== undefined;
 }
-
-
-
-
 
 // Cart Item Component
 function CartItem({ item }: { item: ServerCartItem | GuestCartItem }) {
@@ -99,10 +89,6 @@ function CartItemsList({ items }: { items: (ServerCartItem | GuestCartItem)[] })
     );
 }
 
-
-
-
-
 // Main Cart Page View Component
 interface PlatformSettings {
     taxPercentage: number;
@@ -117,10 +103,7 @@ interface CartPageViewProps {
 export default function CartPageView({ platformSettings }: CartPageViewProps) {
     const { isAuthenticated, isLoading } = useCheckIsLogin();
     const { cart } = useCartStore();
-    const [loading, setLoading] = useState(false);
-    const [mergeToastShown, setMergeToastShown] = useState(false);
     const router = useRouter();
-    const [showLoginDialog, setShowLoginDialog] = useState(false);
 
     // Cart calculations using platform settings
     const items = Object.values(cart);
@@ -129,43 +112,14 @@ export default function CartPageView({ platformSettings }: CartPageViewProps) {
     const tax = subtotal * (platformSettings.taxPercentage / 100);
     const total = subtotal + shipping + tax;
 
-    // Reusable checkout handler for consistent authentication logic
+    // Simple checkout handler
     const handleCheckout = () => {
-        if (!isAuthenticated) {
-            setShowLoginDialog(true);
-            return false;
+        if (isAuthenticated) {
+            router.push('/checkout');
         }
-        router.push('/checkout');
-        return true;
     };
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            setLoading(true);
-            getCart()
-                .then((data) => {
-                    setLoading(false);
-                    // Show merge toast if guest cart was merged (detect by checking if localCartId cookie existed and now is gone)
-                    if (!mergeToastShown && typeof window !== 'undefined') {
-                        if (!document.cookie.includes('localCartId=')) {
-                            toast.success('تم دمج سلة التسوق الخاصة بك مع حسابك بنجاح.');
-                            setMergeToastShown(true);
-                        }
-                    }
-                    // Don't show error for null data - this might be normal after merge
-                    if (!data) {
-                        console.log('Cart data is null, this might be normal after merge');
-                    }
-                })
-                .catch((error) => {
-                    setLoading(false);
-                    console.error('Cart loading error:', error);
-                    toast.error('حدث خطأ أثناء تحميل السلة أو دمجها. يرجى إعادة المحاولة.');
-                });
-        }
-    }, [isAuthenticated, mergeToastShown]);
-
-    if (isLoading || loading) {
+    if (isLoading) {
         return <CartPageSkeleton />;
     }
 
@@ -187,8 +141,8 @@ export default function CartPageView({ platformSettings }: CartPageViewProps) {
                             total={total}
                             taxPercentage={platformSettings.taxPercentage}
                             onCheckout={handleCheckout}
-                            showLoginDialog={showLoginDialog}
-                            setShowLoginDialog={setShowLoginDialog}
+                            showLoginDialog={false}
+                            setShowLoginDialog={() => { }}
                         />
                     </div>
 

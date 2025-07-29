@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AddressBook from "./AddressBook";
 import UserInfoCard from "./UserInfoCard";
 import MiniCartSummary from "./MiniCartSummary";
@@ -13,6 +14,7 @@ import { TermsDialogContent } from "./TermsDialog";
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 import { Badge } from '@/components/ui/badge';
 import type { Policy } from "./TermsDialog";
 
@@ -30,6 +32,8 @@ interface CheckoutClientProps {
 }
 
 export default function CheckoutClient({ user, cart, addresses, platformSettings }: CheckoutClientProps) {
+    const router = useRouter();
+    const { cart: zustandCart } = useCartStore();
     const [selectedAddress, setSelectedAddress] = useState<AddressWithDefault | null>(addresses.find(addr => addr.isDefault) || addresses[0] || null);
     const [selectedShiftId, setSelectedShiftId] = useState("");
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("CASH");
@@ -39,6 +43,17 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
     const [loadingPolicies, setLoadingPolicies] = useState(false);
     const [policiesError, setPoliciesError] = useState("");
     const [activeTab, setActiveTab] = useState("summary");
+
+    // Check if both database cart and Zustand cart are empty
+    useEffect(() => {
+        const databaseCartEmpty = !cart?.items || cart.items.length === 0;
+        const zustandCartEmpty = Object.keys(zustandCart).length === 0;
+
+        if (databaseCartEmpty && zustandCartEmpty) {
+            console.log("Both database and Zustand carts are empty, redirecting to cart");
+            router.push("/cart?message=empty");
+        }
+    }, [cart, zustandCart, router]);
 
     const fetchPolicies = async () => {
         setLoadingPolicies(true);
@@ -164,12 +179,12 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
                         </Card>
 
                         <PlaceOrderButton
-                            cart={cart}
                             user={user}
                             selectedAddress={selectedAddress}
                             shiftId={selectedShiftId}
                             paymentMethod={selectedPaymentMethod}
                             termsAccepted={termsAccepted}
+                            platformSettings={platformSettings}
                         />
                     </div>
                     <div className="space-y-6">

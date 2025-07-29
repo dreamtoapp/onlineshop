@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Search, Grid3X3 } from 'lucide-react';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Heart, Search } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 import Link from '@/components/link';
 
 export default function EmptyWishlist() {

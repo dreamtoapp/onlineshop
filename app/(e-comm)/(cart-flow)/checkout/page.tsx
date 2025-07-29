@@ -45,9 +45,12 @@ export default async function CheckoutPage() {
     getAddresses(session.user.id),
     getPlatformSettings()
   ]);
+  console.log(platformSettings, cart);
 
+  // Check if database cart is empty, but don't redirect immediately
+  // The CheckoutClient will handle Zustand cart as fallback
   if (!cart || !cart.items || cart.items.length === 0) {
-    redirect("/cart?message=empty");
+    console.log("Database cart is empty, will use Zustand cart as fallback");
   }
 
   if (!user) return null;

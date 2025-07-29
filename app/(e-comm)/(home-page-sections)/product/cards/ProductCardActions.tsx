@@ -21,15 +21,24 @@ const ProductCardActions = React.memo(function ProductCardActions({
     isOutOfStock,
 }: ProductCardActionsProps) {
     const [modalOpen, setModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleOpenModal = () => setModalOpen(true);
+    const handleOpenModal = () => {
+        if (isDeleting) return; // Prevent modal from opening during delete
+        setModalOpen(true);
+    };
     const handleCloseModal = () => setModalOpen(false);
 
     return (
         <div className="flex flex-col gap-3 mt-auto" onClick={e => e.stopPropagation()}>
             {quantity > 0 ? (
                 <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-muted/50 to-muted/30 backdrop-blur-sm rounded-full p-1.5 border border-border/50">
-                    <QuantityControls productId={product.id} size="sm" />
+                    <QuantityControls
+                        productId={product.id}
+                        size="sm"
+                        onDeleteStart={() => setIsDeleting(true)}
+                        onDeleteEnd={() => setIsDeleting(false)}
+                    />
                 </div>
             ) : (
                 <>

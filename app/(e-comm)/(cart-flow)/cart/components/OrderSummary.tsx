@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from '@/components/link';
 import { useRouter } from 'next/navigation';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 
 // Types
 type GuestCartItem = { product: any; quantity: number };
@@ -89,62 +89,49 @@ function TotalAmount({ total }: { total: number }) {
   );
 }
 
-// Login Dialog Component
-function LoginDialog({
-  showLoginDialog,
-  setShowLoginDialog,
-  onCheckout
+// Action Buttons Component
+function ActionButtons({
+  onCheckout,
+
 }: {
+  onCheckout: () => void;
   showLoginDialog: boolean;
   setShowLoginDialog: (show: boolean) => void;
-  onCheckout: () => void;
 }) {
+  const { isAuthenticated } = useCheckIsLogin();
   const router = useRouter();
 
   return (
-    <AlertDialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-      <AlertDialogTrigger asChild>
+    <div className="space-y-3 pt-2">
+      {/* Login requirement banner for non-authenticated users */}
+      {!isAuthenticated && (
+        <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg border border-muted">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-feature-commerce">🔐</span>
+            <span className="font-medium">تسجيل الدخول مطلوب</span>
+          </div>
+          <p>سجل دخولك لإتمام الطلب وحفظ سلة التسوق</p>
+        </div>
+      )}
+
+      {/* Checkout button - direct navigation for non-authenticated users */}
+      {isAuthenticated ? (
         <Button
           className="w-full btn-save text-lg py-3 h-12"
           onClick={onCheckout}
         >
           متابعة للدفع
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent dir="rtl">
-        <AlertDialogHeader>
-          <AlertDialogTitle>تسجيل الدخول أو إنشاء حساب</AlertDialogTitle>
-          <AlertDialogDescription>
-            يجب عليك تسجيل الدخول أو إنشاء حساب لإتمام الطلب. هذا يضمن حفظ طلبك وتتبع الشحن بسهولة.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-row-reverse gap-3">
-          <Button variant="outline" onClick={() => setShowLoginDialog(false)}>إلغاء</Button>
-          <Button variant="default" onClick={() => { setShowLoginDialog(false); router.push('/auth/login'); }}>تسجيل الدخول</Button>
-          <Button variant="default" onClick={() => { setShowLoginDialog(false); router.push('/auth/register'); }}>إنشاء حساب جديد</Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
+      ) : (
+        <Button
+          asChild
+          className="w-full btn-save text-lg py-3 h-12"
+          onClick={() => router.push('/auth/login')}
+        >
+          <Link href="/auth/login">تسجيل الدخول للدفع</Link>
+        </Button>
+      )}
 
-// Action Buttons Component
-function ActionButtons({
-  onCheckout,
-  showLoginDialog,
-  setShowLoginDialog
-}: {
-  onCheckout: () => void;
-  showLoginDialog: boolean;
-  setShowLoginDialog: (show: boolean) => void;
-}) {
-  return (
-    <div className="space-y-3 pt-2">
-      <LoginDialog
-        showLoginDialog={showLoginDialog}
-        setShowLoginDialog={setShowLoginDialog}
-        onCheckout={onCheckout}
-      />
       <Button asChild variant="outline" className="w-full border-feature-commerce text-feature-commerce hover:bg-feature-commerce-soft">
         <Link href="/">متابعة التسوق</Link>
       </Button>

@@ -130,16 +130,7 @@ export default function PlatformSettingsForm() {
         }
     };
 
-    const completedFields = [
-        platformData.businessHours,
-        platformData.taxRate,
-        platformData.deliveryRadius,
-        platformData.deliveryFee,
-        platformData.freeDeliveryThreshold
-    ].filter(field => field && field.trim() !== '').length;
 
-    const totalFields = 5;
-    const isComplete = completedFields === totalFields;
 
     if (isLoading) {
         return (

@@ -7,50 +7,234 @@ import { z } from "zod";
 import { OrderNumberGenerator } from "@/helpers/orderNumberGenerator";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-// Updated validation schema for AddressBook system
+// Validation schema
 const checkoutSchema = z.object({
-  // Personal information (will update user profile if needed)
   fullName: z.string()
     .min(2, "الاسم يجب أن يكون حرفين على الأقل")
     .max(50, "الاسم طويل جداً")
     .regex(/^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s\u0020-\u007E]+$/, "يرجى إدخال اسم صحيح"),
-  
   phone: z.string()
     .min(10, "رقم الهاتف يجب أن يكون 10 أرقام على الأقل")
     .max(15, "رقم الهاتف طويل جداً")
     .regex(/^[+]?[0-9\s\-\(\)]+$/, "رقم الهاتف غير صحيح")
-    .transform(phone => phone.replace(/\s/g, '')), // Remove spaces
-  
-  // AddressBook reference
+    .transform(phone => phone.replace(/\s/g, '')),
   addressId: z.string().min(1, "يرجى اختيار عنوان التوصيل"),
-  
-  // Delivery and payment options
   shiftId: z.string().min(1, "يرجى اختيار وقت التوصيل"),
   paymentMethod: z.enum(["CASH", "CARD", "WALLET"], {
     errorMap: () => ({ message: "يرجى اختيار طريقة الدفع" })
   }),
-  
-  // Terms acceptance
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "يجب الموافقة على الشروط والأحكام"
   })
 });
 
+// Types
+interface PlatformSettings {
+  taxPercentage: number;
+  shippingFee: number;
+  minShipping: number;
+}
+
+interface OrderCalculation {
+  subtotal: number;
+  deliveryFee: number;
+  taxAmount: number;
+  total: number;
+}
+
+// Single Responsibility: Get platform settings
+async function getPlatformSettings(): Promise<PlatformSettings> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/platform-settings`, {
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (error) {
+    console.error('Error fetching platform settings:', error);
+  }
+
+  return { taxPercentage: 15, shippingFee: 25, minShipping: 200 };
+}
+
+// Single Responsibility: Calculate order totals
+function calculateOrderTotals(cart: any, platformSettings: PlatformSettings): OrderCalculation {
+  const subtotal = cart.items.reduce((sum: number, item: any) => {
+    const effectivePrice = (item.product as any)?.discountedPrice || item.product?.price || 0;
+    return sum + effectivePrice * (item.quantity || 1);
+  }, 0);
+
+  const deliveryFee = subtotal >= platformSettings.minShipping ? 0 : platformSettings.shippingFee;
+  const taxAmount = subtotal * (platformSettings.taxPercentage / 100);
+  const total = subtotal + deliveryFee + taxAmount;
+
+  return { subtotal, deliveryFee, taxAmount, total };
+}
+
+// Single Responsibility: Validate and get address
+async function validateAddress(addressId: string, userId: string) {
+  const address = await db.address.findFirst({
+    where: { id: addressId, userId }
+  });
+
+  if (!address) {
+    throw new Error("العنوان المحدد غير صحيح أو غير موجود");
+  }
+
+  return address;
+}
+
+// Single Responsibility: Validate shift
+async function validateShift(shiftId: string) {
+  const shift = await db.shift.findUnique({
+    where: { id: shiftId }
+  });
+
+  if (!shift) {
+    throw new Error("وقت التوصيل المحدد غير متاح");
+  }
+
+  return shift;
+}
+
+// Single Responsibility: Update user information
+async function updateUserIfNeeded(user: any, validatedData: any) {
+  const updateUserData: any = {};
+
+  if (user.name !== validatedData.fullName) {
+    updateUserData.name = validatedData.fullName;
+  }
+  if (user.phone !== validatedData.phone) {
+    updateUserData.phone = validatedData.phone;
+  }
+
+  if (Object.keys(updateUserData).length > 0) {
+    await db.user.update({
+      where: { id: user.id },
+      data: updateUserData
+    });
+  }
+}
+
+// Single Responsibility: Create order in database
+async function createOrderInDatabase(orderData: any) {
+  return await db.order.create({
+    data: orderData,
+    include: {
+      items: { include: { product: true } },
+      address: true
+    }
+  });
+}
+
+// Single Responsibility: Send notifications to admins
+async function notifyAdmins(order: any, customerName: string, total: number) {
+  const adminUsers = await db.user.findMany({
+    where: { role: { in: ['ADMIN', 'MARKETER'] } },
+    select: { id: true }
+  });
+
+  if (adminUsers.length === 0) return;
+
+  // Create database notifications
+  const notificationPromises = adminUsers.map(admin =>
+    db.userNotification.create({
+      data: {
+        title: 'طلب جديد',
+        body: `طلب جديد #${order.orderNumber} بقيمة ${total.toFixed(2)} ر.س من ${customerName}`,
+        type: 'ORDER',
+        read: false,
+        userId: admin.id,
+        actionUrl: `/dashboard/management-orders`
+      },
+    })
+  );
+
+  await Promise.all(notificationPromises);
+
+  // Send real-time notifications
+  try {
+    const { pusherServer } = await import('@/lib/pusherServer');
+    const pusherPromises = adminUsers.map(admin =>
+      pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
+        orderId: order.orderNumber,
+        customer: customerName,
+        total,
+        createdAt: order.createdAt,
+      })
+    );
+    await Promise.all(pusherPromises);
+  } catch (error) {
+    console.error('Failed to send real-time notifications:', error);
+  }
+
+  // Send push notifications
+  try {
+    const { PushNotificationService } = await import('@/lib/push-notification-service');
+    const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
+
+    const template = ORDER_NOTIFICATION_TEMPLATES.NEW_ORDER(order.orderNumber, customerName, total);
+    const payload = {
+      title: template.title,
+      body: template.body,
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
+      tag: `order-${order.id}-new`,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        type: 'new_order',
+        customerName,
+        total
+      },
+      requireInteraction: true,
+      actions: [
+        { action: 'view_order', title: 'عرض الطلب', icon: '/icons/icon-192x192.png' },
+        { action: 'close', title: 'إغلاق' }
+      ]
+    };
+
+    const adminUserIds = adminUsers.map(admin => admin.id);
+    await PushNotificationService.sendToUsers(adminUserIds, payload);
+  } catch (error) {
+    console.error('Failed to send push notifications:', error);
+  }
+}
+
+// Single Responsibility: Revalidate cache
+function revalidateCache(userId: string) {
+  revalidatePath('/');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/management-dashboard');
+  revalidatePath('/dashboard/management-orders');
+  revalidateTag('analyticsData');
+  revalidateTag('fetchOrders');
+  revalidateTag('userStats');
+  revalidateTag(`user-${userId}`);
+  revalidateTag('products');
+  revalidateTag('promotions');
+}
+
+// Main function - orchestrates the order creation process
 export async function createDraftOrder(formData: FormData) {
   try {
+    // Get user and cart
     const user = await checkIsLogin();
     const cart = await getCart();
-    
-    if (!cart || !cart.items || cart.items.length === 0) {
-      throw { code: 'REDIRECT_TO_HAPPYORDER', message: 'redirect to happyorder' };
-    }
 
-    // Ensure user is authenticated and exists
     if (!user?.id) {
       throw { code: 'REDIRECT_TO_LOGIN', message: 'User not authenticated' };
     }
 
-    // Parse and validate all form data
+    if (!cart?.items?.length) {
+      throw { code: 'REDIRECT_TO_HAPPYORDER', message: 'redirect to happyorder' };
+    }
+
+    // Validate form data
     const validatedData = checkoutSchema.parse({
       fullName: formData.get("fullName"),
       phone: formData.get("phone"),
@@ -60,218 +244,62 @@ export async function createDraftOrder(formData: FormData) {
       termsAccepted: formData.get("termsAccepted") === "true"
     });
 
-    // Verify the address exists and belongs to the user
-    const address = await db.address.findFirst({
-      where: {
-        id: validatedData.addressId,
-        userId: user.id
-      }
-    });
+    // Validate address and shift
+    const [address, shift] = await Promise.all([
+      validateAddress(validatedData.addressId, user.id),
+      validateShift(validatedData.shiftId)
+    ]);
 
-    if (!address) {
-      throw new Error("العنوان المحدد غير صحيح أو غير موجود");
-    }
+    // Update user if needed
+    await updateUserIfNeeded(user, validatedData);
 
-    // Update user information if it's different from what's stored
-    const updateUserData: any = {};
-    if (user.name !== validatedData.fullName) {
-      updateUserData.name = validatedData.fullName;
-    }
-    if (user.phone !== validatedData.phone) {
-      updateUserData.phone = validatedData.phone;
-    }
+    // Get platform settings and calculate totals
+    const platformSettings = await getPlatformSettings();
+    const { total } = calculateOrderTotals(cart, platformSettings);
 
-    // Update user information if needed
-    if (Object.keys(updateUserData).length > 0) {
-      await db.user.update({
-        where: { id: user.id },
-        data: updateUserData
-      });
-    }
-
-    // Calculate totals
-    const subtotal = cart.items.reduce(
-      (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
-      0
-    );
-    
-    const deliveryFee = subtotal >= 200 ? 0 : 25; // Free delivery over 200 SAR
-    const taxRate = 0.15;
-    const taxAmount = (subtotal + deliveryFee) * taxRate;
-    const total = subtotal + deliveryFee + taxAmount;
-
-    // Verify shift exists and is available
-    const shift = await db.shift.findUnique({
-      where: { id: validatedData.shiftId }
-    });
-
-    if (!shift) {
-      throw new Error("وقت التوصيل المحدد غير متاح");
-    }
-
-    // Generate unique order number
+    // Generate order number
     const orderNumber = await OrderNumberGenerator.generateOrderNumber();
 
-    // Create order with new AddressBook system
-    const order = await db.order.create({
-      data: {
-        orderNumber,
-        customerId: user.id,
-        addressId: validatedData.addressId, // Use addressId from AddressBook
-        status: "PENDING",
-        amount: total,
-        paymentMethod: validatedData.paymentMethod,
-        shiftId: validatedData.shiftId,
-        deliveryInstructions: address.deliveryInstructions, // Use delivery instructions from address
-        items: {
-          createMany: {
-            data: cart.items.map((ci) => ({
-              productId: ci.productId,
-              quantity: ci.quantity ?? 1,
-              price: ci.product?.price ?? 0,
-            })),
-          },
+    // Create order data
+    const orderData = {
+      orderNumber,
+      customerId: user.id,
+      addressId: validatedData.addressId,
+      status: "PENDING" as const,
+      amount: total,
+      paymentMethod: validatedData.paymentMethod,
+      shiftId: validatedData.shiftId,
+      deliveryInstructions: address.deliveryInstructions,
+      items: {
+        createMany: {
+          data: cart.items.map((ci: any) => ({
+            productId: ci.productId,
+            quantity: ci.quantity ?? 1,
+            price: ((ci.product as any)?.discountedPrice || ci.product?.price) ?? 0,
+          })),
         },
       },
-      include: {
-        items: {
-          include: {
-            product: true
-          }
-        },
-        address: true // Include address details
-      }
-    });
+    };
 
-    // Clear cart after successful order creation
-    // for (const item of cart.items) {
-    //   await db.cartItem.delete({ where: { id: item.id } });
-    // }
-    // revalidateTag("cart");
+    // Create order
+    const order = await createOrderInDatabase(orderData);
 
-    // Create notification for admin users (not the customer)
-    const adminUsers = await db.user.findMany({
-      where: {
-        role: { in: ['ADMIN', 'MARKETER'] }
-      },
-      select: { id: true }
-    });
+    // Send notifications
+    await notifyAdmins(order, validatedData.fullName, total);
 
-    console.log(`🔍 [NEW ORDER] Found ${adminUsers.length} admin users for notifications`);
+    // Revalidate cache
+    revalidateCache(user.id);
 
-    // Send dashboard feedback to admin users (for immediate toast when on dashboard)
-    try {
-      const { pusherServer } = await import('@/lib/pusherServer');
-      
-      // Send to each admin's specific channel for dashboard feedback
-      const pusherPromises = adminUsers.map(admin =>
-        pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
-          orderId: order.orderNumber,
-          customer: validatedData.fullName,
-          total,
-          createdAt: order.createdAt,
-        })
-      );
-      
-      await Promise.all(pusherPromises);
-      console.log('✅ [DASHBOARD] Dashboard feedback sent to admin users');
-    } catch (error) {
-      console.error('❌ [DASHBOARD] Failed to send dashboard feedback:', error);
-      // Don't fail the order creation if dashboard feedback fails
-    }
-
-    // Create notifications for all admin users
-    const notificationPromises = adminUsers.map(admin =>
-      db.userNotification.create({
-        data: {
-          title: 'طلب جديد',
-          body: `طلب جديد #${order.orderNumber} بقيمة ${total.toFixed(2)} ر.س من ${validatedData.fullName}`,
-          type: 'ORDER',
-          read: false,
-          userId: admin.id, // Send to admin, not customer
-          actionUrl: `/dashboard/management-orders`
-        },
-      })
-    );
-
-    await Promise.all(notificationPromises);
-
-    // Send push notifications to all admin users
-    try {
-      console.log('🚀 [NEW ORDER] Sending push notifications to admins...');
-      
-      // Import notification functions
-      const { PushNotificationService } = await import('@/lib/push-notification-service');
-      const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
-      
-      // Create notification template for new order
-      const template = ORDER_NOTIFICATION_TEMPLATES.NEW_ORDER(order.orderNumber, validatedData.fullName, total);
-      
-      // Prepare push notification payload
-      const payload = {
-        title: template.title,
-        body: template.body,
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-192x192.png',
-        tag: `order-${order.id}-new`,
-        data: { 
-          orderId: order.id, 
-          orderNumber: order.orderNumber, 
-          type: 'new_order',
-          customerName: validatedData.fullName,
-          total: total
-        },
-        requireInteraction: true,
-        actions: [
-          {
-            action: 'view_order',
-            title: 'عرض الطلب',
-            icon: '/icons/icon-192x192.png'
-          },
-          {
-            action: 'close',
-            title: 'إغلاق'
-          }
-        ]
-      };
-      
-      // Get admin user IDs
-      const adminUserIds = adminUsers.map(admin => admin.id);
-      
-      // Send push notifications to all admin users
-      const pushResult = await PushNotificationService.sendToUsers(adminUserIds, payload);
-      
-      console.log(`✅ [NEW ORDER] Push notifications sent - Success: ${pushResult.success.length}/${adminUserIds.length}, Failed: ${pushResult.failed.length}`);
-      
-    } catch (error) {
-      console.error('❌ [NEW ORDER] Failed to send push notifications:', error);
-      // Don't fail the order creation if push notifications fail
-    }
-
-    // Revalidate home page and user stats data
-    revalidatePath('/');
-    revalidatePath('/dashboard');
-    revalidatePath('/dashboard/management-dashboard');
-    revalidatePath('/dashboard/management-orders');
-    revalidateTag('analyticsData');
-    revalidateTag('fetchOrders');
-    revalidateTag('userStats');
-    revalidateTag(`user-${user.id}`); // Revalidate specific user's cached data
-    revalidateTag('products');
-    revalidateTag('promotions');
-
-    // Instead of redirect, return orderId
     return order.orderNumber;
-    
+
   } catch (error) {
     console.error("Order creation error:", error);
-    
+
     if (error instanceof z.ZodError) {
-      // Return validation errors as an array for better UX
       const errorMessages = error.errors.map(err => err.message);
       throw { validationErrors: errorMessages };
     }
-    
+
     throw new Error("حدث خطأ أثناء إنشاء الطلب. يرجى المحاولة مرة أخرى");
   }
 } 

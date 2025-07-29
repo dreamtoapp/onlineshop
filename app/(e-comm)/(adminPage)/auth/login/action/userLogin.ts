@@ -9,8 +9,8 @@ export const userLogin = async (
 ): Promise<{ success: boolean; message: string } | null> => {
   const phone = formData.get('phone') as string;
   const password = formData.get('password') as string;
-  const redirect = formData.get('redirect') as string || '/';
-  
+
+
   // Validate input data
   if (!phone || !password) {
     return { success: false, message: 'جميع الحقول مطلوبة' };
@@ -27,11 +27,21 @@ export const userLogin = async (
     return { success: false, message: 'المعلومات غير صحيحة' };
   }
 
-  await signIn('credentials', {
-    phone,
-    password,
-    redirectTo: redirect,
-  });
+  // Sign in with NextAuth (without redirect - handle redirect in client)
+  console.log('🔐 DEBUG: About to sign in with NextAuth...');
+  try {
+    const result = await signIn('credentials', {
+      phone,
+      password,
+      redirect: false, // Don't redirect automatically
+    });
+    console.log('✅ DEBUG: NextAuth signIn completed, result:', result);
 
-  return { success: true, message: 'تم تسجيل الدخول بنجاح' };
+    // Cart sync will be triggered by client-side after successful login
+    console.log('🎯 DEBUG: Returning success response from userLogin action');
+    return { success: true, message: 'تم تسجيل الدخول بنجاح' };
+  } catch (error: any) {
+    console.error('❌ DEBUG: NextAuth signIn failed:', error);
+    return { success: false, message: 'فشل في تسجيل الدخول' };
+  }
 };

@@ -12,6 +12,7 @@ import { CarFront, Focus } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import NotificationBellClient from '@/components/NotificationBellClient';
 
+
 interface User {
     id: string;
     name?: string | null;
@@ -26,6 +27,7 @@ interface HeaderUnifiedProps {
     user: User | null;
     isLoggedIn?: boolean;
     notificationBell?: ReactNode;
+    wishlistIcon?: ReactNode;
     unreadCount?: number;
 }
 

@@ -7,6 +7,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useCartStore } from './cartStore';
 import { Icon } from '@/components/icons/Icon';
+import { useSession } from 'next-auth/react';
+
+import CartQuantityControls from './CartQuantityControls';
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -26,10 +29,14 @@ interface CartPreviewProps {
 
 // Cart preview using Zustand store for instant updates
 export default function CartPreview({ closePopover, hideHeader = false }: CartPreviewProps) {
-    const { cart, getTotalPrice, updateQuantity, removeItem, clearCart } = useCartStore();
+    const { cart, getTotalPrice, clearCart } = useCartStore();
+    const { data: session, status } = useSession();
+    const isAuthenticated = status === 'authenticated' && !!session?.user;
     const items = Object.values(cart);
     const total = getTotalPrice();
     const isEmpty = items.length === 0;
+
+
 
     return (
         <Card className="shadow-lg border-l-4 border-feature-commerce card-hover-effect card-border-glow max-h-[calc(100vh-100px)] w-full flex flex-col h-full">
@@ -118,38 +125,11 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                                             </p>
                                             {/* Quantity controls + delete */}
                                             <div className="flex items-center gap-4 mt-2">
-                                                {/* Simple quantity controls */}
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-7 w-7 p-0"
-                                                        onClick={() => updateQuantity(item.product.id, -1)}
-                                                        disabled={item.quantity <= 1}
-                                                    >
-                                                        <Icon name="Minus" className="h-3 w-3" />
-                                                    </Button>
-                                                    <span className="text-sm font-medium w-8 text-center">
-                                                        {item.quantity}
-                                                    </span>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-7 w-7 p-0"
-                                                        onClick={() => updateQuantity(item.product.id, 1)}
-                                                    >
-                                                        <Icon name="Plus" className="h-3 w-3" />
-                                                    </Button>
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-7 w-7 text-muted-foreground hover:text-destructive btn-delete"
-                                                    onClick={() => removeItem(item.product.id)}
-                                                    aria-label="حذف المنتج من السلة"
-                                                >
-                                                    <Icon name="Trash2" className="h-4 w-4" />
-                                                </Button>
+                                                <CartQuantityControls
+                                                    productId={item.product.id}
+                                                    size="sm"
+                                                    variant="dropdown"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -169,10 +149,26 @@ export default function CartPreview({ closePopover, hideHeader = false }: CartPr
                             <Button asChild variant="outline" className="flex-1 btn-view-outline" onClick={closePopover}>
                                 <Link href="/cart">عرض السلة</Link>
                             </Button>
-                            <Button asChild className="flex-1 btn-save" onClick={closePopover}>
-                                <Link href="/checkout">إتمام الطلب</Link>
-                            </Button>
+                            {isAuthenticated ? (
+                                <Button asChild className="flex-1 btn-save" onClick={closePopover}>
+                                    <Link href="/checkout">إتمام الطلب</Link>
+                                </Button>
+                            ) : (
+                                <Button
+                                    asChild
+                                    className="flex-1 btn-save opacity-60 cursor-not-allowed"
+                                    disabled
+                                    title="يجب تسجيل الدخول لإتمام الطلب"
+                                >
+                                    <Link href="/auth/login">تسجيل الدخول</Link>
+                                </Button>
+                            )}
                         </div>
+                        {!isAuthenticated && (
+                            <p className="text-xs text-muted-foreground text-center">
+                                سجل دخولك لإتمام الطلب وحفظ سلة التسوق
+                            </p>
+                        )}
                     </div>
                 )}
             </CardContent>

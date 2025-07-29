@@ -16,16 +16,7 @@ async function getCartIdFromCookie(): Promise<string | undefined> {
   return cookieStore.get('localCartId')?.value;
 }
 
-// Helper: set cart ID cookie
-async function setCartIdCookie(cartId: string) {
-  const cookieStore = await cookies();
-  cookieStore.set('localCartId', cartId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-  });
-}
+
 
 // Helper: clear cart ID cookie - Server Action
 export async function clearCartIdCookie() {
@@ -33,16 +24,7 @@ export async function clearCartIdCookie() {
   cookieStore.set('localCartId', '', { maxAge: -1 });
 }
 
-// Helper: create a new guest cart
-async function createGuestCart(): Promise<CartWithItems> {
-  const newCart = await db.cart.create({
-    data: {},
-    include: {
-      items: { include: { product: true } },
-    },
-  });
-  return newCart;
-}
+
 
 // Get the current user's or guest's cart
 export async function getCart(): Promise<CartWithItems | null> {
@@ -63,7 +45,7 @@ export async function getCart(): Promise<CartWithItems | null> {
           where: { id: localCartId },
           include: { items: { include: { product: true } } },
         });
-        
+
         if (localCart && localCart.items.length > 0) {
           if (userCart) {
             await db.$transaction(async (tx) => {
@@ -99,7 +81,7 @@ export async function getCart(): Promise<CartWithItems | null> {
             where: { userId: user.id },
             include: { items: { include: { product: true } } },
           });
-          
+
           // Clear the cookie immediately after successful merge
           await clearCartIdCookie();
         } else if (!localCart) {
@@ -130,31 +112,28 @@ export async function getCart(): Promise<CartWithItems | null> {
 // Schema for quantity validation
 const quantitySchema = z.number().int().min(1).max(99);
 
-// Add item to cart (guest or user)
+// Add item to cart (only for authenticated users)
 export async function addItem(productId: string, quantity: number = 1): Promise<void> {
   console.log('[addItem] called with:', { productId, quantity });
   const user = await checkIsLogin();
   console.log('[addItem] user from checkIsLogin:', user);
+
+  // Only proceed with database operations if user is authenticated
+  if (!user) {
+    console.log('[addItem] User not authenticated, skipping database operations');
+    return;
+  }
+
   let cart: CartWithItems | null = null;
-  let cartId: string | undefined = await getCartIdFromCookie();
+  let cartId: string | undefined;
   console.log('[addItem] cartId before:', cartId);
 
-  if (user) {
-    cart = await db.cart.findUnique({ where: { userId: user.id } });
-    if (!cart) {
-      cart = await db.cart.create({ data: { userId: user.id } });
-    }
-    cartId = cart.id;
-  } else {
-    if (cartId) {
-      cart = await db.cart.findUnique({ where: { id: cartId } });
-    }
-    if (!cart) {
-      cart = await createGuestCart();
-      cartId = cart.id;
-      if (cartId) await setCartIdCookie(cartId);
-    }
+  // Get or create user cart
+  cart = await db.cart.findUnique({ where: { userId: user.id } });
+  if (!cart) {
+    cart = await db.cart.create({ data: { userId: user.id } });
   }
+  cartId = cart.id;
 
   console.log('[addItem] cartId after:', cartId);
   // Log product quantity before add
@@ -199,39 +178,53 @@ export async function addItem(productId: string, quantity: number = 1): Promise<
 
 // Update quantity of a cart item
 export async function updateItemQuantity(itemId: string, quantity: number): Promise<void> {
-  if (quantity <= 0) {
-    await removeItem(itemId);
-    return;
-  }
+  console.log('[updateItemQuantity] called with:', { itemId, quantity });
 
-  const validQty = quantitySchema.parse(quantity);
+  // Prevent quantity from going below 1
+  const minQuantity = Math.max(1, quantity);
+  console.log('[updateItemQuantity] enforcing minimum quantity:', minQuantity);
+
+  const validQty = quantitySchema.parse(minQuantity);
+  console.log('[updateItemQuantity] updating database with quantity:', validQty);
 
   await db.cartItem.update({
     where: { id: itemId },
     data: { quantity: validQty },
   });
 
+  console.log('[updateItemQuantity] database update completed');
   revalidateTag('cart');
 }
 
 // Remove item from cart (and delete the cart itself if it becomes empty)
 export async function removeItem(itemId: string): Promise<void> {
+  console.log('[removeItem] called with:', { itemId });
+
   // Find the cartId first (needed after deletion)
   const cartItem = await db.cartItem.findUnique({ where: { id: itemId } });
+  console.log('[removeItem] cartItem found:', !!cartItem, 'cartId:', cartItem?.cartId);
   if (!cartItem) {
+    console.log('[removeItem] Cart item not found, revalidating and returning');
     revalidateTag('cart');
     return;
   }
 
+  console.log('[removeItem] deleting cart item from database');
   await db.cartItem.delete({ where: { id: itemId } });
+  console.log('[removeItem] cart item deleted from database');
 
   // Check if the cart has any remaining items; if none, delete the cart
   const remaining = await db.cartItem.count({ where: { cartId: cartItem.cartId } });
+  console.log('[removeItem] remaining items in cart:', remaining);
   if (remaining === 0) {
+    console.log('[removeItem] no remaining items, deleting cart');
     await db.cart.delete({ where: { id: cartItem.cartId } });
+    console.log('[removeItem] cart deleted');
   }
 
+  console.log('[removeItem] revalidating cart tag');
   revalidateTag('cart');
+  console.log('[removeItem] completed');
 }
 
 // Merge guest cart into user cart on login
@@ -302,22 +295,104 @@ export async function clearCart(): Promise<void> {
   revalidateTag('cart');
 }
 
+// Helper: Sync Zustand quantity to database (replaces quantity, doesn't add)
+export async function syncZustandQuantityToDatabase(productId: string, quantity: number): Promise<void> {
+  console.log('[syncZustandQuantityToDatabase] called with:', { productId, quantity });
+  const user = await checkIsLogin();
+  console.log('[syncZustandQuantityToDatabase] user from checkIsLogin:', user);
+
+  // Only proceed with database operations if user is authenticated
+  if (!user) {
+    console.log('[syncZustandQuantityToDatabase] User not authenticated, skipping database operations');
+    return;
+  }
+
+  let cart: CartWithItems | null = null;
+  let cartId: string | undefined;
+
+  // Get or create user cart
+  cart = await db.cart.findUnique({ where: { userId: user.id } });
+  if (!cart) {
+    cart = await db.cart.create({ data: { userId: user.id } });
+  }
+  cartId = cart.id;
+
+  const existingItem = await db.cartItem.findFirst({
+    where: { cartId: cartId, productId },
+  });
+
+  if (existingItem) {
+    // Replace quantity instead of adding
+    await db.cartItem.update({
+      where: { id: existingItem.id },
+      data: { quantity: quantity }, // ✅ REPLACES quantity
+    });
+  } else {
+    // Create new item with exact quantity
+    await db.cartItem.create({
+      data: {
+        cartId: cartId!,
+        productId,
+        quantity: quantity,
+      },
+    });
+  }
+
+  console.log('[syncZustandQuantityToDatabase] quantity synced to:', quantity);
+  revalidateTag('cart');
+}
+
 // Convenience: remove item using productId rather than itemId
 export async function removeItemByProduct(productId: string): Promise<void> {
+  console.log('[removeItemByProduct] called with:', { productId });
+  const user = await checkIsLogin();
+  console.log('[removeItemByProduct] user from checkIsLogin:', user);
+
+  // Only proceed with database operations if user is authenticated
+  if (!user) {
+    console.log('[removeItemByProduct] User not authenticated, skipping database operations');
+    return;
+  }
+
   const cart = await getCart();
-  if (!cart || !cart.items) return;
+  console.log('[removeItemByProduct] cart found:', !!cart, 'items count:', cart?.items?.length || 0);
+  if (!cart || !cart.items) {
+    console.log('[removeItemByProduct] No cart or items found');
+    return;
+  }
+
   const item = cart.items.find((i) => i.productId === productId);
-  if (!item) return;
+  console.log('[removeItemByProduct] item found:', !!item, 'itemId:', item?.id);
+  if (!item) {
+    console.log('[removeItemByProduct] Item not found in cart');
+    return;
+  }
+
+  console.log('[removeItemByProduct] calling removeItem with itemId:', item.id);
   await removeItem(item.id);
+  console.log('[removeItemByProduct] removeItem completed');
 }
 
 // Update quantity using productId (positive or negative delta). If quantity <=0 after update, item is removed.
 export async function updateItemQuantityByProduct(productId: string, delta: number): Promise<void> {
+  console.log('[updateItemQuantityByProduct] called with:', { productId, delta });
+  const user = await checkIsLogin();
+  console.log('[updateItemQuantityByProduct] user from checkIsLogin:', user);
+
+  // Only proceed with database operations if user is authenticated
+  if (!user) {
+    console.log('[updateItemQuantityByProduct] User not authenticated, skipping database operations');
+    return;
+  }
+
   const cart = await getCart();
-  // Removed console.logs for cleaner build output
+  console.log('[updateItemQuantityByProduct] cart found:', !!cart, 'items count:', cart?.items?.length || 0);
   if (!cart || !cart.items) return;
   const item = cart.items.find((i) => i.productId === productId);
+  console.log('[updateItemQuantityByProduct] item found:', !!item, 'current quantity:', item?.quantity || 0);
   if (!item) return;
-  const newQty = (item.quantity ?? 0) + delta;
+  const newQty = Math.max(1, (item.quantity ?? 0) + delta); // Prevent going below 1
+  console.log('[updateItemQuantityByProduct] updating quantity from', item.quantity, 'to', newQty);
   await updateItemQuantity(item.id, newQty);
+  console.log('[updateItemQuantityByProduct] quantity update completed');
 } 

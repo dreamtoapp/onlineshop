@@ -15,7 +15,7 @@ export default function OfferCard({ offer, isFeatured = false }: OfferCardProps)
   const hasValidImage = offer.bannerImage &&
     (offer.bannerImage.startsWith('/') || offer.bannerImage.startsWith('http'));
 
-  const imageUrl = hasValidImage ? offer.bannerImage : fallbackImage;
+  const imageUrl = hasValidImage ? offer.bannerImage! : fallbackImage;
 
   return (
     <Link href={`/offers/${offer.slug}`}>

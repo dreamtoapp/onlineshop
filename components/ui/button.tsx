@@ -1,7 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import debounce from "debounce" // Lightweight debounce/throttle
 
 import { cn } from "@/lib/utils"
 
@@ -39,29 +38,16 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
   VariantProps<typeof buttonVariants> {
   asChild?: boolean
-  /**
-   * If set, throttles the onClick handler to fire at most once per X ms.
-   * Uses debounce package with immediate=true for throttle behavior.
-   */
-  throttle?: number
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, throttle, onClick, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-    // Throttle onClick if throttle prop is set
-    const throttledOnClick = React.useMemo(() => {
-      if (!throttle || !onClick) return onClick
-      // Use debounce as throttle (immediate: true)
-      return debounce((...args: [React.MouseEvent<HTMLButtonElement>]) => {
-        onClick(...args);
-      }, throttle, { immediate: true })
-    }, [onClick, throttle])
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        onClick={throttledOnClick}
+        onClick={onClick}
         {...props}
       />
     )

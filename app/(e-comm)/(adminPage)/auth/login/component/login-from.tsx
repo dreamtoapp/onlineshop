@@ -1,12 +1,15 @@
 'use client';
 import { useActionState } from 'react';
 import { Eye, EyeOff, Loader2, Shield, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { log } from '@/utils/logger';
 import { userLogin } from '../action/userLogin';
+import { syncCartOnLogin } from '@/app/(e-comm)/(cart-flow)/cart/helpers/cartSyncHelper';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface LoginFormProps {
   redirect?: string;
@@ -90,7 +93,7 @@ function FormActions({
       {state?.message && (
         <p className={cn(
           "text-sm text-center",
-          state.success ? "text-feature-products" : "text-destructive"
+          state.success ? "text-green-600" : "text-destructive"
         )}>
           {state.message}
         </p>
@@ -105,7 +108,7 @@ function FormActions({
         {isPending ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin ml-2" />
-            جارٍ تسجيل الدخول...
+            جارٍ تسجيل الدخول ومزامنة السلة...
           </>
         ) : (
           <>
@@ -146,6 +149,54 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
 
   const [state, addAction, isPending] = useActionState(userLogin, { success: false, message: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  // Debug form state changes
+  console.log('🔍 DEBUG: Login form state changed:', { state, isPending });
+
+  // Trigger cart sync and redirect after successful login
+  useEffect(() => {
+    console.log('🔍 DEBUG: useEffect triggered, state:', state);
+
+    if (state?.success) {
+      console.log('✅ DEBUG: Login successful, state.success is true');
+      console.log('🔄 DEBUG: About to trigger cart sync...');
+
+      // Remove the setTimeout delay - trigger sync immediately
+      console.log('⏰ DEBUG: Calling syncCartOnLogin immediately...');
+      const loadingToast = toast.loading('جاري مزامنة السلة...');
+
+      console.log('🚀 DEBUG: syncCartOnLogin() called');
+      syncCartOnLogin()
+        .then((result) => {
+          console.log('✅ DEBUG: syncCartOnLogin resolved with result:', result);
+          toast.dismiss(loadingToast);
+          if (result.success) {
+            toast.success(result.message, {
+              description: `${result.itemCount} منتج تمت المزامنة`
+            });
+          } else {
+            toast.error(result.message);
+          }
+
+          // Redirect after cart sync completes
+          console.log('🚀 DEBUG: Redirecting to:', redirect);
+          router.push(redirect);
+        })
+        .catch((error) => {
+          console.error('❌ DEBUG: syncCartOnLogin rejected with error:', error);
+          toast.dismiss(loadingToast);
+          toast.error('فشل في المزامنة، تم الاحتفاظ بالمنتجات الحالية');
+          console.error('Cart sync error:', error);
+
+          // Redirect even if cart sync fails
+          console.log('🚀 DEBUG: Redirecting to:', redirect);
+          router.push(redirect);
+        });
+    } else {
+      console.log('❌ DEBUG: Login not successful, state:', state);
+    }
+  }, [state, redirect, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -157,7 +208,7 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
         <div className="space-y-8">
           <LoginHeader />
 
-          <form action={addAction} className="space-y-6">
+          <form action={addAction} className="space-y-6" onSubmit={() => console.log('🚀 DEBUG: Form submitted - starting login process')}>
             {/* Hidden input for redirect */}
             <input type="hidden" name="redirect" value={redirect} />
 

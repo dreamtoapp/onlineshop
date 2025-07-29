@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Invalid subscription data' }, { status: 400 });
     }
 
-    const upsertResult = await db.pushSubscription.upsert({
+    await db.pushSubscription.upsert({
       where: { endpoint: subscription.endpoint },
       update: {
         userId: session.user.id,
