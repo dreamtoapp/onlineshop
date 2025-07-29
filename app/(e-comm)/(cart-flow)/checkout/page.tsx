@@ -55,7 +55,7 @@ export default async function CheckoutPage() {
 
   if (!user) return null;
   return <CheckoutClient user={user} cart={{
-    ...cart, items: (cart.items ?? []).map(item => ({
+    ...cart, items: (cart?.items ?? []).map(item => ({
       ...item,
       id: item.id,
       product: item.product ? { id: item.product.id, name: item.product.name, price: item.product.price } : null

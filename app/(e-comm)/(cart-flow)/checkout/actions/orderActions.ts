@@ -245,7 +245,7 @@ export async function createDraftOrder(formData: FormData) {
     });
 
     // Validate address and shift
-    const [address, shift] = await Promise.all([
+    const [address] = await Promise.all([
       validateAddress(validatedData.addressId, user.id),
       validateShift(validatedData.shiftId)
     ]);
