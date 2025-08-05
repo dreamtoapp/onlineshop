@@ -68,11 +68,11 @@ export default function DriverCard({ driver }: DriverCardProps) {
     const getStatusBadge = (status: string | null) => {
         switch (status) {
             case 'ONLINE':
-                return <Badge variant="default" className="bg-green-600 hover:bg-green-700">متصل</Badge>;
+                return <Badge variant="default" className="bg-primary hover:bg-primary/90">متصل</Badge>;
             case 'BUSY':
                 return <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600">مشغول</Badge>;
             default:
-                return <Badge variant="secondary" className="bg-gray-500 hover:bg-gray-600">غير متصل</Badge>;
+                return null;
         }
     };
 
@@ -94,11 +94,11 @@ export default function DriverCard({ driver }: DriverCardProps) {
     };
 
     return (
-        <Card className='overflow-hidden rounded-lg border border-green-200 bg-background text-foreground shadow-md transition-shadow hover:shadow-lg'>
+        <Card className='flex flex-col overflow-hidden rounded-lg border border-border bg-background text-foreground shadow-md transition-shadow hover:shadow-lg'>
             {/* Card Header with Driver-specific styling */}
-            <CardHeader className='border-b border-green-200 bg-green-50/50 p-4'>
+            <CardHeader className='border-b border-border bg-muted/50 p-4'>
                 <div className='flex items-center justify-between'>
-                    <CardTitle className='line-clamp-1 text-lg font-semibold text-green-700'>
+                    <CardTitle className='line-clamp-1 text-lg font-semibold text-primary'>
                         {safeDriver.name}
                     </CardTitle>
                     <div className='flex items-center gap-2'>
@@ -108,7 +108,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
             </CardHeader>
 
             {/* Card Content */}
-            <CardContent className='space-y-4 p-4'>
+            <CardContent className='flex-1 space-y-4 p-4'>
                 {/* Image */}
                 <div className="relative h-48 w-full overflow-hidden rounded-lg bg-muted/20">
                     <AddImage
@@ -124,42 +124,42 @@ export default function DriverCard({ driver }: DriverCardProps) {
                 {/* Driver Details */}
                 <div className='space-y-2'>
                     <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                        <Icon name="Mail" size="xs" className="text-green-600" />
+                        <Icon name="Mail" size="xs" className="text-primary" />
                         <strong className='font-medium'>Email:</strong> {safeDriver.email || 'No Email'}
                     </p>
                     <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                        <Icon name="Phone" size="xs" className="text-green-600" />
+                        <Icon name="Phone" size="xs" className="text-primary" />
                         <strong className='font-medium'>Phone:</strong> {safeDriver.phone || 'No Phone'}
                     </p>
 
                     {/* Vehicle Information */}
                     {driver.vehicleType && (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="Car" size="xs" className="text-green-600" />
+                            <Icon name="Car" size="xs" className="text-primary" />
                             <strong className='font-medium'>Vehicle:</strong> {getVehicleTypeLabel(driver.vehicleType)}
                         </p>
                     )}
                     {driver.vehiclePlateNumber && (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="Hash" size="xs" className="text-green-600" />
+                            <Icon name="Hash" size="xs" className="text-primary" />
                             <strong className='font-medium'>Plate:</strong> {driver.vehiclePlateNumber}
                         </p>
                     )}
                     {driver.vehicleColor && driver.vehicleModel && (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="Palette" size="xs" className="text-green-600" />
+                            <Icon name="Palette" size="xs" className="text-primary" />
                             <strong className='font-medium'>Model:</strong> {driver.vehicleColor} {driver.vehicleModel}
                         </p>
                     )}
                     {driver.experience && (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="Clock" size="xs" className="text-green-600" />
+                            <Icon name="Clock" size="xs" className="text-primary" />
                             <strong className='font-medium'>Experience:</strong> {driver.experience} سنوات
                         </p>
                     )}
                     {driver.maxOrders && (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="Package" size="xs" className="text-green-600" />
+                            <Icon name="Package" size="xs" className="text-primary" />
                             <strong className='font-medium'>Max Orders:</strong> {driver.maxOrders}
                         </p>
                     )}
@@ -168,7 +168,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
                         driver.addresses.map((address) => (
                             <div key={address.id} className='space-y-1'>
                                 <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                                    <Icon name="MapPin" size="xs" className="text-green-600" />
+                                    <Icon name="MapPin" size="xs" className="text-primary" />
                                     <strong className='font-medium'>{address.label}:</strong>
                                 </p>
                                 <p className='text-xs text-muted-foreground mr-6'>
@@ -185,10 +185,10 @@ export default function DriverCard({ driver }: DriverCardProps) {
                                             label="عرض على الخريطة"
                                             variant="ghost"
                                             size="sm"
-                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                            className="text-primary hover:text-primary/90 hover:bg-muted"
                                         />
                                     ) : (
-                                        <div className="text-xs text-amber-600 flex items-center gap-1">
+                                        <div className="text-xs text-amber-500 flex items-center gap-1">
                                             <Icon name="MapPin" size="xs" className="w-3 h-3" />
                                             لا توجد إحداثيات متاحة
                                         </div>
@@ -198,7 +198,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
                         ))
                     ) : (
                         <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <Icon name="MapPin" size="xs" className="text-green-600" />
+                            <Icon name="MapPin" size="xs" className="text-primary" />
                             <strong className='font-medium'>Address:</strong> No Address
                         </p>
                     )}
@@ -206,7 +206,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
             </CardContent>
 
             {/* Card Footer with Driver-specific actions */}
-            <CardFooter className='flex justify-between border-t border-green-200 bg-green-50/30 p-4'>
+            <CardFooter className='flex justify-between border-t border-border bg-muted/30 p-4'>
                 <DriverUpsert
                     mode='update'
                     title="تعديل بيانات السائق"

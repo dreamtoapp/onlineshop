@@ -1,12 +1,13 @@
+import { Icon } from '@/components/icons/Icon';
 // Server Component - Following Next.js 15+ best practices
 import Link from '@/components/link';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import NewsletterClientWrapper from './NewsletterClientWrapper';
-import { Icon } from '@/components/icons/Icon';
+import { Separator } from '@/components/ui/separator';
+import db from '@/lib/prisma';
+
 import AppVersion from '../AppVersion';
 import LazyFooterContactIcons from './LazyFooterContactIcons';
-import db from '@/lib/prisma';
+import NewsletterClientWrapper from './NewsletterClientWrapper';
 
 interface FooterProps {
   aboutus?: string;
@@ -147,7 +148,7 @@ async function ServicesSection({ userId }: { userId?: string }) {
   if (websitePolicy) {
     customerService.push({
       name: 'سياسة الموقع',
-      href: '/policies/website',
+      href: '/policies/terms',
       iconName: 'Globe',
       description: 'شروط وأحكام استخدام الموقع'
     });
@@ -165,7 +166,7 @@ async function ServicesSection({ userId }: { userId?: string }) {
   if (returnPolicy) {
     customerService.push({
       name: 'سياسة الإرجاع',
-      href: '/policies/return',
+      href: '/policies/refund',
       iconName: 'RotateCcw',
       description: 'شروط الإرجاع والاستبدال'
     });

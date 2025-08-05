@@ -70,7 +70,7 @@ export default function DriverUpsert({
             vehicleModel: defaultValues.vehicleModel || '',
             driverLicenseNumber: defaultValues.driverLicenseNumber || '',
             experience: defaultValues.experience || '',
-            maxOrders: defaultValues.maxOrders || '3',
+            maxOrders: defaultValues.maxOrders || '',
         },
     });
 

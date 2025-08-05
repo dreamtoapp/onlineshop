@@ -1,12 +1,19 @@
 'use client';
 
-import { useState, useTransition, useId } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  useId,
+  useState,
+  useTransition,
+} from 'react';
+
 import { toast } from 'sonner';
-import { subscribeToNewsletter } from '../../actions/newsletter';
+
 import { Icon } from '@/components/icons/Icon';
 import Link from '@/components/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+import { subscribeToNewsletter } from '../../actions/newsletter';
 
 const Newsletter = () => {
   const [isPending, startTransition] = useTransition();
@@ -145,7 +152,7 @@ const Newsletter = () => {
         <p className="text-xs text-muted-foreground text-center leading-relaxed">
           بالاشتراك، أنت توافق على{' '}
           <Link
-            href="/privacy"
+            href="/policies/privacy"
             className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-sm"
           >
             سياسة الخصوصية

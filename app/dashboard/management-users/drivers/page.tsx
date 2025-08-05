@@ -18,8 +18,8 @@ export default async function DriversPage() {
       {/* Page Title */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
-          <h1 className='text-3xl font-bold text-green-700'>ادارة السائقين</h1>
-          <Badge variant="outline" className="border-green-200 text-green-700">{drivers.length}</Badge>
+          <h1 className='text-3xl font-bold text-primary'>ادارة السائقين</h1>
+          <Badge variant="outline" className="border-border text-primary">{drivers.length}</Badge>
         </div>
         <DriverUpsert
           mode='new'
@@ -44,7 +44,7 @@ export default async function DriversPage() {
             vehicleModel: '',
             driverLicenseNumber: '',
             experience: '',
-            maxOrders: '3',
+            maxOrders: '',
           }} />
       </div>
 

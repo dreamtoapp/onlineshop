@@ -173,16 +173,16 @@ export function getDriverFields(
         },
         {
           name: 'experience',
-          type: 'number',
+          type: 'text',
           placeholder: 'سنوات الخبرة',
-          register: register('experience', { valueAsNumber: true }),
+          register: register('experience'),
           error: errors.experience?.message,
         },
         {
           name: 'maxOrders',
           type: 'number',
           placeholder: 'الحد الأقصى للطلبات',
-          register: register('maxOrders', { valueAsNumber: true }),
+          register: register('maxOrders'),
           error: errors.maxOrders?.message,
         },
 
