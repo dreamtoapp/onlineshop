@@ -17,7 +17,7 @@ export default function DashboardNav({ pendingOrdersCount = 0 }: DashboardNavPro
             {/* Left side - Logo and Navigation */}
             <div className="flex items-center gap-4 md:gap-6">
                 {/* Logo */}
-                <Link href="/dashboard" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2">
                     <Icon name="Store" className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     <span className="text-base md:text-lg font-bold">متجر</span>
                     <Badge variant="secondary" className="text-xs hidden sm:inline-flex">

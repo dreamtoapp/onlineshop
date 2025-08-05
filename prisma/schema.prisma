@@ -315,6 +315,8 @@ model Company {
   minShipping  Int    @default(0)
   shippingFee  Int    @default(0)
 
+  online Boolean @default(false)
+
   latitude  String? // Latitude of the company location
   longitude String? // Longitude of the company location
   createdAt DateTime @default(now()) // Timestamp of creation
