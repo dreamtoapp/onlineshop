@@ -1,8 +1,8 @@
 import { createOrderNotification } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
 import { ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
 import { PushNotificationService } from '@/lib/push-notification-service';
-
 import { OrderNotificationType } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
+import { debug, error } from '@/utils/logger';
 
 interface NotificationData {
   userId: string;
@@ -29,9 +29,9 @@ interface NotificationResult {
  */
 export async function sendOrderNotification(data: NotificationData): Promise<NotificationResult> {
   const { userId, orderId, orderNumber, driverName, notificationType } = data;
-  
-  console.log('🚀 [NOTIFICATION HELPER] Starting notification process...');
-  console.log('📋 [NOTIFICATION HELPER] Notification details:', {
+
+  debug('Starting notification process...');
+  debug('Notification details:', {
     userId,
     orderId,
     orderNumber,
@@ -43,7 +43,7 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
   let pushSuccess = false;
   let inAppResult: any = null;
   let pushResult: boolean = false;
-  let error: string | undefined;
+  let errorMessage: string | undefined;
 
   try {
     // Step 1: Create template based on notification type
@@ -68,10 +68,10 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
         throw new Error(`Unknown notification type: ${notificationType}`);
     }
 
-    console.log('📝 [NOTIFICATION HELPER] Template created:', template);
+    debug('Template created:', template);
 
     // Step 2: Send in-app notification (fallback)
-    console.log('📱 [NOTIFICATION HELPER] Creating in-app notification...');
+    debug('Creating in-app notification...');
     try {
       inAppResult = await createOrderNotification({
         userId,
@@ -80,20 +80,20 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
         driverName,
         ...template
       });
-      
+
       inAppSuccess = inAppResult.success;
-      console.log('📱 [NOTIFICATION HELPER] In-app notification result:', inAppResult);
+      debug('In-app notification result:', inAppResult);
     } catch (inAppError) {
-      console.error('❌ [NOTIFICATION HELPER] In-app notification failed:', inAppError);
+      error('In-app notification failed:', inAppError instanceof Error ? inAppError.message : String(inAppError));
       inAppSuccess = false;
     }
 
     // Step 3: Send push notification
-    console.log('🔔 [NOTIFICATION HELPER] Sending push notification...');
+    debug('Sending push notification...');
     try {
       // Map notification type to push service type
       const pushNotificationType = notificationType === 'order_delivered' ? 'delivered' : notificationType;
-      
+
       pushResult = await PushNotificationService.sendOrderNotification(
         userId,
         orderId,
@@ -101,29 +101,29 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
         pushNotificationType as any,
         driverName
       );
-      
+
       pushSuccess = pushResult;
-      console.log('🔔 [NOTIFICATION HELPER] Push notification result:', pushResult);
+      debug('Push notification result:', pushResult);
     } catch (pushError) {
-      console.error('❌ [NOTIFICATION HELPER] Push notification failed:', pushError);
+      error('Push notification failed:', pushError instanceof Error ? pushError.message : String(pushError));
       pushSuccess = false;
     }
 
     // Step 4: Determine overall success
     const overallSuccess = inAppSuccess || pushSuccess; // Success if at least one works
-    
+
     if (overallSuccess) {
-      console.log(`✅ [NOTIFICATION HELPER] Notification sent successfully for ${notificationType}`);
+      debug(`Notification sent successfully for ${notificationType}`);
     } else {
-      error = 'Both in-app and push notifications failed';
-      console.error('❌ [NOTIFICATION HELPER] All notification methods failed');
+      errorMessage = 'Both in-app and push notifications failed';
+      error('All notification methods failed');
     }
 
     return {
       success: overallSuccess,
       inAppSuccess,
       pushSuccess,
-      error,
+      error: errorMessage,
       details: {
         inAppResult,
         pushResult
@@ -131,7 +131,7 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
     };
 
   } catch (mainError) {
-    console.error('❌ [NOTIFICATION HELPER] Critical error in notification process:', mainError);
+    error('Critical error in notification process:', mainError instanceof Error ? mainError.message : String(mainError));
     return {
       success: false,
       inAppSuccess: false,
@@ -149,8 +149,8 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
  * Quick test function to verify notification system is working
  */
 export async function testNotificationSystem(userId: string): Promise<NotificationResult> {
-  console.log('🧪 [NOTIFICATION HELPER] Testing notification system...');
-  
+  debug('Testing notification system...');
+
   return await sendOrderNotification({
     userId,
     orderId: 'test-order-id',

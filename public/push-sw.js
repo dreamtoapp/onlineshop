@@ -1,10 +1,15 @@
 // Enhanced Push Notification Service Worker
 self.addEventListener('push', function(event) {
-    console.log('🔔 Push event received:', event);
+    // Only log in development
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.log('🔔 Push event received:', event);
+    }
     
     if (event.data) {
         const data = event.data.json();
-        console.log('📦 Push data received:', data);
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            console.log('📦 Push data received:', data);
+        }
         
         // Service Worker notifications need different approach for Windows
         const options = {
@@ -36,7 +41,9 @@ self.addEventListener('push', function(event) {
         };
 
         // Show notification
-        console.log('📱 Showing notification with options:', options);
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            console.log('📱 Showing notification with options:', options);
+        }
         
         // For Windows, we need to ensure the notification is shown properly
         event.waitUntil(
@@ -50,10 +57,16 @@ self.addEventListener('push', function(event) {
                             return clientList[0].focus();
                         }
                     })
-                    .catch(err => console.log('Could not focus window:', err))
+                    .catch(err => {
+                        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+                            console.log('Could not focus window:', err);
+                        }
+                    })
             ])
                 .then(() => {
-                    console.log('✅ Notification shown successfully');
+                    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+                        console.log('✅ Notification shown successfully');
+                    }
                 })
                 .catch((error) => {
                     console.error('❌ Failed to show notification:', error);
@@ -92,25 +105,33 @@ self.addEventListener('notificationclick', function(event) {
 
 // Handle notification close events
 self.addEventListener('notificationclose', function(event) {
-    console.log('Notification closed:', event.notification.tag);
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.log('Notification closed:', event.notification.tag);
+    }
     
     // You can send analytics here if needed
     const data = event.notification.data;
     if (data?.orderId) {
         // Track notification close for analytics
-        console.log('Order notification closed:', data.orderId);
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            console.log('Order notification closed:', data.orderId);
+        }
     }
 });
 
 // Service Worker Installation
 self.addEventListener('install', function(event) {
-    console.log('Service Worker installing...');
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.log('Service Worker installing...');
+    }
     self.skipWaiting();
 });
 
 // Service Worker Activation
 self.addEventListener('activate', function(event) {
-    console.log('Service Worker activating...');
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.log('Service Worker activating...');
+    }
     event.waitUntil(
         Promise.all([
             clients.claim(),
@@ -133,14 +154,20 @@ self.addEventListener('sync', function(event) {
     if (event.tag === 'background-sync') {
         event.waitUntil(
             // Handle background sync tasks
-            console.log('Background sync triggered')
+            (() => {
+                if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+                    console.log('Background sync triggered');
+                }
+            })()
         );
     }
 });
 
 // Handle push subscription changes
 self.addEventListener('pushsubscriptionchange', function(event) {
-    console.log('Push subscription changed');
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.log('Push subscription changed');
+    }
     event.waitUntil(
         // Re-subscribe to push notifications
         self.registration.pushManager.subscribe({

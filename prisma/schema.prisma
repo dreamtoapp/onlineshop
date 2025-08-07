@@ -151,8 +151,8 @@ model User {
   updatedAt           DateTime           @updatedAt
   accounts            Account[]
   role                UserRole           @default(CUSTOMER) // Use enum for roles
-  isOtp               Boolean            @default(true)
-  isOauth             Boolean            @default(true)
+  isOtp               Boolean            @default(false)
+  isOauth             Boolean            @default(false)
   otpCode             String?            @default("1234")
   reviews             Review[] // User's product reviews
   wishlist            WishlistItem[] // User's wishlist items

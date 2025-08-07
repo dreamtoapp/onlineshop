@@ -4,6 +4,7 @@ import { generateOTP } from '@/lib/otp-Generator';
 import { sendOTPTemplate, sendOTPTextMessage, generateWhatsAppGuidanceURL } from '@/lib/whatsapp-template-api';
 import db from '@/lib/prisma';
 import { auth } from '@/auth';
+import { debug, error, warn } from '@/utils/logger';
 
 // Rate limiting helper
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -69,7 +70,7 @@ export const otpViaWhatsApp = async () => {
 
     // Only return fake OTP if WhatsApp token is completely missing
     if (!process.env.WHATSAPP_PERMANENT_TOKEN) {
-      console.log('⚠️ WhatsApp token missing, returning fake OTP');
+      warn('WhatsApp token missing, returning fake OTP');
       return {
         success: true,
         message: 'تم إرسال رمز التحقق (وهمي) - WhatsApp غير مُعد',
@@ -86,30 +87,30 @@ export const otpViaWhatsApp = async () => {
     let attemptLog = [];
 
     try {
-      // Primary method: Use template (works for all users, including new registrations)
-      console.log(`🔍 Attempting template message for user ${userId} (${userPhone})`);
-      whatsappResult = await sendOTPTemplate(userPhone, token);
-      attemptLog.push(`Template message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
+      // Primary method: Use text message (works for users who messaged business)
+      debug(`Attempting text message for user ${userId} (${userPhone})`);
+      whatsappResult = await sendOTPTextMessage(userPhone, token);
+      attemptLog.push(`Text message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
 
       if (!whatsappResult.success) {
-        console.log('Template failed, trying text message as fallback:', whatsappResult.error);
-        // Fallback: Use text message (only works if user messaged business within 24 hours)
-        console.log(`🔍 Attempting text message for user ${userId} (${userPhone})`);
-        whatsappResult = await sendOTPTextMessage(userPhone, token);
-        attemptLog.push(`Text message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
+        debug('Text message failed, trying template:', whatsappResult.error);
+        // Fallback: Use template (may work for new users, but has button structure issues)
+        debug(`Attempting template message for user ${userId} (${userPhone})`);
+        whatsappResult = await sendOTPTemplate(userPhone, token);
+        attemptLog.push(`Template message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
       }
-    } catch (error) {
-      console.error('WhatsApp API error:', error);
+    } catch (whatsappError) {
+      error('WhatsApp API error:', whatsappError instanceof Error ? whatsappError.message : 'Unknown error');
       whatsappResult = { success: false, error: 'WhatsApp API error' };
-      attemptLog.push(`API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      attemptLog.push(`API error: ${whatsappError instanceof Error ? whatsappError.message : 'Unknown error'}`);
     }
 
     // Log all attempts for debugging
-    console.log(`📊 OTP attempts for user ${userId}:`, attemptLog.join(' | '));
+    debug(`OTP attempts for user ${userId}:`, attemptLog.join(' | '));
 
     if (!whatsappResult.success) {
       // If WhatsApp fails, provide guidance with clickable WhatsApp link
-      console.error('WhatsApp OTP failed:', whatsappResult.error);
+      error('WhatsApp OTP failed:', whatsappResult.error);
       const whatsappGuidanceURL = generateWhatsAppGuidanceURL(userPhone);
 
       return {
@@ -133,8 +134,8 @@ export const otpViaWhatsApp = async () => {
       isFake: false
     };
 
-  } catch (error) {
-    console.error('Error in otpViaWhatsApp:', error);
+  } catch (otpError) {
+    error('Error in otpViaWhatsApp:', otpError instanceof Error ? otpError.message : 'Unknown error');
     return {
       success: false,
       message: 'خطأ في الخادم. يرجى المحاولة مرة أخرى'
@@ -203,8 +204,8 @@ export const verifyTheUser = async (code: string) => {
       message: 'تم التحقق من الرمز بنجاح'
     };
 
-  } catch (error) {
-    console.error('Error in verifyTheUser:', error);
+  } catch (verifyError) {
+    error('Error in verifyTheUser:', verifyError instanceof Error ? verifyError.message : 'Unknown error');
     return {
       success: false,
       message: 'خطأ في الخادم. يرجى المحاولة مرة أخرى'
@@ -248,8 +249,8 @@ export const resendOTP = async () => {
     // Send new OTP
     return await otpViaWhatsApp();
 
-  } catch (error) {
-    console.error('Error in resendOTP:', error);
+  } catch (resendError) {
+    error('Error in resendOTP:', resendError instanceof Error ? resendError.message : 'Unknown error');
     return {
       success: false,
       message: 'خطأ في الخادم. يرجى المحاولة مرة أخرى'
@@ -279,7 +280,7 @@ export const testArabicConfirmTemplate = async (phoneNumber: string) => {
       internationalPhone = phoneNumber;
     }
 
-    console.log(`📱 Testing Arabic confirm template for: ${phoneNumber} → ${internationalPhone}`);
+    debug(`Testing Arabic confirm template for: ${phoneNumber} → ${internationalPhone}`);
 
     const endpoint = `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`;
 
@@ -308,7 +309,7 @@ export const testArabicConfirmTemplate = async (phoneNumber: string) => {
       }
     };
 
-    console.log(`🔍 Testing Arabic confirm template:`, JSON.stringify(requestBody, null, 2));
+    debug(`Testing Arabic confirm template:`, JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -320,10 +321,10 @@ export const testArabicConfirmTemplate = async (phoneNumber: string) => {
     });
 
     const data = await response.json();
-    console.log(`📡 Arabic confirm template test response (${response.status}):`, JSON.stringify(data, null, 2));
+    debug(`Arabic confirm template test response (${response.status}):`, JSON.stringify(data, null, 2));
 
     if (response.ok) {
-      console.log(`✅ Arabic confirm template test SUCCESS!`);
+      debug(`Arabic confirm template test SUCCESS!`);
       return {
         success: true,
         data,
@@ -333,7 +334,7 @@ export const testArabicConfirmTemplate = async (phoneNumber: string) => {
         testOTP: testOTP
       };
     } else {
-      console.log(`❌ Arabic confirm template test FAILED:`, data.error?.message);
+      debug(`Arabic confirm template test FAILED:`, data.error?.message);
       return {
         success: false,
         error: data.error?.message || 'Template test failed',
@@ -343,9 +344,9 @@ export const testArabicConfirmTemplate = async (phoneNumber: string) => {
       };
     }
 
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('Error testing Arabic confirm template:', error);
+  } catch (templateError) {
+    const errorMessage = templateError instanceof Error ? templateError.message : 'Unknown error occurred';
+    error('Error testing Arabic confirm template:', errorMessage);
     return {
       success: false,
       error: errorMessage,

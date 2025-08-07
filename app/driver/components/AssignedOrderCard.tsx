@@ -19,6 +19,7 @@ import { useState } from 'react';
 import WhatsappShareButton from '@/components/WhatsappShareButton';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+import { debug } from '@/utils/logger';
 
 function AssignedOrderHeader({ order, onStartTrip, alertOpen, setAlertOpen, alertMessage }: any) {
     return (
@@ -165,7 +166,7 @@ export default function AssignedOrderCard({ order, driverId }: { order: any; dri
     const router = useRouter();
     const handleStartTrip = async () => {
         const res = await setOrderInTransit(order.id, driverId);
-        console.log('setOrderInTransit result:', res);
+        debug('setOrderInTransit result:', res);
         if (res.success && !res.error) {
             await Swal.fire({
                 icon: 'success', // This shows a green checkmark (universal for success)

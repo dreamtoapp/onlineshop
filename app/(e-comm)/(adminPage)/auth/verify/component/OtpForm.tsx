@@ -33,6 +33,8 @@ export default function OtpForm({ phone }: { phone: string }) {
   const [timer, setTimer] = useState(60);
   const [isOTPSent, setIsOTPSent] = useState(false);
   const [otpFromBackEnd, setOtpFromBackEnd] = useState('');
+  const [whatsappGuidanceURL, setWhatsappGuidanceURL] = useState<string>('');
+  const [showWhatsappGuidance, setShowWhatsappGuidance] = useState(false);
 
   const userPhone = phone || '';
 
@@ -76,7 +78,21 @@ export default function OtpForm({ phone }: { phone: string }) {
           setOtpFromBackEnd('');
         }
         setIsOTPSent(true);
-        setSuccess('تم إرسال رمز التحقق عبر WhatsApp بنجاح');
+
+        // Check if it's a fake OTP (WhatsApp failed)
+        if ('isFake' in result && result.isFake) {
+          setSuccess('تم إرسال رمز التحقق (وهمي) - خطأ في WhatsApp');
+          if ('whatsappGuidanceURL' in result && result.whatsappGuidanceURL) {
+            result.whatsappGuidanceURL.then(url => {
+              setWhatsappGuidanceURL(url);
+              setShowWhatsappGuidance(true);
+            });
+          }
+        } else {
+          setSuccess('تم إرسال رمز التحقق عبر WhatsApp بنجاح');
+          setShowWhatsappGuidance(false);
+        }
+
         setTimer(60);
         // Show OTP in dev mode
         if (
@@ -119,7 +135,21 @@ export default function OtpForm({ phone }: { phone: string }) {
         } else {
           setOtpFromBackEnd('');
         }
-        setSuccess('تم إعادة إرسال رمز التحقق عبر WhatsApp');
+
+        // Check if it's a fake OTP (WhatsApp failed)
+        if ('isFake' in result && result.isFake) {
+          setSuccess('تم إعادة إرسال رمز التحقق (وهمي) - خطأ في WhatsApp');
+          if ('whatsappGuidanceURL' in result && result.whatsappGuidanceURL) {
+            result.whatsappGuidanceURL.then(url => {
+              setWhatsappGuidanceURL(url);
+              setShowWhatsappGuidance(true);
+            });
+          }
+        } else {
+          setSuccess('تم إعادة إرسال رمز التحقق عبر WhatsApp');
+          setShowWhatsappGuidance(false);
+        }
+
         setTimer(60);
       } else {
         setError(result.message || 'حدث خطأ أثناء إعادة الإرسال');
@@ -209,6 +239,26 @@ export default function OtpForm({ phone }: { phone: string }) {
               <Alert variant="default" className="flex items-center gap-2 border-l-4 border-green-500 bg-green-50 text-green-800">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span>{success}</span>
+              </Alert>
+            )}
+            {showWhatsappGuidance && whatsappGuidanceURL && (
+              <Alert variant="default" className="flex flex-col gap-3 border-l-4 border-blue-500 bg-blue-50 text-blue-800">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium">للاستلام، يرجى إرسال رسالة إلى رقم WhatsApp أولاً</span>
+                </div>
+                <a
+                  href={whatsappGuidanceURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  إرسال رسالة WhatsApp
+                </a>
+                <p className="text-xs text-blue-700">
+                  انقر على الزر أعلاه لفتح WhatsApp مع رسالة جاهزة. أرسل الرسالة ثم حاول مرة أخرى.
+                </p>
               </Alert>
             )}
             {error && (

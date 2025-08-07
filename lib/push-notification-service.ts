@@ -1,6 +1,7 @@
 import webpush from 'web-push';
 import { VAPID_CONFIG, validateVapidConfig } from './vapid-config';
 import db from './prisma';
+import { debug, error, info } from '@/utils/logger';
 
 // Initialize web-push with VAPID keys
 validateVapidConfig();
@@ -25,10 +26,10 @@ export interface PushNotificationPayload {
   }>;
 }
 
-export type OrderNotificationType = 
+export type OrderNotificationType =
   | 'order_shipped'
   | 'driver_assigned'
-  | 'trip_started' 
+  | 'trip_started'
   | 'delivered'
   | 'cancelled';
 
@@ -44,7 +45,7 @@ export class PushNotificationService {
       });
 
       if (!subscription) {
-        console.log(`No push subscription found for user ${userId}`);
+        debug(`No push subscription found for user ${userId}`);
         return false;
       }
 
@@ -63,19 +64,19 @@ export class PushNotificationService {
         JSON.stringify(payload)
       );
 
-      console.log(`✅ Push notification sent to user ${userId}: ${payload.title}`);
+      info(`Push notification sent to user ${userId}: ${payload.title}`);
       return true;
-    } catch (error) {
-      console.error(`❌ Failed to send push notification to user ${userId}:`, error);
-      
+    } catch (pushError) {
+      error(`Failed to send push notification to user ${userId}:`, pushError instanceof Error ? pushError.message : 'Unknown error');
+
       // If subscription is invalid, remove it
       if (error instanceof Error && error.message.includes('410')) {
         await db.pushSubscription.delete({
           where: { id: userId }
         });
-        console.log(`🗑️ Removed invalid subscription for user ${userId}`);
+        debug(`Removed invalid subscription for user ${userId}`);
       }
-      
+
       return false;
     }
   }
@@ -103,7 +104,7 @@ export class PushNotificationService {
       }
     });
 
-    console.log(`📱 Batch push notification results: ${success.length} success, ${failed.length} failed`);
+    debug(`Batch push notification results: ${success.length} success, ${failed.length} failed`);
     return { success, failed };
   }
 
@@ -111,10 +112,10 @@ export class PushNotificationService {
    * Send order-specific notification
    */
   static async sendOrderNotification(
-    userId: string, 
-    orderId: string, 
-    orderNumber: string, 
-    type: OrderNotificationType, 
+    userId: string,
+    orderId: string,
+    orderNumber: string,
+    type: OrderNotificationType,
     driverName?: string
   ): Promise<boolean> {
     const templates = {
@@ -152,7 +153,7 @@ export class PushNotificationService {
 
     const template = templates[type];
     if (!template) {
-      console.error(`Unknown order notification type: ${type}`);
+      error(`Unknown order notification type: ${type}`);
       return false;
     }
 
@@ -200,22 +201,22 @@ export class PushNotificationService {
             title: 'Test',
             body: 'Test notification'
           }));
-        } catch (error) {
+        } catch (subscriptionError) {
           // If subscription is invalid, remove it
-          if (error instanceof Error && error.message.includes('410')) {
+          if (subscriptionError instanceof Error && subscriptionError.message.includes('410')) {
             await db.pushSubscription.delete({
               where: { id: subscription.id }
             });
             removedCount++;
-            console.log(`🗑️ Removed invalid subscription for user ${subscription.userId}`);
+            debug(`Removed invalid subscription for user ${subscription.userId}`);
           }
         }
       }
 
-      console.log(`🧹 Cleanup complete: removed ${removedCount} invalid subscriptions`);
+      info(`Cleanup complete: removed ${removedCount} invalid subscriptions`);
       return removedCount;
-    } catch (error) {
-      console.error('Error during subscription cleanup:', error);
+    } catch (cleanupError) {
+      error('Error during subscription cleanup:', cleanupError instanceof Error ? cleanupError.message : 'Unknown error');
       return 0;
     }
   }

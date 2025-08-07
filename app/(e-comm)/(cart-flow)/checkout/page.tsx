@@ -4,6 +4,7 @@ import CheckoutClient from "./components/CheckoutClient";
 import { getUser } from "./actions/getUser";
 import { mergeCartOnCheckout } from "./actions/mergeCartOnCheckout";
 import { getAddresses } from "./actions/getAddresses";
+import { debug, error } from '@/utils/logger';
 
 async function getPlatformSettings() {
   try {
@@ -22,8 +23,8 @@ async function getPlatformSettings() {
 
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.error('Error fetching platform settings:', error);
+  } catch (err) {
+    error('Error fetching platform settings:', err instanceof Error ? err.message : String(err));
     // Return default values if API fails
     return {
       taxPercentage: 15,
@@ -45,12 +46,12 @@ export default async function CheckoutPage() {
     getAddresses(session.user.id),
     getPlatformSettings()
   ]);
-  console.log(platformSettings, cart);
+  debug('Platform settings and cart:', { platformSettings, cart });
 
   // Check if database cart is empty, but don't redirect immediately
   // The CheckoutClient will handle Zustand cart as fallback
   if (!cart || !cart.items || cart.items.length === 0) {
-    console.log("Database cart is empty, will use Zustand cart as fallback");
+    debug("Database cart is empty, will use Zustand cart as fallback");
   }
 
   if (!user) return null;

@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 
 import { checkIsLogin } from '@/lib/check-is-login';
 import { User } from '@/types/databaseTypes';
+import { debug } from '@/utils/logger';
 // import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 
 // Custom type definitions
@@ -23,45 +24,45 @@ export const useCheckIsLogin = () => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        console.log('🔐 Fetching session from checkIsLogin...');
+        debug('Fetching session from checkIsLogin...');
         const user = await checkIsLogin();
-        console.log('🔐 checkIsLogin result:', !!user, user?.id);
+        debug('checkIsLogin result:', !!user, user?.id);
 
         if (user) {
           setSession(user);
           setStatus('authenticated');
-          console.log('🔐 Set status to authenticated');
+          debug('Set status to authenticated');
         } else {
           setSession(null);
           setStatus('unauthenticated');
-          console.log('🔐 Set status to unauthenticated');
+          debug('Set status to unauthenticated');
         }
-      } catch (err) {
-        console.error('🔐 Error fetching session:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch session');
+      } catch (sessionError) {
+        console.error('Error fetching session:', sessionError instanceof Error ? sessionError.message : 'Unknown error');
+        setError(sessionError instanceof Error ? sessionError.message : 'Failed to fetch session');
         setStatus('unauthenticated');
       }
     };
 
     // Debug logging
-    console.log('🔐 useCheckIsLogin - NextAuth Status:', nextAuthStatus, 'NextAuth Session:', !!nextAuthSession?.user);
+    debug('useCheckIsLogin - NextAuth Status:', nextAuthStatus, 'NextAuth Session:', !!nextAuthSession?.user);
 
     // Simplified logic - use NextAuth status directly
     if (nextAuthStatus === 'authenticated' && nextAuthSession?.user) {
-      console.log('🔐 NextAuth authenticated, fetching session...');
+      debug('NextAuth authenticated, fetching session...');
       fetchSession();
     } else if (nextAuthStatus === 'unauthenticated') {
-      console.log('🔐 NextAuth unauthenticated, setting status...');
+      debug('NextAuth unauthenticated, setting status...');
       setSession(null);
       setStatus('unauthenticated');
     } else if (nextAuthStatus === 'loading') {
-      console.log('🔐 NextAuth loading, setting status...');
+      debug('NextAuth loading, setting status...');
       setStatus('loading');
     }
 
     // Add fallback: if NextAuth is authenticated but we haven't fetched session yet
     if (nextAuthStatus === 'authenticated' && nextAuthSession?.user && status === 'loading') {
-      console.log('🔐 Fallback: NextAuth authenticated but status still loading, fetching session...');
+      debug('Fallback: NextAuth authenticated but status still loading, fetching session...');
       fetchSession();
     }
 

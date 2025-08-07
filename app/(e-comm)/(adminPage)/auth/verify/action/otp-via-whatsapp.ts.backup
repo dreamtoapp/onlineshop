@@ -2,6 +2,7 @@
 
 import { generateOTP } from '@/lib/otp-Generator';
 import { sendOTPTemplate, sendOTPTextMessage, generateWhatsAppGuidanceURL } from '@/lib/whatsapp-template-api';
+import { getWhatsAppConfig } from '@/lib/whatsapp/config';
 import db from '@/lib/prisma';
 import { auth } from '@/auth';
 
@@ -86,17 +87,17 @@ export const otpViaWhatsApp = async () => {
     let attemptLog = [];
 
     try {
-      // Primary method: Use template (works for all users, including new registrations)
-      console.log(`🔍 Attempting template message for user ${userId} (${userPhone})`);
-      whatsappResult = await sendOTPTemplate(userPhone, token);
-      attemptLog.push(`Template message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
+      // Primary method: Use text message (works for users who messaged business)
+      console.log(`🔍 Attempting text message for user ${userId} (${userPhone})`);
+      whatsappResult = await sendOTPTextMessage(userPhone, token);
+      attemptLog.push(`Text message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
 
       if (!whatsappResult.success) {
-        console.log('Template failed, trying text message as fallback:', whatsappResult.error);
-        // Fallback: Use text message (only works if user messaged business within 24 hours)
-        console.log(`🔍 Attempting text message for user ${userId} (${userPhone})`);
-        whatsappResult = await sendOTPTextMessage(userPhone, token);
-        attemptLog.push(`Text message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
+        console.log('Text message failed, trying template:', whatsappResult.error);
+        // Fallback: Use template (may work for new users, but has button structure issues)
+        console.log(`🔍 Attempting template message for user ${userId} (${userPhone})`);
+        whatsappResult = await sendOTPTemplate(userPhone, token);
+        attemptLog.push(`Template message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
       }
     } catch (error) {
       console.error('WhatsApp API error:', error);

@@ -1,10 +1,32 @@
-// utils/logger.ts
+import { shouldLog } from './logging-config';
 
-// (Optional) Flag to disable logging (e.g. in production or via env var)
-const disableLogging = (process.env.NODE_ENV === 'production' || process.env.DISABLE_LOGGING === 'true');
+// Enhanced logger functions with environment-based filtering
+export const log = (...args: any[]) => {
+  if (shouldLog('log')) {
+    console.log(...args);
+  }
+};
 
-// Helper (logger) functions that (if disableLogging is true) do nothing, otherwise call the corresponding console method.
-export const log = (disableLogging ? (() => {}) : (console.log.bind(console)));
-export const error = (disableLogging ? (() => {}) : (console.error.bind(console)));
-export const warn = (disableLogging ? (() => {}) : (console.warn.bind(console)));
-export const info = (disableLogging ? (() => {}) : (console.info.bind(console))); 
+export const debug = (...args: any[]) => {
+  if (shouldLog('debug')) {
+    console.log('[DEBUG]', ...args);
+  }
+};
+
+export const info = (...args: any[]) => {
+  if (shouldLog('info')) {
+    console.info('[INFO]', ...args);
+  }
+};
+
+export const warn = (...args: any[]) => {
+  if (shouldLog('warn')) {
+    console.warn('[WARN]', ...args);
+  }
+};
+
+export const error = (...args: any[]) => {
+  if (shouldLog('error')) {
+    console.error('[ERROR]', ...args);
+  }
+}; 

@@ -1,15 +1,16 @@
 "use server";
 import db from '@/lib/prisma';
+import { debug } from '@/utils/logger';
 
 export const setOrderInTransit = async (
   orderId: string,
   driverId: string
 ): Promise<{ success: boolean; error?: string; order?: any }> => {
   try {
-    console.log('setOrderInTransit called with:', { orderId, driverId });
+    debug('setOrderInTransit called with:', { orderId, driverId });
     // 1. Find the order and check assignment and status
     const order = await db.order.findUnique({ where: { id: orderId } });
-    console.log('Fetched order:', order);
+    debug('Fetched order:', order);
     if (!order) {
       return { success: false, error: 'Order not found' };
     }
@@ -27,7 +28,7 @@ export const setOrderInTransit = async (
         NOT: { id: orderId },
       },
     });
-    console.log('Existing IN_TRANSIT order:', existing);
+    debug('Existing IN_TRANSIT order:', existing);
     if (existing) {
       return { success: false, error: 'ACTIVE_TRIP_EXISTS' };
     }

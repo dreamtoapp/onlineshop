@@ -1,8 +1,23 @@
-import Image from 'next/image';
+'use client';
 
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import Link from '@/components/link';
 
 export default function Logo({ logo, logoAlt }: { logo: string; logoAlt: string }) {
+  const { theme, resolvedTheme } = useTheme();
+
+  // Determine which logo to use based on theme
+  const getLogoSource = () => {
+    if (logo) return logo; // Use provided logo if available
+
+    // Use theme-based fallback logos
+    const currentTheme = resolvedTheme || theme || 'light';
+    return currentTheme === 'dark'
+      ? '/fallback/dreamToApp2-dark.png'
+      : '/fallback/dreamToApp-light.png';
+  };
+
   return (
     <Link href='/' aria-label='الصفحة الرئيسية' className="shrink-0">
       <div
@@ -12,7 +27,7 @@ export default function Logo({ logo, logoAlt }: { logo: string; logoAlt: string 
         aria-label={logoAlt || 'شعار المتجر'}
       >
         <Image
-          src={logo || '/assets/logo.png'}
+          src={getLogoSource()}
           alt={logoAlt || 'شعار المتجر'}
           fill
           priority
