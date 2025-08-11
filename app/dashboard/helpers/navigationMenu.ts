@@ -76,6 +76,7 @@ export const navigationItems = [
       { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
       { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
       { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
+      { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
       { label: '---', href: '#', icon: 'Minus', key: 'divider-1' },
       { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
       { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },

@@ -44,6 +44,13 @@ export const CompanySchema = z.object({
   minShipping: z.number().min(0, 'حد التوصيل المجاني يجب أن يكون 0 أو أكثر').optional(),
   taxPercentage: z.number().min(0, 'نسبة الضريبة يجب أن تكون 0 أو أكثر').max(100, 'نسبة الضريبة يجب أن تكون 100 أو أقل').optional(),
 
+  // Cloudinary Settings (advanced UI)
+  cloudinaryCloudName: z.string().trim().optional().or(z.literal('')),
+  cloudinaryApiKey: z.string().trim().optional().or(z.literal('')),
+  cloudinaryApiSecret: z.string().trim().optional().or(z.literal('')),
+  cloudinaryUploadPreset: z.string().trim().optional().or(z.literal('')),
+  cloudinaryClientFolder: z.string().trim().optional().or(z.literal('')),
+
 });
 
 export type CompanyFormData = z.infer<typeof CompanySchema>;

@@ -10,7 +10,7 @@ Make client-specific configuration editable from the admin panel and stored in D
 Follow in strict order. Move to the next task ONLY when the current task’s Testing Gate is fully checked.
 
 ### Task 1 — Database Schema (Company) [FIRST]
-- [ ] Add ALL new fields to `Company` in `prisma/schema.prisma` (single migration)
+- [x] Add ALL new fields to `Company` in `prisma/schema.prisma` (single migration)
   - Prisma change snippet (additions only):
     ```prisma
     model Company {
@@ -59,31 +59,35 @@ Follow in strict order. Move to the next task ONLY when the current task’s Tes
       authCallbackUrl            String @default("")
     }
     ```
-- [ ] Run `prisma generate` and `prisma db push` on STAGING
+- [x] Run `prisma generate` and `prisma db push` on STAGING
 - [ ] Backfill from `.env` into `Company` (staging): create a one-off script or manual seed
+  - [skipped] Decision: populate via Admin UI instead of backfill script
 - [ ] Implement feature flags env variables per service group (e.g., `USE_DB_CLOUDINARY_*`, `USE_DB_WHATSAPP_*`, `USE_DB_PUSHER_*`, ...)
 - [ ] Prepare production backup + rollback plan
 
 Testing Gate (must pass before Task 2):
-- [ ] Schema visible in DB (staging)
-- [ ] Seeded values match `.env`
-- [ ] No errors in logs after deploy to staging
+- [x] Schema visible in DB (staging)
+- [skipped] Seeded values match `.env` (we will input values via Admin UI)
+- [x] No errors in logs after deploy to staging
 
 ### Task 2 — Admin UI (Full CRUD for Company Settings)
 - [ ] Extend existing Company settings UI under admin (do not create a new app section)
   - Suggested location: `app/dashboard/management/settings` (reuse existing pattern)
-- [ ] Add Cloudinary section fields with validation
-  - [ ] `cloudinaryCloudName`
-  - [ ] `cloudinaryApiKey`
-  - [ ] `cloudinaryApiSecret`
-  - [ ] `cloudinaryUploadPreset`
-  - [ ] `cloudinaryClientFolder`
-- [ ] Wire UI to `actions/settings.ts` for create/update with proper auth and CSRF protections
+- [ ] Add settings sections with validation (covering ALL variables)
+  - [ ] Cloudinary: `cloudinaryCloudName`, `cloudinaryApiKey`, `cloudinaryApiSecret`, `cloudinaryUploadPreset`, `cloudinaryClientFolder`
+  - [ ] WhatsApp: `whatsappPermanentToken`, `whatsappPhoneNumberId`, `whatsappApiVersion`, `whatsappBusinessAccountId`, `whatsappWebhookVerifyToken`, `whatsappAppSecret`, `whatsappNumber`
+  - [ ] Email/SMTP: `emailUser`, `emailPass`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPass`, `smtpFrom`
+  - [ ] Analytics: `gtmContainerId`
+  - [ ] Pusher: `pusherAppId`, `pusherKey`, `pusherSecret`, `pusherCluster`
+  - [ ] Web Push: `vapidPublicKey`, `vapidPrivateKey`, `vapidSubject`, `vapidEmail`
+  - [ ] Auth: `authCallbackUrl`
+- [ ] Wire UI to server actions for create/update with proper auth and CSRF protections
 - [ ] Use `revalidateTag('company')` on successful mutation
 - [ ] Ensure no secret values are leaked to client components
+  - Implementation status: Cloudinary section wired to `saveCompnay` with partial updates; more sections pending.
 
 Testing Gate (must pass before Task 3):
-- [ ] Admin can read/update Cloudinary settings successfully
+- [ ] Admin can read/update all settings successfully
 - [ ] Cache invalidates and UI reflects new values
 - [ ] Secrets never rendered client-side
 - [ ] No unrelated UI affected
@@ -385,6 +389,10 @@ Additional WhatsApp touchpoints to update:
 - Test image upload after each file update
 - Monitor upload success rates
 - Test image optimization
+
+References:
+- [Cloudinary Node SDK configuration](https://cloudinary.com/documentation/node_integration#configuration)
+- [Image Upload API reference](https://cloudinary.com/documentation/image_upload_api_reference)
 
 #### **CLOUDINARY_API_KEY**
 **Files to update:**
