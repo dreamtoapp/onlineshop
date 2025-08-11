@@ -88,7 +88,7 @@ function CircularProfileImage({
     formData.append('tableField', 'image');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/images`, {
+      const response = await fetch(`/api/images`, {
         method: 'POST',
         body: formData,
       });

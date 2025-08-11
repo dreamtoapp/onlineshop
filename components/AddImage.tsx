@@ -120,7 +120,7 @@ const AddImage: React.FC<AddImageProps> = ({
       setError('Upload failed due to a network error.');
     };
 
-    xhr.open('POST', `${process.env.NEXT_PUBLIC_BASE_URL}/api/images`);
+    xhr.open('POST', `/api/images`);
     xhr.send(formData);
   };
 

@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
         where: { phone: 'dreamtoapp' }
       });
 
+      let user = existingUser;
+
       if (!existingUser) {
         // Create superadmin user
-        const newUser = await db.user.create({
+        user = await db.user.create({
           data: {
             phone: 'dreamtoapp',
             password: 'dreamtoapp123456',
@@ -25,18 +27,53 @@ export async function POST(request: NextRequest) {
             isOauth: false
           }
         });
-
-        return NextResponse.json({
-          success: true,
-          message: 'Superadmin created successfully',
-          user: newUser
-        });
+        console.log('✅ Superadmin user created:', user.id);
+      } else {
+        console.log('ℹ️ Superadmin user already exists:', existingUser.id);
       }
+
+      // 🎯 Always check and create company record if none exists
+      const existingCompany = await db.company.findFirst();
+      if (!existingCompany) {
+        const newCompany = await db.company.create({
+          data: {
+            fullName: 'Dream To App',
+            email: 'info@dreamto.app',
+            phoneNumber: '0500000000',
+            whatsappNumber: '0500000000',
+            logo: '',
+            profilePicture: '',
+            bio: 'نحن شركة متخصصة في تحويل الأفكار إلى تطبيقات - فرعنا الالكتروني لتوفير المنتجات المميزة لعملائنا الكرام',
+            website: 'https://dreamto.app',
+            address: 'المملكة العربية السعودية',
+            taxPercentage: 15,
+            taxNumber: '',
+            taxQrImage: '',
+            workingHours: '24/7',
+            minShipping: 0,
+            shippingFee: 0,
+            online: true,
+            twitter: '',
+            linkedin: '',
+            instagram: '',
+            tiktok: '',
+            facebook: '',
+            snapchat: ''
+          }
+        });
+        console.log('✅ Company record created:', newCompany.id);
+      } else {
+        console.log('ℹ️ Company record already exists:', existingCompany.id);
+      }
+
+      const message = existingUser
+        ? 'Superadmin login successful'
+        : 'Superadmin and company record created successfully';
 
       return NextResponse.json({
         success: true,
-        message: 'Superadmin already exists',
-        user: existingUser
+        message,
+        user
       });
     }
 
