@@ -321,6 +321,49 @@ model Company {
   longitude String? // Longitude of the company location
   createdAt DateTime @default(now()) // Timestamp of creation
   updatedAt DateTime @updatedAt // Timestamp of last update
+
+  // --- DB-backed settings (ENV to DB) ---
+  // WhatsApp settings
+  whatsappPermanentToken     String @default("")
+  whatsappPhoneNumberId      String @default("")
+  whatsappApiVersion         String @default("v23.0")
+  whatsappBusinessAccountId  String @default("")
+  whatsappWebhookVerifyToken String @default("")
+  whatsappAppSecret          String @default("")
+
+  // Email/SMTP settings
+  emailUser String @default("")
+  emailPass String @default("")
+  smtpHost  String @default("")
+  smtpPort  String @default("")
+  smtpUser  String @default("")
+  smtpPass  String @default("")
+  smtpFrom  String @default("")
+
+  // Analytics (GTM)
+  gtmContainerId String @default("")
+
+  // Cloudinary
+  cloudinaryCloudName    String @default("")
+  cloudinaryApiKey       String @default("")
+  cloudinaryApiSecret    String @default("")
+  cloudinaryUploadPreset String @default("")
+  cloudinaryClientFolder String @default("")
+
+  // Pusher
+  pusherAppId   String @default("")
+  pusherKey     String @default("")
+  pusherSecret  String @default("")
+  pusherCluster String @default("")
+
+  // Web Push (VAPID)
+  vapidPublicKey  String @default("")
+  vapidPrivateKey String @default("")
+  vapidSubject    String @default("")
+  vapidEmail      String @default("")
+
+  // Authentication
+  authCallbackUrl String @default("")
 }
 
 model NewLetter {
