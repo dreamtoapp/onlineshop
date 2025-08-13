@@ -198,23 +198,20 @@ export default function CloudinarySettingsForm({ company }: { company: any }) {
             </div>
           ) : null}
         </div>
-        <div className="mb-4 flex items-start gap-2 rounded-md border border-amber-300/60 bg-amber-50 p-3">
-          <InfoTooltip
-            side="right"
-            content="القيم (Cloud name, API key, API secret) ضرورية لعمل الرفع.
-لا تشاركها مع أي طرف. أي تعديل عليها يؤثر فوراً على الرفع."
-            iconSize={16}
-          />
-          <div>
-            <div className="font-semibold">بيانات حسّاسة</div>
-            <p className="text-sm text-muted-foreground">
-              يرجى التأكد من صحة القيم وعدم مشاركتها. أي تعديل سيؤثر مباشرة على رفع الوسائط.
-            </p>
-          </div>
-        </div>
+
         <form className="grid gap-4 max-w-2xl" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-2">
-            <Label htmlFor="cloudinaryCloudName">Cloudinary ID (Cloud name) <span className="ml-2 inline-flex items-center rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">مهم</span></Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="cloudinaryCloudName" className="mb-0">Cloudinary ID (Cloud name) <span className="ml-2 inline-flex items-center rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">مهم</span></Label>
+              <InfoTooltip
+                side="right"
+                iconSize={14}
+                content={
+                  "هذه القيم الخاصة بالوسائط (Cloud name / API Key / API Secret) ضرورية لنجاح الرفع. لا تشاركها مع أي طرف، وأي تغيير عليها قد يوقف الرفع حتى التصحيح."
+                }
+                tone="critical"
+              />
+            </div>
             <Input id="cloudinaryCloudName" placeholder="مثال: demo" {...register('cloudinaryCloudName')} />
             <p className="text-xs text-muted-foreground">
               موجود في Cloudinary Console → Settings → Account → Cloud name.
