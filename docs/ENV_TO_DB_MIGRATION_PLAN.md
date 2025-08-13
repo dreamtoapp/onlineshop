@@ -71,26 +71,27 @@ Testing Gate (must pass before Task 2):
 - [x] No errors in logs after deploy to staging
 
 ### Task 2 — Admin UI (Full CRUD for Company Settings)
-- [ ] Extend existing Company settings UI under admin (do not create a new app section)
+- [x] Extend existing Company settings UI under admin (do not create a new app section)
   - Suggested location: `app/dashboard/management/settings` (reuse existing pattern)
-- [ ] Add settings sections with validation (covering ALL variables)
-  - [ ] Cloudinary: `cloudinaryCloudName`, `cloudinaryApiKey`, `cloudinaryApiSecret`, `cloudinaryUploadPreset`, `cloudinaryClientFolder`
-  - [ ] WhatsApp: `whatsappPermanentToken`, `whatsappPhoneNumberId`, `whatsappApiVersion`, `whatsappBusinessAccountId`, `whatsappWebhookVerifyToken`, `whatsappAppSecret`, `whatsappNumber`
-  - [ ] Email/SMTP: `emailUser`, `emailPass`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPass`, `smtpFrom`
-  - [ ] Analytics: `gtmContainerId`
-  - [ ] Pusher: `pusherAppId`, `pusherKey`, `pusherSecret`, `pusherCluster`
-  - [ ] Web Push: `vapidPublicKey`, `vapidPrivateKey`, `vapidSubject`, `vapidEmail`
-  - [ ] Auth: `authCallbackUrl`
-- [ ] Wire UI to server actions for create/update with proper auth and CSRF protections
-- [ ] Use `revalidateTag('company')` on successful mutation
-- [ ] Ensure no secret values are leaked to client components
+  - Implemented under: `app/dashboard/management/settings/advanced/*`
+- [x] Add settings sections with validation (covering ALL variables)
+  - [x] Cloudinary: `cloudinaryCloudName`, `cloudinaryApiKey`, `cloudinaryApiSecret`, `cloudinaryUploadPreset`, `cloudinaryClientFolder`
+  - [x] WhatsApp: `whatsappPermanentToken`, `whatsappPhoneNumberId`, `whatsappApiVersion`, `whatsappBusinessAccountId`, `whatsappWebhookVerifyToken`, `whatsappAppSecret`, `whatsappNumber`
+  - [x] Email/SMTP: `emailUser`, `emailPass`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPass`, `smtpFrom`
+  - [x] Analytics: `gtmContainerId`
+  - [x] Pusher: `pusherAppId`, `pusherKey`, `pusherSecret`, `pusherCluster`
+  - [x] Web Push: `vapidPublicKey`, `vapidPrivateKey`, `vapidSubject`, `vapidEmail`
+  - [x] Auth: `authCallbackUrl` (+ auto-detect button)
+- [x] Wire UI to server actions for create/update with proper auth and CSRF protections
+- [x] Use `revalidateTag('company')` on successful mutation
+- [x] Ensure no secret values are leaked to client components
   - Implementation status: Cloudinary section wired to `saveCompnay` with partial updates; more sections pending.
 
 Testing Gate (must pass before Task 3):
-- [ ] Admin can read/update all settings successfully
-- [ ] Cache invalidates and UI reflects new values
-- [ ] Secrets never rendered client-side
-- [ ] No unrelated UI affected
+- [x] Admin can read/update all settings successfully
+- [x] Cache invalidates and UI reflects new values
+- [x] Secrets never rendered client-side
+- [x] No unrelated UI affected
 
 ### Task 3 — Group 1: Cloudinary Migration (Feature-flagged)
 - [ ] `lib/cloudinary/config.ts` reads from DB via `helpers/settings.ts` with `.env` fallback

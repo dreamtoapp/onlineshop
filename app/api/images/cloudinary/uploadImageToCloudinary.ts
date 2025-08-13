@@ -1,26 +1,21 @@
-// lib/cloudinary/uploadImageToCloudinary.ts
-import cloudinary from 'cloudinary';
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
+import cloudinary, { type UploadApiOptions, type UploadApiResponse } from 'cloudinary';
+import { initCloudinary } from '@/app/api/images/cloudinary/config';
 
-/**
- * Upload image to Cloudinary and return an optimized secure URL.
- * @param filePath - Local path or remote URL
- * @param preset - Cloudinary upload preset
- * @returns Optimized secure URL string
- */
-export async function uploadImageToCloudinary(filePath: string, preset: string, folder: string): Promise<string> {
-  // Validate Cloudinary configuration
-  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    throw new Error('Missing Cloudinary configuration. Please check environment variables.');
+
+export async function uploadImageToCloudinary(
+  filePath: string,
+  preset: string,
+  folder: string,
+): Promise<string> {
+  // Ensure Cloudinary SDK is initialized from the centralized config (DB or env)
+  const { error } = await initCloudinary();
+  if (error) {
+    throw new Error('Missing Cloudinary configuration. Please check Cloudinary settings.');
   }
 
   // Upload options - try with preset first, fallback without preset
-  const uploadOptions: any = {
+  const uploadOptions: UploadApiOptions = {
     folder: folder || 'products',
     resource_type: 'image',
     // Basic transformations during upload
@@ -35,13 +30,12 @@ export async function uploadImageToCloudinary(filePath: string, preset: string, 
     uploadOptions.upload_preset = preset;
   }
 
-  let result;
+  let result: UploadApiResponse;
   try {
     result = await cloudinary.v2.uploader.upload(filePath, uploadOptions);
   } catch (error) {
     // If preset fails, try without preset
     if (preset && error instanceof Error && error.message.includes('preset')) {
-      // console.warn('[CLOUDINARY] Preset failed, trying without preset:', preset);
       delete uploadOptions.upload_preset;
       result = await cloudinary.v2.uploader.upload(filePath, uploadOptions);
     } else {

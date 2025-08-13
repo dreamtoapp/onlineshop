@@ -348,7 +348,7 @@ model Company {
   cloudinaryApiKey       String @default("")
   cloudinaryApiSecret    String @default("")
   cloudinaryUploadPreset String @default("")
-  cloudinaryClientFolder String @default("")
+  cloudinaryClientFolder String @default("images")
 
   // Pusher
   pusherAppId   String @default("")

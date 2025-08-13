@@ -21,14 +21,12 @@ type AuthForm = z.infer<typeof AuthSchema>;
 export default function AuthSettingsForm({ company }: { company: any }) {
   const [isSaving, setIsSaving] = useState(false);
 
-  const { register, handleSubmit, reset, setValue, watch } = useForm<AuthForm>({
+  const { register, handleSubmit, reset, setValue } = useForm<AuthForm>({
     resolver: zodResolver(AuthSchema),
     defaultValues: {
       authCallbackUrl: company?.authCallbackUrl || '',
     },
   });
-
-  const authUrl = watch('authCallbackUrl');
 
   const detectFromBrowser = () => {
     try {

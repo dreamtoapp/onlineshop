@@ -140,6 +140,23 @@
 - [ ] Add tests for API routes and error handling
 - [ ] Test infrastructure (unit, integration, E2E)
 
+### Cloudinary Upload UX/Errors
+- [ ] Enhance server error payloads from `app/api/images/route.ts` with stable error codes and user-friendly messages
+  - Include: `code` (e.g., `MISSING_FIELDS`, `CLOUDINARY_UPLOAD_FAILED`, `DB_UPDATE_FAILED`), `details`
+  - Keep secrets out of responses; log internals server-side only
+- [ ] Client: normalize and display backend errors in a consistent toast/alert pattern
+  - Map backend `code` to localized messages
+  - Show actionable hints (e.g., check preset/folder, check credentials)
+- [ ] Remove `cloudinaryUploadPreset` from `Company` model and UI (preset optional with signed uploads)
+
+### Cloudinary Per-Client Storage Quota (Monetization)
+- [ ] Add per-company quota field `cloudQuotaBytes` (default: 1_073_741_824 for 1GB) and `quotaPeriod` ('monthly')
+- [ ] Create `CloudAssetUsage` log (companyId, bytes, assetId?, createdAt)
+- [ ] In upload route, pre-check file size against remaining quota; block > 100% with upgrade message
+- [ ] After successful upload, log bytes; on delete, subtract logged bytes
+- [ ] Add monthly usage bar with soft warnings at 80% and 95%, block at 100%
+- [ ] Optional: nightly reconciliation via Cloudinary Search API by folder/context to correct drift
+
 ---
 
 ## 🚀 PERFORMANCE

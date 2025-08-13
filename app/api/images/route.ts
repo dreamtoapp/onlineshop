@@ -3,8 +3,8 @@ import {
   NextResponse,
 } from 'next/server';
 
-import prisma from '@/lib/prisma';
-import { uploadImageToCloudinary } from '@/lib/sendTOCloudinary';
+import db from '@/lib/prisma';
+import { uploadImageToCloudinary } from '@/app/api/images/cloudinary/uploadImageToCloudinary';
 
 // Allowed models for image updates
 const SUPPORTED_TABLES = {
@@ -21,6 +21,31 @@ const SUPPORTED_TABLES = {
 
 type TableName = keyof typeof SUPPORTED_TABLES;
 
+async function resolveCloudinaryContext(table: TableName | null, overridePreset: string | null, overrideFolder: string | null) {
+  const useDbCloudinary = process.env.USE_DB_CLOUDINARY === 'true';
+  let uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || 'E-comm';
+  let clientFolder = process.env.CLOUDINARY_CLIENT_FOLDER || 'E-comm';
+
+  if (useDbCloudinary) {
+    try {
+      const company = await db.company.findFirst();
+      const dbPreset = (company as any)?.cloudinaryUploadPreset as string | undefined;
+      const dbFolder = (company as any)?.cloudinaryClientFolder as string | undefined;
+      if (dbPreset) uploadPreset = dbPreset;
+      if (dbFolder) clientFolder = dbFolder;
+      if (!dbPreset || !dbFolder) {
+        console.warn('[cloudinary] Using env fallback for preset/folder; missing DB values while USE_DB_CLOUDINARY=true');
+      }
+    } catch {
+      console.warn('[cloudinary] Failed to read preset/folder from DB; using env fallback');
+    }
+  }
+
+  const finalPreset = overridePreset || uploadPreset;
+  const finalFolder = overrideFolder || `${uploadPreset}/${clientFolder}/${table ?? ''}`;
+  return { finalPreset, finalFolder };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -33,12 +58,8 @@ export async function POST(req: NextRequest) {
     const folder = formData.get('folder') as string | null;
     const uploadOnly = formData.get('uploadOnly') as string | null;
 
-    // Use environment variables for Cloudinary configuration
-    const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || 'E-comm';
-    const clientFolder = process.env.CLOUDINARY_CLIENT_FOLDER || 'E-comm';
-    
-    // Build folder structure: uploadPreset/clientFolder/tableName or use provided folder
-    const finalFolder = folder || `${uploadPreset}/${clientFolder}/${table}`;
+    // Resolve preset/folder (DB when flagged, else env) and build final folder
+    const { finalPreset, finalFolder } = await resolveCloudinaryContext(table, cloudinaryPreset, folder);
 
 
 
@@ -51,7 +72,7 @@ export async function POST(req: NextRequest) {
             file: file?.name ?? null,
             table,
             uploadOnly: uploadOnly || 'false',
-            cloudinaryPreset: cloudinaryPreset || uploadPreset,
+            cloudinaryPreset: cloudinaryPreset || finalPreset,
             folder: finalFolder,
           },
         },
@@ -78,7 +99,7 @@ export async function POST(req: NextRequest) {
     let model;
     if (!uploadOnly) {
       const modelKey = SUPPORTED_TABLES[table];
-      model = (prisma as any)[modelKey];
+      model = (db as any)[modelKey];
 
       if (!model?.update) {
         return NextResponse.json(
@@ -92,10 +113,9 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`;
 
-    // Upload to Cloudinary using environment variables
+    // Upload to Cloudinary
     let imageUrl;
     try {
-      const finalPreset = cloudinaryPreset || uploadPreset;
       imageUrl = await uploadImageToCloudinary(dataUri, finalPreset, finalFolder);
       console.log('[CLOUDINARY UPLOAD SUCCESS]', {
         imageUrl,
@@ -105,7 +125,7 @@ export async function POST(req: NextRequest) {
       });
     } catch (cloudinaryError) {
       console.error('[CLOUDINARY UPLOAD ERROR]', cloudinaryError);
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'Failed to upload image to Cloudinary',
         details: cloudinaryError instanceof Error ? cloudinaryError.message : 'Unknown Cloudinary error'
       }, { status: 500 });
