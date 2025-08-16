@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getUserNotifications } from './actions/getUserNotifications';
 import { markAllAsRead, toggleNotificationRead } from './actions/markAsRead';
-import { getSystemNotificationIcon, getSystemNotificationStyle } from '@/helpers/notificationIconHelper';
+import { getSystemNotificationIcon, getSystemNotificationStyle } from './components/notificationIconHelper';
 
 type NotificationType = 'ORDER' | 'PROMO' | 'SYSTEM';
 

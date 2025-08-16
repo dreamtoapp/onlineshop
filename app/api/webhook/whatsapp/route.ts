@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWhatsAppConfig } from '@/lib/whatsapp/config';
 import crypto from 'crypto';
+import { saveIncomingMessage, recordMessageStatus } from '@/lib/whatsapp/whatsapp-webhook';
+import { info } from '@/utils/logger';
+import { ERROR_LOGGER } from '@/helpers/errorLogger';
+import { sendWhatsAppText } from '@/lib/whatsapp/send';
+
+// DB-backed WhatsApp webhook: verifies subscription (GET) and signatures (POST)
 
 // Verify webhook signature for security
 function verifyWebhookSignature(
@@ -28,7 +34,8 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get('hub.verify_token');
     const challenge = searchParams.get('hub.challenge');
 
-    const config = getWhatsAppConfig();
+    // DB config (per-tenant)
+    const config = await getWhatsAppConfig();
 
     if (mode === 'subscribe' && token === config.webhookVerifyToken) {
       console.log('✅ WhatsApp webhook verified successfully');
@@ -48,14 +55,16 @@ export async function POST(request: NextRequest) {
     const body = await request.text();
     const signature = request.headers.get('x-hub-signature-256');
 
-    // Verify webhook signature for security
-    const config = getWhatsAppConfig();
+    // Verify signature using DB app secret
+    const config = await getWhatsAppConfig();
     if (signature && !verifyWebhookSignature(body, signature, config.appSecret)) {
       console.error('❌ Invalid webhook signature');
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const data = JSON.parse(body);
+    const useDb = process.env.USE_DB_WHATSAPP_WEBHOOK_PROCESSING === 'true';
+    info('whatsapp.webhook', { kind: 'request', mode: useDb ? 'db' : 'log-only' });
 
     // Handle incoming messages and status updates
     if (data.object === 'whatsapp_business_account') {
@@ -66,41 +75,40 @@ export async function POST(request: NextRequest) {
       if (value?.messages) {
         // Handle incoming messages
         for (const message of value.messages) {
-          const from = message.from;
-          const text = message.text?.body;
-          const timestamp = message.timestamp;
+          info('whatsapp.webhook', { kind: 'message', waMessageId: message.id, fromWa: message.from, mode: useDb ? 'db' : 'log-only' });
 
-          console.log('📨 Received WhatsApp message:', {
-            from,
-            text,
-            timestamp,
-            messageId: message.id
-          });
+          if (useDb) {
+            try {
+              await saveIncomingMessage(value, message);
+            } catch (e) {
+              ERROR_LOGGER.api(e as Error, '/api/webhook/whatsapp');
+            }
+          }
 
-          // TODO: Implement message handling logic
-          // - Save to database
-          // - Send auto-reply
-          // - Process commands
+          // Optional auto-reply
+          if (process.env.AUTO_REPLY_ENABLED === 'true') {
+            try {
+              const to = message.from;
+              await sendWhatsAppText(to, 'مرحبا! تم استلام رسالتك. سنعاودك قريبًا.');
+            } catch (e) {
+              ERROR_LOGGER.api(e as Error, '/api/webhook/whatsapp');
+            }
+          }
         }
       }
 
       if (value?.statuses) {
         // Handle message status updates
         for (const status of value.statuses) {
-          const messageId = status.id;
-          const statusType = status.status;
-          const timestamp = status.timestamp;
+          info('whatsapp.webhook', { kind: 'status', waMessageId: status.id, status: status.status, mode: useDb ? 'db' : 'log-only' });
 
-          console.log('📊 Message status update:', {
-            messageId,
-            status: statusType,
-            timestamp
-          });
-
-          // TODO: Update message status in database
-          // - Track delivery status
-          // - Handle failures
-          // - Update analytics
+          if (useDb) {
+            try {
+              await recordMessageStatus(status);
+            } catch (e) {
+              ERROR_LOGGER.api(e as Error, '/api/webhook/whatsapp');
+            }
+          }
         }
       }
     }
@@ -108,6 +116,9 @@ export async function POST(request: NextRequest) {
     return new NextResponse('OK', { status: 200 });
   } catch (error) {
     console.error('❌ Webhook processing error:', error);
+    try {
+      ERROR_LOGGER.api(error as Error, '/api/webhook/whatsapp');
+    } catch { }
     return new NextResponse('Error', { status: 500 });
   }
 } 

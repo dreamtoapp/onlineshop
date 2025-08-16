@@ -3,15 +3,26 @@
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import Link from '@/components/link';
+import { useEffect, useState } from 'react';
 
 export default function Logo({ logo, logoAlt }: { logo: string; logoAlt: string }) {
   const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by not rendering theme-dependent content until mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Determine which logo to use based on theme
   const getLogoSource = () => {
     if (logo) return logo; // Use provided logo if available
 
-    // Use theme-based fallback logos
+    // Only use theme-based fallback after component is mounted to prevent hydration mismatch
+    if (!mounted) {
+      return '/fallback/dreamToApp-light.png'; // Default to light theme logo during SSR
+    }
+
     const currentTheme = resolvedTheme || theme || 'light';
     return currentTheme === 'dark'
       ? '/fallback/dreamToApp2-dark.png'

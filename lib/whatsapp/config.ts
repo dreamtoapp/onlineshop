@@ -1,4 +1,6 @@
 // WhatsApp Cloud API Configuration
+import db from '@/lib/prisma';
+
 export interface WhatsAppConfig {
   accessToken: string;
   phoneNumberId: string;
@@ -9,60 +11,39 @@ export interface WhatsAppConfig {
   environment: string;
 }
 
-// Validate WhatsApp configuration
-export function validateWhatsAppConfig(): { isValid: boolean; errors: string[] } {
-  const errors: string[] = [];
+// DB-only async getter (single responsibility)
+export async function getWhatsAppConfig(): Promise<WhatsAppConfig> {
+  const company = await db.company.findFirst();
+  if (!company) throw new Error('Company not configured');
 
-  const requiredVars = [
-    'WHATSAPP_PERMANENT_TOKEN',
-    'WHATSAPP_PHONE_NUMBER_ID',
-    'WHATSAPP_BUSINESS_ACCOUNT_ID',
-    'WHATSAPP_WEBHOOK_VERIFY_TOKEN',
-    'WHATSAPP_APP_SECRET'
-  ];
-
-  for (const varName of requiredVars) {
-    if (!process.env[varName]) {
-      errors.push(`Missing required environment variable: ${varName}`);
-    }
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors
+  const cfg: WhatsAppConfig = {
+    accessToken: company.whatsappPermanentToken || '',
+    phoneNumberId: company.whatsappPhoneNumberId || '',
+    apiVersion: company.whatsappApiVersion || 'v23.0',
+    businessAccountId: company.whatsappBusinessAccountId || '',
+    webhookVerifyToken: company.whatsappWebhookVerifyToken || '',
+    appSecret: company.whatsappAppSecret || '',
+    environment: company.whatsappEnvironment || 'production',
   };
+
+  // Validate required fields and fail fast
+  const missing: string[] = [];
+  if (!cfg.accessToken) missing.push('accessToken');
+  if (!cfg.phoneNumberId) missing.push('phoneNumberId');
+  if (missing.length) throw new Error(`WhatsApp configuration error: missing ${missing.join(', ')}`);
+
+  return cfg;
 }
 
-// Get WhatsApp configuration
-export function getWhatsAppConfig(): WhatsAppConfig {
-  const validation = validateWhatsAppConfig();
-
-  if (!validation.isValid) {
-    throw new Error(`WhatsApp configuration error: ${validation.errors.join(', ')}`);
-  }
-
-  return {
-    accessToken: process.env.WHATSAPP_PERMANENT_TOKEN!,
-    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID!,
-    apiVersion: process.env.WHATSAPP_API_VERSION || 'v23.0',
-    businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID!,
-    webhookVerifyToken: process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!,
-    appSecret: process.env.WHATSAPP_APP_SECRET!,
-    environment: process.env.WHATSAPP_ENVIRONMENT || 'production'
-  };
-}
-
-// Build API endpoint
-export function buildApiEndpoint(path: string): string {
-  const config = getWhatsAppConfig();
+export async function buildApiEndpoint(path: string): Promise<string> {
+  const config = await getWhatsAppConfig();
   return `https://graph.facebook.com/${config.apiVersion}/${config.phoneNumberId}${path}`;
 }
 
-// Get API headers
-export function getApiHeaders(): Record<string, string> {
-  const config = getWhatsAppConfig();
+export async function getApiHeaders(): Promise<Record<string, string>> {
+  const config = await getWhatsAppConfig();
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.accessToken}`,
+    Authorization: `Bearer ${config.accessToken}`,
   };
-} 
+}

@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
+import { getNextAuthURL } from '@/lib/auth-dynamic-config';
 
 export default function robots(): MetadataRoute.Robots {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const BASE_URL = getNextAuthURL();
 
   return {
     rules: [

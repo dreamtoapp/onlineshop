@@ -1,68 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { MapPin, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import FormError from '@/components/form-error';
-import { createAddress, updateAddress } from '../actions/addressActions';
+import { addressSchema, AddressInput } from '../helpers';
 import { getAddressFromLatLng } from '@/lib/getAddressFromLatLng';
-import InfoTooltip from '@/components/InfoTooltip';
-
-// Address validation schema
-const AddressSchema = z.object({
-    label: z.string().min(1, 'نوع العنوان مطلوب'),
-    district: z.string().min(1, 'الحي مطلوب'),
-    street: z.string().min(1, 'الشارع مطلوب'),
-    buildingNumber: z.string().min(1, 'رقم المبنى مطلوب'),
-    floor: z.string().optional(),
-    apartmentNumber: z.string().optional(),
-    landmark: z.string().optional(),
-    deliveryInstructions: z.string().optional(),
-    latitude: z.string().optional(),
-    longitude: z.string().optional(),
-});
-
-type AddressFormData = z.infer<typeof AddressSchema>;
-
-interface Address {
-    id: string;
-    label: string;
-    district: string;
-    street: string;
-    buildingNumber: string;
-    floor?: string | null;
-    apartmentNumber?: string | null;
-    landmark?: string | null;
-    deliveryInstructions?: string | null;
-    latitude?: string | null;
-    longitude?: string | null;
-    isDefault: boolean;
-}
+import { toast } from 'sonner';
+import { ERROR_MESSAGES } from '../helpers';
+import { AddressFormHeader } from './AddressFormHeader';
+import { AddressFormFields } from './AddressFormFields';
+import { AddressFormFooter } from './AddressFormFooter';
 
 interface AddressFormProps {
-    userId: string;
-    address?: Address | null;
-    onSubmit: () => void;
+    address?: AddressInput;
+    onSubmit: (data: AddressInput) => void;
     onCancel: () => void;
 }
 
-const addressLabels = [
-    { value: 'المنزل', label: 'المنزل' },
-    { value: 'العمل', label: 'العمل' },
-    { value: 'أخرى', label: 'أخرى' },
-];
-
-export default function AddressForm({ userId, address, onSubmit, onCancel }: AddressFormProps) {
+export default function AddressForm({ address, onSubmit, onCancel }: AddressFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isOptionalOpen, setIsOptionalOpen] = useState(false);
+    const [locationDetected, setLocationDetected] = useState(false);
+    const [locationError, setLocationError] = useState(false);
+    const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
+    const [isExtractionDialogOpen, setIsExtractionDialogOpen] = useState(false);
 
     const {
         register,
@@ -70,283 +32,141 @@ export default function AddressForm({ userId, address, onSubmit, onCancel }: Add
         setValue,
         watch,
         formState: { errors },
-    } = useForm<AddressFormData>({
-        resolver: zodResolver(AddressSchema),
-        defaultValues: {
-            label: address?.label || 'المنزل',
-            district: address?.district || '',
-            street: address?.street || '',
-            buildingNumber: address?.buildingNumber || '',
-            floor: address?.floor || '',
-            apartmentNumber: address?.apartmentNumber || '',
-            landmark: address?.landmark || '',
-            deliveryInstructions: address?.deliveryInstructions || '',
-            latitude: address?.latitude || '',
-            longitude: address?.longitude || '',
+    } = useForm({
+        resolver: zodResolver(addressSchema),
+        defaultValues: address || {
+            label: 'المنزل',
+            district: '',
+            street: '',
+            buildingNumber: '',
+            floor: '',
+            apartmentNumber: '',
+            landmark: '',
+            deliveryInstructions: '',
+            latitude: '',
+            longitude: '',
+            isDefault: false,
         },
     });
 
-    const handleFormSubmit = async (data: AddressFormData) => {
+    const handleFormSubmit = async (data: AddressInput) => {
+        console.log('Form submission started with data:', data); // Debug log
+        setIsSubmitting(true);
         try {
-            setIsSubmitting(true);
-
-            if (address) {
-                // Update existing address
-                const result = await updateAddress(address.id, data);
-                if (result.success) {
-                    toast.success('تم تحديث العنوان بنجاح');
-                    onSubmit();
-                } else {
-                    toast.error(result.message || 'فشل في تحديث العنوان');
-                }
-            } else {
-                // Create new address
-                const result = await createAddress(userId, data);
-                if (result.success) {
-                    toast.success('تم إضافة العنوان بنجاح');
-                    onSubmit();
-                } else {
-                    toast.error(result.message || 'فشل في إضافة العنوان');
-                }
-            }
+            await onSubmit(data);
+            console.log('Form submission successful'); // Debug log
         } catch (error) {
             console.error('Error submitting address:', error);
-            toast.error('حدث خطأ أثناء حفظ العنوان');
+            toast.error(ERROR_MESSAGES.CREATE_FAILED);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDetectLocation = async () => {
+    const onSubmitForm = handleSubmit(handleFormSubmit);
+
+    // Add logging to see form state
+    console.log('Form errors:', errors);
+    console.log('Form values:', watch());
+
+    const handleDetectLocation = useCallback(async () => {
         setLoading(true);
-        if (!navigator.geolocation) {
-            toast.error('المتصفح لا يدعم تحديد الموقع الجغرافي.');
-            setLoading(false);
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                const { latitude, longitude } = pos.coords;
-                const address = await getAddressFromLatLng(latitude, longitude);
-                setLoading(false);
-                if (address && address.address) {
-                    setValue('district', address.address.suburb || address.address.neighbourhood || address.address.city_district || address.address.city || '');
-                    setValue('street', address.address.road || address.address.pedestrian || address.address.residential || '');
-                    setValue('buildingNumber', address.address.house_number || '');
-                    setValue('landmark', address.address.landmark || address.address.attraction || address.address.public_building || '');
-                    setValue('latitude', address.lat || '');
-                    setValue('longitude', address.lon || '');
-                    toast.success('تم جلب العنوان بنجاح! يمكنك التعديل قبل الحفظ.');
-                } else {
-                    toast.error('تعذر جلب العنوان. حاول مرة أخرى.');
-                }
-            },
-            () => {
-                toast.error('تعذر تحديد الموقع. يرجى السماح بالوصول للموقع.');
-                setLoading(false);
+        setLocationDetected(false);
+        setLocationError(false);
+        setLocationAccuracy(null);
+        try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000,
+                });
+            });
+
+            const { latitude, longitude, accuracy } = position.coords;
+            setValue('latitude', latitude.toString());
+            setValue('longitude', longitude.toString());
+            setLocationAccuracy(accuracy);
+
+            const addressData = await getAddressFromLatLng(latitude, longitude);
+            if (addressData && addressData.address) {
+                setLocationDetected(true);
+            } else {
+                setLocationError(true);
             }
-        );
+        } catch (error) {
+            console.error('Error detecting location:', error);
+            setLocationError(true);
+        } finally {
+            setLoading(false);
+        }
+    }, [setValue]);
+
+    // Auto-detect location when component mounts
+    useEffect(() => {
+        if (!address?.latitude && !address?.longitude) {
+            handleDetectLocation();
+        }
+    }, [address?.latitude, address?.longitude, handleDetectLocation]);
+
+    const handleCoordinatesExtracted = async (coords: { lat: number; lng: number }) => {
+        try {
+            const { lat, lng } = coords;
+
+            // Update form coordinates
+            setValue('latitude', lat.toString());
+            setValue('longitude', lng.toString());
+
+            // Try to get address from new coordinates
+            const addressData = await getAddressFromLatLng(lat, lng);
+            if (addressData && addressData.address) {
+                // Address data available but not auto-filling fields
+            }
+
+            // Update location states
+            setLocationDetected(true);
+            setLocationError(false);
+            setLocationAccuracy(5); // Assume high accuracy for manual extraction
+        } catch (error) {
+            console.error('Error applying extracted coordinates:', error);
+            toast.error('حدث خطأ أثناء تحديث الإحداثيات');
+        }
     };
 
     return (
-        <div className="max-h-[80vh] overflow-y-auto p-2 sm:p-4">
-            <div className="mb-4">
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={handleDetectLocation}
-                    disabled={loading}
-                >
-                    <MapPin className="h-4 w-4" />
-                    {loading ? 'جاري تحديد الموقع...' : 'تحديد موقعي تلقائياً'}
-                </Button>
+        <form onSubmit={onSubmitForm} className="max-h-[80vh] flex flex-col">
+            {/* Form Header */}
+            <AddressFormHeader
+                label={watch('label')}
+                onLabelChange={(value) => setValue('label', value)}
+                latitude={watch('latitude') || ''}
+                longitude={watch('longitude') || ''}
+                loading={loading}
+                locationDetected={locationDetected}
+                locationError={locationError}
+                locationAccuracy={locationAccuracy}
+                onDetectLocation={handleDetectLocation}
+                isExtractionDialogOpen={isExtractionDialogOpen}
+                onExtractionDialogChange={setIsExtractionDialogOpen}
+                onCoordinatesExtracted={handleCoordinatesExtracted}
+            />
+
+            {/* Form Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto">
+                <AddressFormFields
+                    register={register}
+                    errors={errors}
+                    isOptionalOpen={isOptionalOpen}
+                    onOptionalOpenChange={setIsOptionalOpen}
+                />
             </div>
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-                {/* Address Label */}
-                <div className="space-y-2">
-                    <Label htmlFor="label">نوع العنوان</Label>
-                    <Select
-                        value={watch('label')}
-                        onValueChange={(value) => setValue('label', value)}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="اختر نوع العنوان" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {addressLabels.map((label) => (
-                                <SelectItem key={label.value} value={label.value}>
-                                    {label.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <FormError message={errors.label?.message} />
-                </div>
 
-                {/* District and Street */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="district">الحي</Label>
-                        <div className="relative">
-                            <Input
-                                {...register('district')}
-                                placeholder="اسم الحي"
-                                className="focus:border-feature-suppliers pr-8"
-                            />
-                            {watch('district') === '' && (
-                                <span className="absolute inset-y-0 left-2 flex items-center">
-                                    <InfoTooltip
-                                        content="يرجى إدخال هذا الحقل يدويًا لضمان دقة التوصيل."
-                                        iconSize={16}
-                                        iconClassName="text-info icon-enhanced"
-                                    />
-                                </span>
-                            )}
-                        </div>
-                        <FormError message={errors.district?.message} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="street">الشارع</Label>
-                        <div className="relative">
-                            <Input
-                                {...register('street')}
-                                placeholder="اسم الشارع"
-                                className="focus:border-feature-suppliers pr-8"
-                            />
-                            {watch('street') === '' && (
-                                <span className="absolute inset-y-0 left-2 flex items-center">
-                                    <InfoTooltip
-                                        content="يرجى إدخال هذا الحقل يدويًا لضمان دقة التوصيل."
-                                        iconSize={16}
-                                        iconClassName="text-info icon-enhanced"
-                                    />
-                                </span>
-                            )}
-                        </div>
-                        <FormError message={errors.street?.message} />
-                    </div>
-                </div>
-
-                {/* Building Number */}
-                <div className="space-y-2">
-                    <Label htmlFor="buildingNumber">رقم المبنى</Label>
-                    <div className="relative">
-                        <Input
-                            {...register('buildingNumber')}
-                            placeholder="رقم المبنى"
-                            className="focus:border-feature-suppliers pr-8"
-                        />
-                        {watch('buildingNumber') === '' && (
-                            <span className="absolute inset-y-0 left-2 flex items-center">
-                                <InfoTooltip
-                                    content="يرجى إدخال هذا الحقل يدويًا لضمان دقة التوصيل."
-                                    iconSize={16}
-                                    iconClassName="text-info icon-enhanced"
-                                />
-                            </span>
-                        )}
-                    </div>
-                    <FormError message={errors.buildingNumber?.message} />
-                </div>
-
-                {/* Floor and Apartment */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="floor">الطابق (اختياري)</Label>
-                        <Input
-                            {...register('floor')}
-                            placeholder="رقم الطابق"
-                            className="focus:border-feature-suppliers"
-                        />
-                        <FormError message={errors.floor?.message} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="apartmentNumber">رقم الشقة (اختياري)</Label>
-                        <Input
-                            {...register('apartmentNumber')}
-                            placeholder="رقم الشقة"
-                            className="focus:border-feature-suppliers"
-                        />
-                        <FormError message={errors.apartmentNumber?.message} />
-                    </div>
-                </div>
-
-                {/* Landmark */}
-                <div className="space-y-2">
-                    <Label htmlFor="landmark">معلم قريب (اختياري)</Label>
-                    <Input
-                        {...register('landmark')}
-                        placeholder="مثال: قرب مسجد، مقابل بنك، إلخ"
-                        className="focus:border-feature-suppliers"
-                    />
-                    <FormError message={errors.landmark?.message} />
-                </div>
-
-                {/* Delivery Instructions */}
-                <div className="space-y-2">
-                    <Label htmlFor="deliveryInstructions">تعليمات التوصيل (اختياري)</Label>
-                    <Textarea
-                        {...register('deliveryInstructions')}
-                        placeholder="أي تعليمات إضافية للموصل"
-                        className="focus:border-feature-suppliers"
-                        rows={3}
-                    />
-                    <FormError message={errors.deliveryInstructions?.message} />
-                </div>
-
-                {/* Coordinates */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="latitude">خط العرض (اختياري)</Label>
-                        <Input
-                            {...register('latitude')}
-                            placeholder="24.7136"
-                            className="focus:border-feature-suppliers"
-                        />
-                        <FormError message={errors.latitude?.message} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="longitude">خط الطول (اختياري)</Label>
-                        <Input
-                            {...register('longitude')}
-                            placeholder="46.6753"
-                            className="focus:border-feature-suppliers"
-                        />
-                        <FormError message={errors.longitude?.message} />
-                    </div>
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex gap-3 pt-4">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                        className="flex-1 btn-cancel-outline"
-                        disabled={isSubmitting}
-                    >
-                        إلغاء
-                    </Button>
-                    <Button
-                        type="submit"
-                        className="flex-1 btn-save"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                                جاري الحفظ...
-                            </>
-                        ) : (
-                            <>
-                                <MapPin className="h-4 w-4 ml-2" />
-                                {address ? 'تحديث العنوان' : 'إضافة العنوان'}
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </form>
-        </div>
+            {/* Form Footer */}
+            <AddressFormFooter
+                isSubmitting={isSubmitting}
+                onCancel={onCancel}
+                address={address}
+            />
+        </form>
     );
 } 

@@ -45,6 +45,8 @@ export const DEFAULT_COMPANY_SETTINGS = {
 
   // Auth
   authCallbackUrl: 'http://localhost:3000',
+  // Auth behavior toggles
+  requireWhatsappOtp: false,
 
   // Other client-only keys (example)
   googleMapsApiKey: 'AIzaSyDQcbJV7DpTft7TkYTutaJ9YBt-eMvn-3E',

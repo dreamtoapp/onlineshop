@@ -46,12 +46,10 @@ function InfoTooltipComponent({
   ariaLabel = 'معلومات إضافية',
   disabled = false,
   children,
-  asChild = false,
+  asChild = true,
   classNameTrigger,
   tone = 'info',
 }: InfoTooltipProps) {
-  if (disabled) return null;
-
   const iconSz = useMemo(() => mapIconSize(iconSize), [iconSize]);
   const toneClass = tone === 'critical' ? 'text-red-600' : tone === 'warning' ? 'text-amber-600' : iconClassName;
   const iconName = tone === 'critical' ? 'AlertTriangle' : tone === 'warning' ? 'AlertCircle' : 'Info';
@@ -60,6 +58,8 @@ function InfoTooltipComponent({
     : tone === 'warning'
       ? 'hover:text-amber-700 hover:bg-amber-50'
       : 'hover:text-foreground hover:bg-accent/30';
+
+  if (disabled) return null;
 
   const trigger = children ? (
     children
@@ -78,7 +78,7 @@ function InfoTooltipComponent({
 
   return (
     <Tooltip delayDuration={delayDuration}>
-      <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+      <TooltipTrigger asChild={asChild}>{trigger}</TooltipTrigger>
       <TooltipContent
         side={side}
         align={align}

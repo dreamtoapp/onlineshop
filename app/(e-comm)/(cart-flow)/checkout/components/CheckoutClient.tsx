@@ -7,13 +7,15 @@ import MiniCartSummary from "./MiniCartSummary";
 import ShiftSelectorWrapper from "./ShiftSelectorWrapper";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import PlaceOrderButton from "./PlaceOrderButton";
+import CheckoutProgressBar from "./CheckoutProgressBar";
+import CheckoutValidation from "./CheckoutValidation";
 import { AddressWithDefault } from "./AddressBook";
 import { UserProfile } from "./UserInfoCard";
 import { CartData } from "./PlaceOrderButton";
 import { TermsDialogContent } from "./TermsDialog";
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { CheckCircle, AlertCircle, FileText, User, MapPin, CreditCard, Receipt } from 'lucide-react';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 import { Badge } from '@/components/ui/badge';
 import type { Policy } from "./TermsDialog";
@@ -55,6 +57,63 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
         }
     }, [cart, zustandCart, router]);
 
+    // Progress tracking logic
+    const getCurrentStep = (): string => {
+        // Check user info completion
+        const userInfoComplete = user?.name && user?.phone && user?.isOtp === true;
+
+        // Check address selection
+        const addressComplete = selectedAddress && selectedAddress.latitude && selectedAddress.longitude;
+
+        // Check shift selection
+        const shiftComplete = selectedShiftId !== "";
+
+        // Check payment method selection
+
+
+        // Check terms acceptance
+        const termsComplete = termsAccepted;
+
+        if (!userInfoComplete) return "user-info";
+        if (!addressComplete) return "address";
+        if (!shiftComplete) return "payment";
+        if (!termsComplete) return "payment";
+        return "review";
+    };
+
+    const currentStep = getCurrentStep();
+
+    // Define checkout steps
+    const checkoutSteps = [
+        {
+            id: "user-info",
+            label: "بيانات العميل",
+            icon: <User className="h-4 w-4" />,
+            status: (currentStep === "user-info" ? "current" :
+                ["address", "payment", "review"].includes(currentStep) ? "completed" : "pending") as "completed" | "current" | "pending"
+        },
+        {
+            id: "address",
+            label: "عنوان التوصيل",
+            icon: <MapPin className="h-4 w-4" />,
+            status: (currentStep === "address" ? "current" :
+                ["payment", "review"].includes(currentStep) ? "completed" : "pending") as "completed" | "current" | "pending"
+        },
+        {
+            id: "payment",
+            label: "طريقة الدفع",
+            icon: <CreditCard className="h-4 w-4" />,
+            status: (currentStep === "payment" ? "current" :
+                currentStep === "review" ? "completed" : "pending") as "completed" | "current" | "pending"
+        },
+        {
+            id: "review",
+            label: "مراجعة الطلب",
+            icon: <Receipt className="h-4 w-4" />,
+            status: (currentStep === "review" ? "current" : "pending") as "completed" | "current" | "pending"
+        }
+    ];
+
     const fetchPolicies = async () => {
         setLoadingPolicies(true);
         setPoliciesError("");
@@ -81,6 +140,12 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
     return (
         <div className="min-h-screen bg-background">
             <div className="max-w-7xl mx-auto px-4 py-6">
+                {/* Checkout Progress Bar */}
+                <CheckoutProgressBar
+                    currentStep={currentStep}
+                    steps={checkoutSteps}
+                />
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
                         {user && <UserInfoCard user={user} />}
@@ -178,13 +243,22 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
                             </CardContent>
                         </Card>
 
+                        {/* Checkout Validation */}
+                        <CheckoutValidation
+                            user={user}
+                            selectedAddress={selectedAddress}
+                            selectedShiftId={selectedShiftId}
+                            selectedPaymentMethod={selectedPaymentMethod}
+                            termsAccepted={termsAccepted}
+                            cart={cart}
+                        />
+
                         <PlaceOrderButton
                             user={user}
                             selectedAddress={selectedAddress}
                             shiftId={selectedShiftId}
                             paymentMethod={selectedPaymentMethod}
                             termsAccepted={termsAccepted}
-                            platformSettings={platformSettings}
                         />
                     </div>
                     <div className="space-y-6">

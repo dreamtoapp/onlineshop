@@ -6,7 +6,8 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { getAccountById, getUserById } from './app/(e-comm)/(adminPage)/auth/action';
 import authConfig from './auth.config';
 import db from './lib/prisma';
-import { getNextAuthURL } from './lib/auth-dynamic-config';
+import { getNextAuthURLAsync } from './lib/auth-dynamic-config';
+
 
 export const {
   auth,
@@ -20,7 +21,8 @@ export const {
   basePath: '/api/auth',
   // Dynamic URL configuration for Vercel deployments
   ...(process.env.NODE_ENV === 'production' && {
-    url: getNextAuthURL(),
+    // prefer DB-backed URL when enabled; fall back to existing logic
+    url: await getNextAuthURLAsync(),
   }),
   ...authConfig,
   callbacks: {

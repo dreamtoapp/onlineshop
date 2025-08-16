@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, CheckCircle } from "lucide-react";
+import { ShoppingCart, AlertCircle, Loader2, Sparkles } from "lucide-react";
 import InfoTooltip from '@/components/InfoTooltip';
 import { createDraftOrder } from '../actions/orderActions';
 import { UserProfile } from './UserInfoCard';
@@ -29,14 +29,10 @@ interface PlaceOrderButtonProps {
     shiftId: string;
     paymentMethod: string;
     termsAccepted: boolean;
-    platformSettings?: {
-        taxPercentage: number;
-        shippingFee: number;
-        minShipping: number;
-    };
+
 }
 
-export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId, paymentMethod, termsAccepted, platformSettings }: PlaceOrderButtonProps) {
+export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId, paymentMethod, termsAccepted }: PlaceOrderButtonProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -49,21 +45,9 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
     const items = zustandItems.length > 0 ? zustandItems : (cart?.items || []);
     const hasItems = items.length > 0;
 
-    // Calculate subtotal using effective price (includes discounts)
-    const subtotal = items.reduce((sum, item) => {
-        if (!item.product) return sum;
-        const effectivePrice = 'discountedPrice' in item.product ? (item.product as any).discountedPrice : item.product.price || 0;
-        return sum + effectivePrice * (item.quantity || 1);
-    }, 0);
 
-    const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-    // Calculate total amount with delivery fee and tax (consistent with MiniCartSummary)
-    const defaultSettings = { taxPercentage: 15, shippingFee: 25, minShipping: 200 };
-    const settings = platformSettings || defaultSettings;
-    const deliveryFee = subtotal >= settings.minShipping ? 0 : settings.shippingFee;
-    const taxAmount = subtotal * (settings.taxPercentage / 100); // Tax on subtotal only
-    const total = subtotal + deliveryFee + taxAmount;
+
 
     // Validation: all 3 conditions
     const isAccountActivated = user.isOtp === true;
@@ -127,39 +111,65 @@ export default function PlaceOrderButton({ cart, user, selectedAddress, shiftId,
     };
 
     return (
-        <div className="space-y-4">
-            {/* Order Summary */}
-            <div className="p-4 bg-feature-commerce-soft rounded-lg border">
-                <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                        <ShoppingCart className="h-4 w-4 text-feature-commerce" />
-                        <span className="font-medium">جاهز للطلب</span>
-                    </div>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="text-sm text-muted-foreground">
-                    {totalItems} منتج • إجمالي {total.toFixed(2)} ريال
-                </div>
-            </div>
+        <div className="space-y-6">
             {/* Place Order Button with Info Tooltip */}
-            <div className="flex items-center gap-2 w-full">
+            <div className="space-y-4">
                 <Button
-                    className="btn-save w-full h-12 text-lg"
+                    className={`w-full h-14 text-xl font-bold transition-all duration-300 transform ${isValid && !loading
+                        ? 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 hover:shadow-xl hover:-translate-y-0.5'
+                        : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        } rounded-xl shadow-lg`}
                     disabled={!isValid || loading}
                     onClick={handlePlaceOrder}
                 >
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    {loading ? 'جاري تنفيذ الطلب...' : 'تنفيذ الطلب'}
+                    {loading ? (
+                        <>
+                            <Loader2 className="h-5 w-5 ml-2 animate-spin" />
+                            جاري تنفيذ الطلب...
+                        </>
+                    ) : (
+                        <>
+                            <ShoppingCart className="h-5 w-5 ml-2" />
+                            {isValid ? (
+                                <span className="flex items-center gap-2">
+                                    تنفيذ الطلب
+                                    <Sparkles className="h-4 w-4" />
+                                </span>
+                            ) : (
+                                'تنفيذ الطلب'
+                            )}
+                        </>
+                    )}
                 </Button>
+
                 {!isValid && (
-                    <InfoTooltip
-                        content={infoMessage}
-                    />
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl">
+                        <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
+                            <AlertCircle className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-lg text-amber-800 mb-1">مطلوب لاتمام عملية الشراء</h4>
+                            <p className="text-base text-amber-700 font-medium">{infoMessage}</p>
+                        </div>
+                        <InfoTooltip content={infoMessage} />
+                    </div>
                 )}
             </div>
+
+            {/* Error Display */}
             {error && (
-                <div className="text-center text-red-600 text-sm mt-2">
-                    {Array.isArray(error) ? error.join('، ') : error}
+                <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-100 text-red-600 rounded-lg">
+                            <AlertCircle className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-lg text-red-800 mb-1">خطأ في الطلب</h4>
+                            <p className="text-base text-red-700 font-medium">
+                                {Array.isArray(error) ? error.join('، ') : error}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

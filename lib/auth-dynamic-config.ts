@@ -26,6 +26,21 @@ export function getNextAuthURL(): string {
   return process.env.NEXTAUTH_URL || 'http://localhost:3000';
 }
 
+// Async variant that can read from DB when feature flag is enabled
+export async function getNextAuthURLAsync(): Promise<string> {
+  try {
+    if (process.env.USE_DB_AUTH_CALLBACK === 'true') {
+      const { default: db } = await import('./prisma');
+      const company = await db.company.findFirst({ select: { authCallbackUrl: true } });
+      const urlFromDb = company?.authCallbackUrl?.trim();
+      if (urlFromDb) return urlFromDb;
+    }
+  } catch {
+    // ignore and fall back to existing logic below
+  }
+  return getNextAuthURL();
+}
+
 export function getOAuthCallbackURL(provider: string): string {
   const baseUrl = getNextAuthURL();
   return `${baseUrl}/api/auth/callback/${provider}`;
@@ -39,12 +54,12 @@ export function getOAuthConfig() {
 
   return {
     // Google OAuth
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackUrl: getOAuthCallbackURL('google'),
-    },
-    
+    // google: {
+    //   clientId: process.env.GOOGLE_CLIENT_ID!,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    //   callbackUrl: getOAuthCallbackURL('google'),
+    // },
+
     // Base configuration
     baseUrl: getNextAuthURL(),
     environment: {

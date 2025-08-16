@@ -611,11 +611,13 @@ export default function UserProfileForm({
   isOtp,
   hasDefaultAddress,
   defaultAddress,
+  globalOtpEnabled,
 }: {
   userData: UserFormData;
   isOtp: boolean;
   hasDefaultAddress: boolean;
   defaultAddress?: any;
+  globalOtpEnabled: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -695,13 +697,23 @@ export default function UserProfileForm({
           <ProfileHeader userData={userData} />
 
           <div className='space-y-2'>
-            {!isOtp && (
+            {globalOtpEnabled && !isOtp && (
               <ActionAlert
                 variant='destructive'
                 title='حساب غير مفعل'
                 description='تفعيل حسابك مطلوب للوصول الكامل إلى ميزات التطبيق وتقديم الطلبات.'
                 buttonText='الانتقال إلى التفعيل'
                 onAction={() => router.push('/auth/verify')}
+              />
+            )}
+            {!globalOtpEnabled && (
+              <ActionAlert
+                variant='default'
+                title='حساب مفعل تلقائياً'
+                description='WhatsApp OTP مفعل تلقائياً. لا حاجة لتفعيل إضافي.'
+                buttonText=''
+                onAction={() => { }}
+                hideButton={true}
               />
             )}
           </div>

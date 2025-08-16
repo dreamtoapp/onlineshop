@@ -6,7 +6,7 @@ import { auth } from '@/auth';
 import db from '@/lib/prisma';
 import { pusherServer } from '@/lib/pusherServer';
 // import { pusherServer } from '@/lib/pusherSetting';
-import { checkNewsletterExists, addNewsletter } from '@/helpers/newsletterHelpers';
+import { checkNewsletterExists, addNewsletter } from '@/app/(e-comm)/homepage/actions/newsletterHelpers';
 
 export async function subscribeToNewsletter(formData: FormData) {
   const email = formData.get('email') as string;
@@ -34,16 +34,16 @@ export async function subscribeToNewsletter(formData: FormData) {
       message: `مشترك جديدة   `,
       type: 'news',
     };
-          // Save the notification to the database
-      await db.userNotification.create({
-        data: {
-          title: 'اشتراك في النشرة الإخبارية',
-          body: notificationMessage,
-          type: 'INFO',
-          read: false,
-          userId: userId, // Associate the notification with the authenticated user
-        },
-      });
+    // Save the notification to the database
+    await db.userNotification.create({
+      data: {
+        title: 'اشتراك في النشرة الإخبارية',
+        body: notificationMessage,
+        type: 'INFO',
+        read: false,
+        userId: userId, // Associate the notification with the authenticated user
+      },
+    });
     // إرسال الإشعار عبر Pusher
     await pusherServer.trigger('admin', 'new-order', {
       message: notificationMessage, // Send the message as a string

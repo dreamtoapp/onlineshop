@@ -8,7 +8,11 @@ export async function updateCompany(partialData: Record<string, unknown>) {
   try {
     const existing = await db.company.findFirst();
     const data = Object.fromEntries(
-      Object.entries(partialData).filter(([, v]) => (typeof v === 'string' ? v.trim() !== '' : v !== undefined))
+      Object.entries(partialData).filter(([, v]) => {
+        if (typeof v === 'boolean') return true; // Always include boolean values
+        if (typeof v === 'string') return v.trim() !== '';
+        return v !== undefined;
+      })
     );
 
     if (!existing) {

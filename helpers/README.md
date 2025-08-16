@@ -1,41 +1,98 @@
-# Helpers Directory
+## helpers/ directory overview
 
-This directory contains utility functions for server actions and business logic.
+### helpers/clientErrorLogger.ts
+- **Exports**: `logClientError(error, context?)`, `CLIENT_ERROR_LOGGER.{form,component,action,network}`
+- **Purpose**: Client-safe error logging via POST `/api/log-error`
+- **Runtime**: Client-safe (uses `fetch`)
+- **Depends on**: `/api/log-error`
+- **Used by**: (no direct imports found; intended for client components)
+- **Notes**: Returns API `errorId` or fallback
+ 
+- **SAFE TO DELETE**: YES
 
-## Files:
+### helpers/system-error-email.ts
+- **Exports**: `sendErrorNotificationEmail(errorData)`
+- **Purpose**: Sends HTML email notification with severity styling
+- **Runtime**: Server (nodemailer)
+- **Depends on**: `nodemailer`, `EMAIL_USER`, `EMAIL_PASS`
+- **Used by**: `helpers/errorLogger.ts`
+- **Notes**: Sends to `dreamto@gmail.com`
+ 
+- **SAFE TO DELETE**: NO
 
-### newsletterHelpers.ts
-Utility functions for newsletter DB operations, such as checking if an email exists and adding a new subscriber.
+### helpers/errorLogger.ts
+- **Exports**: `logErrorToDatabase(error, context?)`, `ERROR_LOGGER.{database,api,payment,auth}`
+- **Purpose**: Central pipeline: severity → email → DB store
+- **Runtime**: Server (Prisma, NextAuth)
+- **Depends on**: `@/lib/prisma`, `@/auth`, `sendErrorNotificationEmail`
+- **Used by**:
+  - `app/api/log-error/route.ts`
+  - `app/api/webhook/whatsapp/route.ts` (`ERROR_LOGGER.api`)
+- **DB models**: `errorLog`
+- **Notes**: Email first, DB is best-effort
+- **SAFE TO DELETE**: NO
 
-### orderNumberGenerator.ts
-**Order Number Generation System**
+<!-- Removed from helpers/: newsletter helpers now live at `app/(e-comm)/homepage/actions/newsletterHelpers.ts` -->
 
-Generates unique sequential order numbers using atomic counter operations to prevent race conditions.
+### helpers/notificationHelper.ts
+- **Exports**: `sendOrderNotification(data)`, `testNotificationSystem(userId)`
+- **Purpose**: Orchestrates in-app + push notifications with logging
+- **Runtime**: Server
+- **Depends on**: `createOrderNotification`, `ORDER_NOTIFICATION_TEMPLATES`, `PushNotificationService`, `@/utils/logger`
+- **Used by**: (no direct usage located; project often calls `PushNotificationService` directly)
+- **Notes**: Returns `{ success, inAppSuccess, pushSuccess, details }`
+ 
+- **SAFE TO DELETE**: YES
 
-**Features:**
-- ✅ Sequential numbering with atomic increments
-- ✅ Customizable prefix, padding, and separator
-- ✅ Uniqueness validation
-- ✅ Fallback to timestamp if counter fails
+<!-- Removed from helpers/: notification icon helper is colocated with the notifications page at `app/(e-comm)/(adminPage)/user/notifications/components/notificationIconHelper.ts` -->
 
-**Usage:**
-```typescript
-import { OrderNumberGenerator } from "@/helpers/orderNumberGenerator";
+<!-- Not in helpers/: order number generator is managed in its feature folder -->
 
-// Default format: ORD-000001
-const orderNumber = await OrderNumberGenerator.generateOrderNumber();
+### helpers/systemNotifications.ts
+- **Exports**: `SYSTEM_NOTIFICATIONS`, `createSystemNotification(params)`
+- **Purpose**: Predefined onboarding notifications + DB create
+- **Runtime**: Server (Prisma)
+- **Depends on**: `@/lib/prisma`
+- **Used by**: `app/(e-comm)/(adminPage)/auth/register/actions/actions.ts`
+- **DB models**: `userNotification`
+ 
+- **SAFE TO DELETE**: NO
 
-// Custom format
-const customNumber = await OrderNumberGenerator.generateOrderNumber({
-  prefix: 'INV',
-  padding: 4,
-  separator: '/'
-});
+<!-- Not in helpers/: WhatsApp webhook helpers are managed with the API route -->
 
-// Check uniqueness
-const isUnique = await OrderNumberGenerator.isOrderNumberUnique(orderNumber);
-```
+<!-- Not in helpers/: WhatsApp utilities are colocated under `lib/whatsapp/` and actions -->
 
-**Format:**
-- Sequential: ORD-000001, ORD-000002, ORD-000003 (uses Counter model)
-- Fallback: ORD-1703123456789 (timestamp if counter fails) 
+## Cross-flows
+- **Error flow**: Client components → `clientErrorLogger` → `/api/log-error` → `logErrorToDatabase` → email + `errorLog`
+- **Notifications**: Onboarding via `systemNotifications`; UI renders with `notificationIconHelper`; unified send available via `notificationHelper`
+- **Orders**: `orderNumberGenerator` used in checkout to guarantee sequential numbers
+- **WhatsApp**: Webhook saves inbound + status; OTP uses number normalization and guidance URL
+
+## Usage audit (direct vs indirect)
+
+- `helpers/system-error-email.ts`
+  - **Direct imports**: `helpers/errorLogger.ts`
+  - **Indirect usage**: Any place calling `logErrorToDatabase` or `ERROR_LOGGER.*` sends emails through this helper
+
+- `helpers/errorLogger.ts`
+  - **Direct imports**: `app/api/log-error/route.ts`, `app/api/webhook/whatsapp/route.ts`
+  - **Indirect usage**: Client-side error POSTs to `/api/log-error` reach `logErrorToDatabase`
+
+- `helpers/systemNotifications.ts`
+  - **Direct imports**: `app/(e-comm)/(adminPage)/auth/register/actions/actions.ts`
+  - **Indirect usage**: none detected
+
+## Safe-to-remove candidates (no direct or indirect references)
+
+- None at this time (all files under `helpers/` are in active use)
+
+
+## Final deletion flags (based on deep scan)
+
+- helpers/clientErrorLogger.ts → SAFE TO DELETE: YES
+- helpers/system-error-email.ts → SAFE TO DELETE: NO
+- helpers/errorLogger.ts → SAFE TO DELETE: NO
+- helpers/notificationHelper.ts → SAFE TO DELETE: YES
+- helpers/systemNotifications.ts → SAFE TO DELETE: NO
+
+

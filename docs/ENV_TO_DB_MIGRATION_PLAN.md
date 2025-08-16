@@ -94,16 +94,16 @@ Testing Gate (must pass before Task 3):
 - [x] No unrelated UI affected
 
 ### Task 3 — Group 1: Cloudinary Migration (Feature-flagged)
-- [ ] `lib/cloudinary/config.ts` reads from DB via `helpers/settings.ts` with `.env` fallback
-- [ ] `app/api/images/route.ts` uses DB values (feature-flagged)
-- [ ] `lib/sendTOCloudinary.ts` uses DB values (feature-flagged)
-- [ ] `lib/cloudinary/uploadImageToCloudinary.ts` uses DB value for cloud name (feature-flagged)
+- [x] `app/api/images/cloudinary/config.ts` reads from DB with `.env` fallback (flag: `USE_DB_CLOUDINARY`)
+- [x] `app/api/images/route.ts` resolves preset/folder from DB when flagged, with env fallback
+- [x] `app/api/images/cloudinary/uploadImageToCloudinary.ts` initializes via centralized config
+- [x] Dead/legacy paths under `lib/cloudinary/*` not used by route
 
 Testing Gate (must pass before Task 4):
-- [ ] Image upload works in staging (product image path)
-- [ ] Upload preset and folder applied correctly
-- [ ] Feature flag off → uses `.env`; on → uses DB
-- [ ] No perf degradation; no new errors
+- [x] Image upload works (tested via `/api/images`)
+- [x] Upload preset optional; route falls back and uploader retries without preset
+- [x] Feature flag off → uses `.env`; on → uses DB
+- [x] No perf degradation; no new errors
 
 ### Task 4 — Group 2: WhatsApp Migration (Feature-flagged)
 - [ ] Migrate each variable one-by-one per “VARIABLE-BY-VARIABLE MIGRATION PLAN”

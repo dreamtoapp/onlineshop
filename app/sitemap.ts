@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 
 import prisma from '@/lib/prisma';
+import { getNextAuthURL } from '@/lib/auth-dynamic-config';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BASE_URL = getNextAuthURL();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [

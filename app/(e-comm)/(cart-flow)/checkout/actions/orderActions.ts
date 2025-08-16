@@ -4,7 +4,7 @@ import db from "@/lib/prisma";
 import { checkIsLogin } from "@/lib/check-is-login";
 import { getCart } from "@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActions";
 import { z } from "zod";
-import { OrderNumberGenerator } from "@/helpers/orderNumberGenerator";
+import { OrderNumberGenerator } from "@/app/(e-comm)/(cart-flow)/checkout/actions/orderNumberGenerator";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 // Validation schema

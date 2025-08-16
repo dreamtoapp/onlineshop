@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import db from '@/lib/prisma';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../helpers';
 
 interface AddressData {
   label: string;
@@ -29,14 +30,14 @@ export async function getAddresses(userId: string) {
     return {
       success: true,
       addresses,
-      message: 'تم جلب العناوين بنجاح',
+      message: SUCCESS_MESSAGES.FETCH_ADDRESSES,
     };
   } catch (error) {
     console.error('Error fetching addresses:', error);
     return {
       success: false,
       addresses: [],
-      message: 'فشل في جلب العناوين',
+      message: ERROR_MESSAGES.FETCH_ADDRESSES,
     };
   }
 }
@@ -62,14 +63,14 @@ export async function createAddress(userId: string, data: AddressData) {
     return {
       success: true,
       address: newAddress,
-      message: 'تم إضافة العنوان بنجاح',
+      message: SUCCESS_MESSAGES.CREATE_ADDRESS,
     };
   } catch (error) {
     console.error('Error creating address:', error);
     return {
       success: false,
       address: null,
-      message: 'فشل في إضافة العنوان',
+      message: ERROR_MESSAGES.CREATE_ADDRESS,
     };
   }
 }
@@ -87,14 +88,14 @@ export async function updateAddress(addressId: string, data: AddressData) {
     return {
       success: true,
       address: updatedAddress,
-      message: 'تم تحديث العنوان بنجاح',
+      message: SUCCESS_MESSAGES.UPDATE_ADDRESS,
     };
   } catch (error) {
     console.error('Error updating address:', error);
     return {
       success: false,
       address: null,
-      message: 'فشل في تحديث العنوان',
+      message: ERROR_MESSAGES.UPDATE_ADDRESS,
     };
   }
 }
@@ -109,7 +110,7 @@ export async function deleteAddress(addressId: string) {
     if (!address) {
       return {
         success: false,
-        message: 'العنوان غير موجود',
+        message: ERROR_MESSAGES.ADDRESS_NOT_FOUND,
       };
     }
 
@@ -125,7 +126,7 @@ export async function deleteAddress(addressId: string) {
       if (otherAddresses === 0) {
         return {
           success: false,
-          message: 'لا يمكن حذف العنوان الافتراضي الوحيد. أضف عنوانًا جديدًا أولاً.',
+          message: ERROR_MESSAGES.DEFAULT_ADDRESS_DELETE,
         };
       }
     }
@@ -139,13 +140,13 @@ export async function deleteAddress(addressId: string) {
 
     return {
       success: true,
-      message: 'تم حذف العنوان بنجاح',
+      message: SUCCESS_MESSAGES.DELETE_ADDRESS,
     };
   } catch (error) {
     console.error('Error deleting address:', error);
     return {
       success: false,
-      message: 'فشل في حذف العنوان',
+      message: ERROR_MESSAGES.DELETE_ADDRESS,
     };
   }
 }
@@ -160,7 +161,7 @@ export async function setDefaultAddress(addressId: string) {
     if (!address) {
       return {
         success: false,
-        message: 'العنوان غير موجود',
+        message: ERROR_MESSAGES.ADDRESS_NOT_FOUND,
       };
     }
 
@@ -183,13 +184,13 @@ export async function setDefaultAddress(addressId: string) {
 
     return {
       success: true,
-      message: 'تم تعيين العنوان كافتراضي بنجاح',
+      message: SUCCESS_MESSAGES.SET_DEFAULT_ADDRESS,
     };
   } catch (error) {
     console.error('Error setting default address:', error);
     return {
       success: false,
-      message: 'فشل في تعيين العنوان كافتراضي',
+      message: ERROR_MESSAGES.SET_DEFAULT_ADDRESS,
     };
   }
 }
@@ -206,14 +207,14 @@ export async function getDefaultAddress(userId: string) {
     return {
       success: true,
       address: defaultAddress,
-      message: defaultAddress ? 'تم العثور على العنوان الافتراضي' : 'لا يوجد عنوان افتراضي',
+      message: defaultAddress ? SUCCESS_MESSAGES.DEFAULT_ADDRESS_FOUND : ERROR_MESSAGES.DEFAULT_ADDRESS_NOT_FOUND,
     };
   } catch (error) {
     console.error('Error fetching default address:', error);
     return {
       success: false,
       address: null,
-      message: 'فشل في جلب العنوان الافتراضي',
+      message: ERROR_MESSAGES.DEFAULT_ADDRESS_FETCH,
     };
   }
 } 

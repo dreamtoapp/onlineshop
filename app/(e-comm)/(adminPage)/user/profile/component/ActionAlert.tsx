@@ -35,6 +35,7 @@ interface ActionAlertProps extends VariantProps<typeof alertVariants> {
     buttonText: string;
     onAction: () => void;
     className?: string;
+    hideButton?: boolean;
 }
 
 export function ActionAlert({
@@ -44,6 +45,7 @@ export function ActionAlert({
     buttonText,
     onAction,
     className,
+    hideButton = false,
 }: ActionAlertProps) {
     const Icon = iconMap[variant || 'default'];
 
@@ -57,12 +59,14 @@ export function ActionAlert({
             </CardHeader>
             <CardContent className='space-y-4'>
                 <p className='text-muted-foreground'>{description}</p>
-                <Button
-                    onClick={onAction}
-                    className='btn-action-primary w-full sm:w-auto'
-                >
-                    {buttonText}
-                </Button>
+                {!hideButton && (
+                    <Button
+                        onClick={onAction}
+                        className='btn-action-primary w-full sm:w-auto'
+                    >
+                        {buttonText}
+                    </Button>
+                )}
             </CardContent>
         </Card>
     );

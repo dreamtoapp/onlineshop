@@ -3,6 +3,7 @@
 import db from '@/lib/prisma';
 import { registerSchema } from '../helpers/registerSchema';
 import { createSystemNotification, SYSTEM_NOTIFICATIONS } from '@/helpers/systemNotifications';
+import { getCompanyOtpRequirement, shouldCreateUserAsVerified } from '@/helpers/featureFlags';
 
 export async function registerUser(_prevState: any, formData: FormData) {
   try {
@@ -36,13 +37,18 @@ export async function registerUser(_prevState: any, formData: FormData) {
       };
     }
 
-    // Create new user
+    // Get company OTP requirement setting using helper function
+    const requireOtp = await getCompanyOtpRequirement();
+    const shouldBeVerified = await shouldCreateUserAsVerified();
+
+    // Create new user with appropriate isOtp value
     const newUser = await db.user.create({
       data: {
         name,
         phone,
         password,
         role: 'CUSTOMER',
+        isOtp: shouldBeVerified, // true if OTP not required, false if OTP required
       },
     });
 
@@ -64,15 +70,18 @@ export async function registerUser(_prevState: any, formData: FormData) {
         actionUrl: '/user/addresses'
       });
 
-      // 3️⃣ Account activation notification
-      await createSystemNotification({
-        userId: newUser.id,
-        title: SYSTEM_NOTIFICATIONS.ACTIVATE_ACCOUNT.title,
-        body: SYSTEM_NOTIFICATIONS.ACTIVATE_ACCOUNT.body,
-        actionUrl: '/auth/verify'
-      });
+      // 3️⃣ Account activation notification (only if OTP is required)
+      if (requireOtp) {
+        await createSystemNotification({
+          userId: newUser.id,
+          title: SYSTEM_NOTIFICATIONS.ACTIVATE_ACCOUNT.title,
+          body: SYSTEM_NOTIFICATIONS.ACTIVATE_ACCOUNT.body,
+          actionUrl: '/auth/verify'
+        });
+      }
 
-      console.log('✅ Created 3 onboarding notifications for user:', newUser.id);
+      console.log(`✅ Created ${requireOtp ? '3' : '2'} onboarding notifications for user:`, newUser.id);
+      console.log(`📱 OTP Required: ${requireOtp}, User isOtp: ${shouldBeVerified}`);
     } catch (notificationError) {
       // Don't fail registration if notification fails
       console.error('⚠️ Failed to create onboarding notifications:', notificationError);
@@ -84,8 +93,9 @@ export async function registerUser(_prevState: any, formData: FormData) {
       redirectTo: '/user/addresses?welcome=true&message=أضف عنوانك الأول لتسهيل عملية التوصيل',
       phone,
       password,
+      requireOtp, // Include this for client-side handling
     };
-    
+
   } catch (error: any) {
     // Enhance error feedback for known DB errors
     if (error.code === 'P2002') {

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
+import { getWhatsAppConfig } from '@/lib/whatsapp/config';
 
 export async function GET() {
   try {
-    const accessToken = process.env.WHATSAPP_PERMANENT_TOKEN;
-    const businessAccountId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
-    const apiVersion = process.env.WHATSAPP_API_VERSION || 'v23.0';
+    // DB-backed WhatsApp config
+    const { accessToken, businessAccountId, apiVersion } = await getWhatsAppConfig();
 
     if (!accessToken || !businessAccountId) {
       return NextResponse.json({

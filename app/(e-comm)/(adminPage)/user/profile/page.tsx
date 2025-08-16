@@ -5,6 +5,7 @@ import getSession from '@/lib/getSession';
 import { userProfile } from './action/action';
 import UserProfileForm from './component/update-profile';
 import { getDefaultAddress } from '../addresses/actions/addressActions';
+import { shouldRequireWhatsappOtp } from '@/helpers/featureFlags';
 
 async function ProfilePage() {
   const session = await getSession();
@@ -19,6 +20,8 @@ async function ProfilePage() {
   const hasDefaultAddress = !!defaultAddressRes.address;
   const defaultAddress = defaultAddressRes.address || null;
 
+  // Check if global OTP is enabled
+  const globalOtpEnabled = await shouldRequireWhatsappOtp();
 
   if (!userData) {
     return <EmptyState message='لم يتم العثور على بيانات المستخدم' />;
@@ -36,7 +39,8 @@ async function ProfilePage() {
     isOtp={userData.isOtp}
     hasDefaultAddress={hasDefaultAddress}
     defaultAddress={defaultAddress}
-  />;
+    globalOtpEnabled={globalOtpEnabled}
+  />
 }
 
 export default ProfilePage;

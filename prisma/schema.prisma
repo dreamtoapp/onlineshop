@@ -330,6 +330,7 @@ model Company {
   whatsappBusinessAccountId  String @default("")
   whatsappWebhookVerifyToken String @default("")
   whatsappAppSecret          String @default("")
+  whatsappEnvironment        String @default("production")
 
   // Email/SMTP settings
   emailUser String @default("")
@@ -364,6 +365,8 @@ model Company {
 
   // Authentication
   authCallbackUrl String @default("")
+  // Auth behavior toggles
+  requireWhatsappOtp Boolean @default(false)
 }
 
 model NewLetter {
@@ -849,4 +852,34 @@ model PushSubscription {
   updatedAt DateTime @updatedAt
 
   // @@map("push_subscriptions")
+}
+
+// --- WhatsApp Webhook Persistence ---
+model WhatsappMessage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId    String?  @db.ObjectId
+  waMessageId  String   @unique
+  fromWa       String
+  toWa         String
+  direction    String   // 'inbound' | 'outbound'
+  type         String   // 'text' | 'image' | 'interactive' | 'unknown'
+  text         String?
+  raw          Json
+  receivedAt   DateTime @default(now())
+
+  // Denormalized latest status
+  lastStatus   String?
+  lastStatusAt DateTime?
+}
+
+model WhatsappMessageStatus {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId    String?  @db.ObjectId
+  waMessageId  String
+  status       String   // 'sent' | 'delivered' | 'read' | 'failed' | 'unknown'
+  reason       String?
+  raw          Json
+  occurredAt   DateTime @default(now())
+
+  @@unique([waMessageId, occurredAt])
 }

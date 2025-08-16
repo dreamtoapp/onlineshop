@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendMessage } from '@/lib/whatapp-cloud-api';
+import { sendOTPTemplate } from '@/lib/whatsapp/send-otp-template';
 
 export async function POST(request: NextRequest) {
   try {
-    const { phoneNumber, message } = await request.json();
+    const { phoneNumber, otp } = await request.json();
 
-    if (!phoneNumber || !message) {
+    if (!phoneNumber) {
       return NextResponse.json(
-        { error: 'Phone number and message are required' },
+        { error: 'Phone number is required' },
         { status: 400 }
       );
     }
 
-    // Test sending message
-    const result = await sendMessage(phoneNumber, message);
+    // Test sending OTP via template
+    const code = otp || Math.floor(100000 + Math.random() * 900000).toString();
+    const result = await sendOTPTemplate(phoneNumber, code);
 
     if (result.success) {
       return NextResponse.json({
         success: true,
-        message: 'Message sent successfully',
+        message: 'Template OTP sent successfully',
         data: result.data
       });
     } else {

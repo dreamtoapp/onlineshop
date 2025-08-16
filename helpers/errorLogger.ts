@@ -1,6 +1,6 @@
 import db from '@/lib/prisma';
 import { auth } from '@/auth';
-import { sendErrorNotificationEmail } from './errorEmailService';
+import { sendErrorNotificationEmail } from './system-error-email';
 
 // 🔍 Generate human-readable error ID for users to reference
 function generateErrorId(): string {
@@ -13,17 +13,17 @@ function generateErrorId(): string {
 function determineErrorSeverity(error: Error): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' {
   const message = error.message?.toLowerCase() || '';
   const stack = error.stack?.toLowerCase() || '';
-  
+
   // Critical errors
   if (
-    message.includes('database') || 
+    message.includes('database') ||
     message.includes('connection') ||
     message.includes('authentication') ||
     stack.includes('prisma')
   ) {
     return 'CRITICAL';
   }
-  
+
   // High severity errors
   if (
     message.includes('payment') ||
@@ -33,7 +33,7 @@ function determineErrorSeverity(error: Error): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRIT
   ) {
     return 'HIGH';
   }
-  
+
   // Low severity errors
   if (
     message.includes('validation') ||
@@ -42,7 +42,7 @@ function determineErrorSeverity(error: Error): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRIT
   ) {
     return 'LOW';
   }
-  
+
   // Default to medium
   return 'MEDIUM';
 }
@@ -50,7 +50,7 @@ function determineErrorSeverity(error: Error): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRIT
 // 🌐 Get browser and device information
 function getBrowserInfo(): string {
   if (typeof window === 'undefined') return 'Server-side';
-  
+
   const nav = navigator;
   return `${nav.userAgent} | Screen: ${screen.width}x${screen.height} | Platform: ${nav.platform}`;
 }
@@ -80,10 +80,10 @@ export async function logErrorToDatabase(
       userAgent,
       userId: session?.user?.id || null,
       severity,
-      timestamp: new Date().toLocaleString('ar-SA', { 
+      timestamp: new Date().toLocaleString('ar-SA', {
         timeZone: 'Asia/Riyadh',
         year: 'numeric',
-        month: 'long', 
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
@@ -125,17 +125,17 @@ export async function logErrorToDatabase(
 // 🎯 Quick error logging for specific error types
 export const ERROR_LOGGER = {
   // Database errors
-  database: (error: Error, query?: string) => 
+  database: (error: Error, query?: string) =>
     logErrorToDatabase(error, { additionalInfo: `Database query: ${query}` }),
-  
+
   // API errors  
   api: (error: Error, endpoint?: string) =>
     logErrorToDatabase(error, { additionalInfo: `API endpoint: ${endpoint}` }),
-  
+
   // Payment errors
   payment: (error: Error, orderId?: string) =>
     logErrorToDatabase(error, { additionalInfo: `Order ID: ${orderId}` }),
-  
+
   // Authentication errors
   auth: (error: Error, userId?: string) =>
     logErrorToDatabase(error, { additionalInfo: `User ID: ${userId}` })

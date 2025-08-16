@@ -1,9 +1,11 @@
 'use server';
 
 import { generateOTP } from '@/lib/otp-Generator';
-import { sendOTPTemplate, sendOTPTextMessage, generateWhatsAppGuidanceURL } from '@/lib/whatsapp-template-api';
+import { sendOTPTemplate } from '@/lib/whatsapp/send-otp-template';
+import { generateWhatsAppGuidanceURL } from '@/lib/whatsapp/whatsapp';
 import db from '@/lib/prisma';
 import { auth } from '@/auth';
+import { shouldRequireWhatsappOtp } from '@/helpers/featureFlags';
 
 // Rate limiting helper
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -29,6 +31,15 @@ const checkRateLimit = (userId: string): boolean => {
 // OTP via WhatsApp handler - Session-based
 export const otpViaWhatsApp = async () => {
   try {
+    // Check if OTP is enabled - gate the entire function
+    const otpEnabled = await shouldRequireWhatsappOtp();
+    if (!otpEnabled) {
+      return {
+        success: false,
+        message: 'OTP verification is currently disabled'
+      };
+    }
+
     // Get user from session
     const session = await auth();
     if (!session?.user?.id) {
@@ -91,13 +102,7 @@ export const otpViaWhatsApp = async () => {
       whatsappResult = await sendOTPTemplate(userPhone, token);
       attemptLog.push(`Template message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
 
-      if (!whatsappResult.success) {
-        console.log('Template failed, trying text message as fallback:', whatsappResult.error);
-        // Fallback: Use text message (only works if user messaged business within 24 hours)
-        console.log(`🔍 Attempting text message for user ${userId} (${userPhone})`);
-        whatsappResult = await sendOTPTextMessage(userPhone, token);
-        attemptLog.push(`Text message: ${whatsappResult.success ? 'SUCCESS' : 'FAILED - ' + whatsappResult.error}`);
-      }
+      // No SMS/text fallback – we only send template per requirement
     } catch (error) {
       console.error('WhatsApp API error:', error);
       whatsappResult = { success: false, error: 'WhatsApp API error' };
@@ -145,6 +150,15 @@ export const otpViaWhatsApp = async () => {
 // Verify OTP - Session-based
 export const verifyTheUser = async (code: string) => {
   try {
+    // Check if OTP is enabled - gate the entire function
+    const otpEnabled = await shouldRequireWhatsappOtp();
+    if (!otpEnabled) {
+      return {
+        success: false,
+        message: 'OTP verification is currently disabled'
+      };
+    }
+
     // Get user from session
     const session = await auth();
     if (!session?.user?.id) {
@@ -215,6 +229,15 @@ export const verifyTheUser = async (code: string) => {
 // Resend OTP with cooldown - Session-based
 export const resendOTP = async () => {
   try {
+    // Check if OTP is enabled - gate the entire function
+    const otpEnabled = await shouldRequireWhatsappOtp();
+    if (!otpEnabled) {
+      return {
+        success: false,
+        message: 'OTP verification is currently disabled'
+      };
+    }
+
     // Get user from session
     const session = await auth();
     if (!session?.user?.id) {

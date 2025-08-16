@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Clock, CheckCircle } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -59,23 +58,6 @@ export const ShiftSelector = ({ selectedShiftId, onShiftSelect }: ShiftSelectorP
     fetchShifts();
   }, [onShiftSelect, selectedShiftId]);
 
-  // Get current time for availability checking
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTime = currentHour * 60 + currentMinute; // Convert to minutes
-
-  const getShiftStatus = (shift: Partial<Shift>) => {
-    if (!shift.startTime) return 'available';
-
-    const [startHour, startMinute] = shift.startTime.split(':').map(Number);
-    const shiftStartTime = startHour * 60 + startMinute;
-
-    if (shiftStartTime <= currentTime) return 'passed';
-    if (shiftStartTime <= currentTime + 120) return 'soon';
-    return 'available';
-  };
-
   if (isLoading) {
     return (
       <Card>
@@ -92,7 +74,6 @@ export const ShiftSelector = ({ selectedShiftId, onShiftSelect }: ShiftSelectorP
   if (error) {
     return (
       <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
@@ -105,45 +86,20 @@ export const ShiftSelector = ({ selectedShiftId, onShiftSelect }: ShiftSelectorP
           <SelectValue placeholder="اختر وقت التوصيل المناسب" />
         </SelectTrigger>
         <SelectContent>
-          {shifts.filter(shift => shift.id).map((shift) => {
-            const status = getShiftStatus(shift);
-            const isAvailable = status === 'available';
-
-            return (
-              <SelectItem
-                key={shift.id}
-                value={shift.id!}
-                disabled={!isAvailable}
-                className="py-3"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">
-                      {shift.startTime} - {shift.endTime}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {status === 'available' && (
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
-                        متاح
-                      </Badge>
-                    )}
-                    {status === 'soon' && (
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 text-xs">
-                        قريباً
-                      </Badge>
-                    )}
-                    {status === 'passed' && (
-                      <Badge variant="secondary" className="bg-gray-100 text-gray-500 text-xs">
-                        انتهى
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </SelectItem>
-            );
-          })}
+          {shifts.filter(shift => shift.id).map((shift) => (
+            <SelectItem
+              key={shift.id}
+              value={shift.id!}
+              className="py-3"
+            >
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">
+                  {shift.startTime} - {shift.endTime}
+                </span>
+              </div>
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
