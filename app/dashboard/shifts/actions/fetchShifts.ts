@@ -7,9 +7,10 @@ export async function fetchShifts(): Promise<Partial<Shift>[]> {
     const shifts = await db.shift.findMany({
       select: {
         id: true,
+        name: true,
         startTime: true,
         endTime: true,
-        // omit fields like name, createdAt, updatedAt, etc.
+        // omit fields like createdAt, updatedAt, etc.
       },
     });
     return shifts;

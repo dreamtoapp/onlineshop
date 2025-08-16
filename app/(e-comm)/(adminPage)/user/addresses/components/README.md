@@ -42,3 +42,5 @@ AddressManagement (State & Logic)
 
 All components use the centralized `Address` interface from `types.ts` to ensure consistency and type safety across the component tree.
 
+
+
