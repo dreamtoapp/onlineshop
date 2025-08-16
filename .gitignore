@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/secret
 /.pnp
 .pnp.*
 .yarn/*
@@ -46,3 +47,5 @@ next-env.d.ts
 /test-results/
 /blob-report/
 /tests/screenshots/
+
+envcopy.md" 
