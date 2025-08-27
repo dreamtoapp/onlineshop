@@ -99,7 +99,7 @@ export async function assignDriverToOrder({
 
     // Check if driver exists and is available
     const driver = await prisma.user.findUnique({
-      where: { 
+      where: {
         id: driverId,
         role: 'DRIVER'
       },
@@ -137,14 +137,14 @@ export async function assignDriverToOrder({
 
     // Check driver capacity (configurable max orders) - TEMPORARILY DISABLED FOR TESTING
     const maxOrders = 999; // Temporarily set to very high number to bypass capacity check
-    
+
     // Debug: Log current driver orders for troubleshooting
     console.log(`Driver ${driver.name} (${driverId}) current orders:`, {
       totalOrders: driver.driverOrders.length,
       orderIds: driver.driverOrders.map(o => ({ id: o.id, status: o.status, orderNumber: o.orderNumber })),
       maxAllowed: maxOrders
     });
-    
+
     // TEMPORARILY COMMENTED OUT FOR TESTING
     /*
     if (driver.driverOrders.length >= maxOrders) {
@@ -182,15 +182,15 @@ export async function assignDriverToOrder({
     // Send notifications to customer
     try {
       console.log('🚀 [ASSIGNMENT] Sending notifications...');
-      
+
       // Import notification functions directly
       const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
       const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
-      const { PushNotificationService } = await import('@/lib/push-notification-service');
-      
+      // const { PushNotificationService } = await import('@/lib/push-notification-service'); // Removed - web push disabled
+
       // Create notification template
       const template = ORDER_NOTIFICATION_TEMPLATES.ORDER_SHIPPED(order.orderNumber, driver.name || undefined);
-      
+
       // Send in-app notification
       console.log('📱 [ASSIGNMENT] Sending in-app notification...');
       const inAppResult = await createOrderNotification({
@@ -200,19 +200,14 @@ export async function assignDriverToOrder({
         driverName: driver.name || undefined,
         ...template
       });
-      
+
       // Send push notification
-      console.log('🔔 [ASSIGNMENT] Sending push notification...');
-      const pushResult = await PushNotificationService.sendOrderNotification(
-        result.customerId,
-        orderId,
-        order.orderNumber,
-        'order_shipped',
-        driver.name || undefined
-      );
-      
+      console.log('🔔 [ASSIGNMENT] Push notifications disabled...');
+      // Push notifications removed - using Pusher real-time + database notifications only
+      const pushResult = { success: true, message: 'Push notifications disabled' };
+
       console.log(`✅ [ASSIGNMENT] Notifications sent - In-app: ${inAppResult.success}, Push: ${pushResult}`);
-      
+
     } catch (error) {
       console.error('❌ [ASSIGNMENT] Notification error:', error);
     }
@@ -238,7 +233,7 @@ export async function assignDriverToOrder({
 
   } catch (error) {
     console.error('Error assigning driver to order:', error);
-    
+
     return {
       success: false,
       message: 'حدث خطأ أثناء تعيين السائق',
@@ -296,7 +291,7 @@ export async function unassignDriverFromOrder(orderId: string): Promise<AssignDr
 
   } catch (error) {
     console.error('Error unassigning driver:', error);
-    
+
     return {
       success: false,
       message: 'حدث خطأ أثناء إلغاء تعيين السائق',
@@ -324,7 +319,7 @@ export async function bulkAssignDriver({
     }
 
     const driver = await prisma.user.findUnique({
-      where: { 
+      where: {
         id: driverId,
         role: 'DRIVER'
       },
@@ -358,7 +353,7 @@ export async function bulkAssignDriver({
 
     const maxOrders = 5;
     const currentOrders = driver.driverOrders.length;
-    
+
     if (currentOrders + orderIds.length > maxOrders) {
       return {
         success: false,
@@ -398,7 +393,7 @@ export async function bulkAssignDriver({
 
   } catch (error) {
     console.error('Error in bulk assignment:', error);
-    
+
     return {
       success: false,
       message: 'حدث خطأ أثناء التعيين المجمع',

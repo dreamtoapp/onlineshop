@@ -22,6 +22,7 @@ interface AddSupplierProps {
   defaultValues: SupplierFormData;
   title?: string;
   description?: string;
+  iconOnly?: boolean;
 }
 
 export default function AddSupplier({
@@ -29,6 +30,7 @@ export default function AddSupplier({
   defaultValues,
   title,
   description,
+  iconOnly = false,
 }: AddSupplierProps) {
   const {
     register,
@@ -63,18 +65,19 @@ export default function AddSupplier({
       trigger={
         <Button
           variant={mode === 'new' ? 'default' : 'outline'}
-          size="sm"
-          className="flex items-center gap-2"
+          size={iconOnly ? 'icon' : 'sm'}
+          className={iconOnly ? '' : 'flex items-center gap-2'}
+          aria-label={mode === 'new' ? 'إضافة' : 'تعديل'}
         >
           {mode === 'new' ? (
             <>
               <Icon name="Plus" size="xs" />
-              <span>إضافة</span>
+              {!iconOnly && <span>إضافة</span>}
             </>
           ) : (
             <>
               <Icon name="Edit" size="xs" />
-              <span>تعديل</span>
+              {!iconOnly && <span>تعديل</span>}
             </>
           )}
         </Button>
@@ -93,7 +96,12 @@ export default function AddSupplier({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {section.fields.map((field) => (
                 <div key={field.name} className={field.className}>
+                  <label className="block text-sm font-medium mb-1" htmlFor={`supplier-${String(field.name)}`}>
+                    {field.placeholder}
+                    {field.name === 'email' && <span className="text-muted-foreground text-xs"> (اختياري)</span>}
+                  </label>
                   <Input
+                    id={`supplier-${String(field.name)}`}
                     {...field.register}
                     type={field.type}
                     placeholder={field.placeholder}

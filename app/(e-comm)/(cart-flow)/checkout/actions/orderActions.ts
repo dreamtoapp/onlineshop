@@ -64,6 +64,12 @@ async function getPlatformSettings(): Promise<PlatformSettings> {
 // Single Responsibility: Calculate order totals
 function calculateOrderTotals(cart: any, platformSettings: PlatformSettings): OrderCalculation {
   const subtotal = cart.items.reduce((sum: number, item: any) => {
+    // Safety check: skip items with null/undefined products
+    if (!item.product) {
+      console.log('[calculateOrderTotals] Skipping item with null product:', item.id);
+      return sum;
+    }
+
     const effectivePrice = (item.product as any)?.discountedPrice || item.product?.price || 0;
     return sum + effectivePrice * (item.quantity || 1);
   }, 0);
@@ -172,37 +178,8 @@ async function notifyAdmins(order: any, customerName: string, total: number) {
     console.error('Failed to send real-time notifications:', error);
   }
 
-  // Send push notifications
-  try {
-    const { PushNotificationService } = await import('@/lib/push-notification-service');
-    const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
-
-    const template = ORDER_NOTIFICATION_TEMPLATES.NEW_ORDER(order.orderNumber, customerName, total);
-    const payload = {
-      title: template.title,
-      body: template.body,
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-192x192.png',
-      tag: `order-${order.id}-new`,
-      data: {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        type: 'new_order',
-        customerName,
-        total
-      },
-      requireInteraction: true,
-      actions: [
-        { action: 'view_order', title: 'عرض الطلب', icon: '/icons/icon-192x192.png' },
-        { action: 'close', title: 'إغلاق' }
-      ]
-    };
-
-    const adminUserIds = adminUsers.map(admin => admin.id);
-    await PushNotificationService.sendToUsers(adminUserIds, payload);
-  } catch (error) {
-    console.error('Failed to send push notifications:', error);
-  }
+  // Push notifications removed - using Pusher real-time + database notifications only
+  console.log('📱 Push notifications disabled - using alternative notification methods');
 }
 
 // Single Responsibility: Revalidate cache

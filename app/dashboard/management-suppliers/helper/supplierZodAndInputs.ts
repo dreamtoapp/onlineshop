@@ -9,10 +9,20 @@ import { z } from 'zod';
 export const SupplierSchema = z.object({
   id: z.string().trim().optional(),
   name: z.string().trim().nonempty('الاسم مطلوب'),
-  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة'),
+  email: z.string().trim().refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+    message: 'صيغة البريد الإلكتروني غير صحيحة'
+  }).optional(),
   phone: z.string().trim().nonempty('رقم الهاتف مطلوب'),
   address: z.string().trim().nonempty('العنوان مطلوب'),
   type: z.string(),
+  // VAT/TIN in Saudi Arabia is 15 digits; allow empty/undefined if not provided
+  taxNumber: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || /^\d{15}$/.test(val), {
+      message: 'الرقم الضريبي يجب أن يكون 15 رقمًا',
+    }),
 });
 
 export type SupplierFormData = z.infer<typeof SupplierSchema>;
@@ -51,6 +61,16 @@ export const getSupplierFields = (
           placeholder: 'الاسم',
           register: register('name'),
           error: errors.name?.message,
+        },
+        {
+          name: 'taxNumber',
+          type: 'text',
+          placeholder: 'الرقم الضريبي',
+          register: register('taxNumber', {
+            setValueAs: (v) => (typeof v === 'string' ? v.replace(/\D/g, '').slice(0, 15) : v),
+          }),
+          maxLength: 15,
+          error: (errors as any).taxNumber?.message,
         },
         {
           name: 'email',

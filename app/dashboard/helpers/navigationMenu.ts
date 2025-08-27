@@ -98,8 +98,8 @@ export const navigationItems = [
       { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
       { label: 'المالية', href: '/dashboard/management-expenses', icon: 'DollarSign' },
       { label: 'التقارير', href: '/dashboard/management-reports', icon: 'BarChart3' },
-      { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
-      { label: 'البيانات', href: '/dashboard/dataSeed', icon: 'Database' }
+      // { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
+      // { label: 'البيانات', href: '/dashboard/dataSeed', icon: 'Database' }
     ]
   }
 ];
@@ -107,7 +107,7 @@ export const navigationItems = [
 export type NavigationItem = {
   label: string;
   href: string;
-  icon: string;
+  icon?: string; // Made optional since some parent items may not need icons
   badge?: string;
   key?: string;
   children?: {

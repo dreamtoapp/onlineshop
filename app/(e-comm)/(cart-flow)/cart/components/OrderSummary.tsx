@@ -2,7 +2,18 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from '@/components/link';
 import { useRouter } from 'next/navigation';
-import { useCheckIsLogin } from '@/hooks/use-check-islogin';
+import { checkIsLogin } from '@/lib/check-is-login';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 // Types
 type GuestCartItem = { product: any; quantity: number };
@@ -68,10 +79,6 @@ function OrderDetails({
         </span>
       </div>
 
-
-
-
-
       <FreeShippingBanner subtotal={subtotal} />
     </div>
   );
@@ -92,45 +99,47 @@ function TotalAmount({ total }: { total: number }) {
 // Action Buttons Component
 function ActionButtons({
   onCheckout,
-
+  setShowLoginDialog,
 }: {
   onCheckout: () => void;
   showLoginDialog: boolean;
   setShowLoginDialog: (show: boolean) => void;
 }) {
-  const { isAuthenticated } = useCheckIsLogin();
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCheckoutClick = async () => {
+    setIsLoading(true);
+    try {
+      const user = await checkIsLogin();
+      if (user) {
+        onCheckout();
+      } else {
+        setShowLoginDialog(true);
+      }
+    } catch (error) {
+      setShowLoginDialog(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-3 pt-2">
-      {/* Login requirement banner for non-authenticated users */}
-      {!isAuthenticated && (
-        <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg border border-muted">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-feature-commerce">🔐</span>
-            <span className="font-medium">تسجيل الدخول مطلوب</span>
+      {/* Checkout button with loading state */}
+      <Button
+        className="w-full btn-save text-lg py-3 h-12"
+        onClick={handleCheckoutClick}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            جاري التحقق...
           </div>
-          <p>سجل دخولك لإتمام الطلب وحفظ سلة التسوق</p>
-        </div>
-      )}
-
-      {/* Checkout button - direct navigation for non-authenticated users */}
-      {isAuthenticated ? (
-        <Button
-          className="w-full btn-save text-lg py-3 h-12"
-          onClick={onCheckout}
-        >
-          متابعة للدفع
-        </Button>
-      ) : (
-        <Button
-          asChild
-          className="w-full btn-save text-lg py-3 h-12"
-          onClick={() => router.push('/auth/login')}
-        >
-          <Link href="/auth/login">تسجيل الدخول للدفع</Link>
-        </Button>
-      )}
+        ) : (
+          'متابعة للدفع'
+        )}
+      </Button>
 
       <Button asChild variant="outline" className="w-full border-feature-commerce text-feature-commerce hover:bg-feature-commerce-soft">
         <Link href="/">متابعة التسوق</Link>
@@ -151,28 +160,55 @@ export default function OrderSummary({
   showLoginDialog,
   setShowLoginDialog
 }: OrderSummaryProps) {
+  const router = useRouter();
+
   return (
-    <div className="sticky top-4">
-      <Card className="shadow-lg border-l-4 border-feature-commerce">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-feature-commerce">ملخص الطلب</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <OrderDetails
-            items={items}
-            subtotal={subtotal}
-            shipping={shipping}
-            tax={tax}
-            taxPercentage={taxPercentage}
-          />
-          <TotalAmount total={total} />
-          <ActionButtons
-            onCheckout={onCheckout}
-            showLoginDialog={showLoginDialog}
-            setShowLoginDialog={setShowLoginDialog}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <div className="sticky top-4">
+        <Card className="shadow-lg border-l-4 border-feature-commerce">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-feature-commerce">ملخص الطلب</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <OrderDetails
+              items={items}
+              subtotal={subtotal}
+              shipping={shipping}
+              tax={tax}
+              taxPercentage={taxPercentage}
+            />
+            <TotalAmount total={total} />
+            <ActionButtons
+              onCheckout={onCheckout}
+              showLoginDialog={showLoginDialog}
+              setShowLoginDialog={setShowLoginDialog}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Login prompt dialog when unauthenticated */}
+      <AlertDialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تسجيل الدخول مطلوب</AlertDialogTitle>
+            <AlertDialogDescription>
+              يجب تسجيل الدخول لإتمام عملية الطلب. سيتم إعادتك إلى صفحة الإتمام بعد تسجيل الدخول.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLoginDialog(false);
+                router.push('/auth/login?callbackUrl=%2Fcheckout');
+              }}
+            >
+              تسجيل الدخول
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 } 

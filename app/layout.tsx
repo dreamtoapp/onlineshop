@@ -10,7 +10,7 @@ import NextAuthSessionProvider from '../providers/session-provider';
 import { ThemeProvider } from '../providers/theme-provider';
 import WebVitalsCollector from '@/components/seo/WebVitalsCollector';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import ServiceWorkerRegistration from '@/app/components/ServiceWorkerRegistration';
+// Removed ServiceWorkerRegistration - web push notifications disabled
 
 export const metadata: Metadata = {
   title: 'Dream To App',
@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale} dir={dir} suppressHydrationWarning>
       {/* <head>{head()}</head> */}
       <body className={`${cairo.className} min-h-screen bg-background antialiased`}>
-        <ServiceWorkerRegistration />
+        {/* ServiceWorkerRegistration removed - web push notifications disabled */}
         <NextAuthSessionProvider>
           <WebVitalsCollector />
           <ThemeProvider

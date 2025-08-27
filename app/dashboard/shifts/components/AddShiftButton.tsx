@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { UI_TEXT } from '../helpers/uiText';
 import AddShiftModal from './AddShiftModal';
-import { Shift } from '@/types/databaseTypes';
+
 
 export default function AddShiftButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleShiftAdded = (newShift: Shift) => {
+  const handleShiftAdded = () => {
     // Refresh the page to show the new shift
     window.location.reload();
   };

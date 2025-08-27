@@ -32,10 +32,14 @@ function validateFormData(formData: SupplierFormData): ValidationResult {
 }
 
 // -------------------- ✅ Duplicate check --------------------
-async function isDuplicateSupplier(phone: string, email: string) {
+async function isDuplicateSupplier(phone: string, email?: string) {
+  const orConditions: any[] = [{ phone }];
+  if (email) {
+    orConditions.push({ email });
+  }
   const existingSupplier = await db.supplier.findFirst({
     where: {
-      OR: [{ phone }, { email }],
+      OR: orConditions,
     },
   });
 
@@ -44,7 +48,7 @@ async function isDuplicateSupplier(phone: string, email: string) {
 
 // -------------------- ✅ Create supplier --------------------
 async function createSupplier(data: SupplierFormData) {
-  const duplicate = await isDuplicateSupplier(data.phone, data.email);
+  const duplicate = await isDuplicateSupplier(data.phone, data.email || undefined);
   if (duplicate) {
     return {
       ok: false,
@@ -63,6 +67,7 @@ async function createSupplier(data: SupplierFormData) {
       email: data.email,
       phone: data.phone,
       address: data.address,
+      taxNumber: (data as any).taxNumber || undefined,
     },
   });
   revalidateTag('suppliers');
@@ -96,6 +101,7 @@ async function updateSupplier(data: SupplierFormData) {
       email: data.email,
       phone: data.phone,
       address: data.address,
+      taxNumber: (data as any).taxNumber || undefined,
     },
   });
   revalidateTag('suppliers');

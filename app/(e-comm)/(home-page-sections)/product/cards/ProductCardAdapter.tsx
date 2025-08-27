@@ -11,9 +11,10 @@ interface ProductCardAdapterProps {
     index?: number;
     discountPercentage?: number; // Optional global discount
     priority?: boolean;
+    logo?: string; // Company logo for fallback
 }
 
-const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, className, discountPercentage, priority }: ProductCardAdapterProps) {
+const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, className, discountPercentage, priority, logo = '/fallback/dreamToApp2-dark.png' }: ProductCardAdapterProps) {
     const { cart } = useCartStore();
     const cartQty = cart[product.id]?.quantity ?? 0;
     const inCart = cartQty > 0;
@@ -35,6 +36,7 @@ const ProductCardAdapter = React.memo(function ProductCardAdapter({ product, cla
             quantity={cartQty}
             isInCart={inCart}
             priority={priority}
+            logo={logo}
         />
     );
 });

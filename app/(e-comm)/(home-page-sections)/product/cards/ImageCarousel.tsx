@@ -16,7 +16,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
     const prev = () => setIndex((i) => (i === 0 ? images.length - 1 : i - 1));
     const next = () => setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
 
-    const current = images[index] ?? '/fallback/product-fallback.avif';
+    const current = images[index] ?? '/fallback/dreamToApp2-dark.png';
 
     const renderImage = (className?: string) => (
         <Image

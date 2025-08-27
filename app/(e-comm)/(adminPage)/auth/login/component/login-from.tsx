@@ -10,6 +10,7 @@ import { userLogin } from '../action/userLogin';
 import { syncCartOnLogin } from '@/app/(e-comm)/(cart-flow)/cart/helpers/cartSyncHelper';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { Label } from '@/components/ui/label';
 
 interface LoginFormProps {
   redirect?: string;
@@ -37,7 +38,8 @@ function FormFields({
   return (
     <div className="space-y-6">
       {/* Phone Input */}
-      <div>
+      <div className="flex flex-col gap-2">
+        <Label>رقم الهاتف</Label>
         <Input
           type="tel"
           name="phone"
@@ -52,7 +54,8 @@ function FormFields({
       </div>
 
       {/* Password Input */}
-      <div className="relative">
+      <div className="relative flex flex-col gap-2">
+        <Label>كلمة المرور</Label>
         <Input
           type={showPassword ? 'text' : 'password'}
           name="password"

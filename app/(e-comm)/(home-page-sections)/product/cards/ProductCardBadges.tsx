@@ -14,7 +14,7 @@ export default function ProductCardBadges({ product }: ProductCardBadgesProps) {
     if (!isOnSale) return null;
 
     return (
-        <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
+        <div className="absolute top-3 left-3 z-15 flex flex-col gap-1">
             {isOnSale && (
                 <span className="rounded-lg bg-destructive px-2.5 py-1 text-[10px] font-bold text-destructive-foreground shadow-sm">
                     -{discountPercentage}%

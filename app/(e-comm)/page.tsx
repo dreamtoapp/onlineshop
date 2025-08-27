@@ -5,6 +5,7 @@ import CategoryList from './homepage/component/category/CategoryList';
 import FeaturedPromotions from './homepage/component/offer/FeaturedPromotions';
 import { SWRConfig } from 'swr';
 import ProductInfiniteGrid from './homepage/component/ProductInfiniteGrid';
+import { companyInfo } from './actions/companyDetail';
 const PAGE_SIZE = 8;
 
 const CriticalCSS = dynamic(() => import('./homepage/component/CriticalCSS'), { ssr: true });
@@ -22,6 +23,10 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
     priceMin,
     priceMax,
   };
+
+  // Fetch company data for logo
+  const company = await companyInfo();
+  const logo = company?.logo || '/fallback/dreamToApp2-dark.png';
   const { products } = await getCachedProductsPage({ ...filters, page, pageSize: PAGE_SIZE }) as {
     products: any[];
     total: number;
@@ -44,7 +49,7 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
         </section>
         <section className="space-y-6" aria-label="Featured products">
           <SWRConfig value={{ fallback: { [firstPageKey]: { products } } }}>
-            <ProductInfiniteGrid initialProducts={products} filters={filters} />
+            <ProductInfiniteGrid initialProducts={products} filters={filters} logo={logo} />
           </SWRConfig>
         </section>
         <BackToTopButton />

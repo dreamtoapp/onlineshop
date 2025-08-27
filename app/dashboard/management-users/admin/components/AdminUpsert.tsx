@@ -2,11 +2,11 @@
 
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 import AppDialog from '@/components/app-dialog';
 import FormError from '@/components/form-error';
-import InfoTooltip from '@/components/InfoTooltip';
+// import InfoTooltip from '@/components/InfoTooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,17 +37,7 @@ export default function AdminUpsert({
     description,
     adminId
 }: AdminUpsertProps) {
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['البيانات الشخصية']));
-
-    const toggleSection = (sectionName: string) => {
-        const newExpanded = new Set(expandedSections);
-        if (newExpanded.has(sectionName)) {
-            newExpanded.delete(sectionName);
-        } else {
-            newExpanded.add(sectionName);
-        }
-        setExpandedSections(newExpanded);
-    };
+    // Collapsible removed for admin dialog
 
     const {
         register,
@@ -58,7 +48,7 @@ export default function AdminUpsert({
         getValues,
         watch,
     } = useForm<AdminFormData>({
-        resolver: zodResolver(AdminSchema),
+        resolver: zodResolver(AdminSchema) as any,
         mode: 'onChange',
         defaultValues: {
             name: defaultValues.name || '',
@@ -118,114 +108,83 @@ export default function AdminUpsert({
             }
         >
             <form id="admin-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {getAdminFields(register, errors).map((section) => {
-                    const isExpanded = expandedSections.has(section.section);
+                {getAdminFields(register, errors).map((section) => (
+                    <div key={section.section} className="space-y-3">
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {section.section}
+                        </h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            {section.fields.map((field) => {
+                                // Handle select fields
+                                if (field.type === 'select' && field.options) {
+                                    return (
+                                        <div key={field.name} className={field.className}>
+                                            <label className="block text-sm font-medium mb-1" htmlFor={`admin-${String(field.name)}`}>
+                                                {field.placeholder}
+                                            </label>
+                                            <Select
+                                                onValueChange={(value) => setValue(field.name as any, value)}
+                                                defaultValue={getValues(field.name as any)}
+                                                disabled={isSubmitting}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder={field.placeholder} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {field.options.map((option) => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormError message={field.error} />
+                                        </div>
+                                    );
+                                }
 
-                    return (
-                        <div key={section.section} className="border rounded-lg">
-                            <div className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-                                <button
-                                    type="button"
-                                    onClick={() => toggleSection(section.section)}
-                                    className="flex items-center gap-2 flex-1 text-left"
-                                >
-                                    <h3 className="text-sm font-semibold text-foreground">
-                                        {section.section}
-                                    </h3>
-                                    {!isExpanded && (
-                                        <span className="text-xs text-muted-foreground">({section.fields.length} حقول)</span>
-                                    )}
-                                </button>
+                                // Handle checkbox fields
+                                if (field.type === 'checkbox') {
+                                    return (
+                                        <div key={field.name} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={field.name}
+                                                checked={watch(field.name as any)}
+                                                onCheckedChange={(checked) => setValue(field.name as any, checked)}
+                                                disabled={isSubmitting}
+                                            />
+                                            <label
+                                                htmlFor={field.name}
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                {field.placeholder}
+                                            </label>
+                                            <FormError message={field.error} />
+                                        </div>
+                                    );
+                                }
 
-                                <div className="flex items-center gap-2">
-                                    {section.hint && (
-                                        <InfoTooltip content="يمكنك الحصول على خط العرض والطول من خلال مشاركة الموقع معك من خرائط Google أو أي تطبيق GPS آخر." />
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleSection(section.section)}
-                                        className="p-1 hover:bg-muted rounded transition-colors"
-                                    >
-                                        {isExpanded ? (
-                                            <Icon name="ChevronUp" className="h-4 w-4" />
-                                        ) : (
-                                            <Icon name="ChevronDown" className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {isExpanded && (
-                                <div className="p-4 pt-0 space-y-3">
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {section.fields.map((field) => {
-
-                                            // Handle select fields
-                                            if (field.type === 'select' && field.options) {
-                                                return (
-                                                    <div key={field.name} className={field.className}>
-                                                        <Select
-                                                            onValueChange={(value) => setValue(field.name as any, value)}
-                                                            defaultValue={getValues(field.name as any)}
-                                                            disabled={isSubmitting}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder={field.placeholder} />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {field.options.map((option) => (
-                                                                    <SelectItem key={option.value} value={option.value}>
-                                                                        {option.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormError message={field.error} />
-                                                    </div>
-                                                );
-                                            }
-
-                                            // Handle checkbox fields
-                                            if (field.type === 'checkbox') {
-                                                return (
-                                                    <div key={field.name} className="flex items-center space-x-2">
-                                                        <Checkbox
-                                                            id={field.name}
-                                                            checked={watch(field.name as any)}
-                                                            onCheckedChange={(checked) => setValue(field.name as any, checked)}
-                                                            disabled={isSubmitting}
-                                                        />
-                                                        <label
-                                                            htmlFor={field.name}
-                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                        >
-                                                            {field.placeholder}
-                                                        </label>
-                                                        <FormError message={field.error} />
-                                                    </div>
-                                                );
-                                            }
-
-                                            // Handle regular input fields
-                                            return (
-                                                <div key={field.name} className={field.className}>
-                                                    <Input
-                                                        {...field.register}
-                                                        type={field.type}
-                                                        placeholder={field.placeholder}
-                                                        disabled={isSubmitting}
-                                                        maxLength={field.maxLength}
-                                                    />
-                                                    <FormError message={field.error} />
-                                                </div>
-                                            );
-                                        })}
+                                // Handle regular input fields
+                                return (
+                                    <div key={field.name} className={field.className}>
+                                        <label className="block text-sm font-medium mb-1" htmlFor={`admin-${String(field.name)}`}>
+                                            {field.placeholder}
+                                        </label>
+                                        <Input
+                                            id={`admin-${String(field.name)}`}
+                                            {...field.register}
+                                            type={field.type}
+                                            placeholder={field.placeholder}
+                                            disabled={isSubmitting}
+                                            maxLength={field.maxLength}
+                                        />
+                                        <FormError message={field.error} />
                                     </div>
-                                </div>
-                            )}
+                                );
+                            })}
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </form>
         </AppDialog>
     );

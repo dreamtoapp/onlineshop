@@ -16,7 +16,7 @@ export default function WishlistProductCard({ product, index, onRemove }: { prod
         >
             <div className="relative h-48 w-full overflow-hidden">
                 <Image
-                    src={product.imageUrl || '/fallback/product-fallback.avif'}
+                    src={product.imageUrl || '/fallback/dreamToApp2-dark.png'}
                     alt={product.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -11,8 +11,8 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogDescrip
 import { signOut } from 'next-auth/react';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
 import { Icon } from '@/components/icons/Icon';
-import { usePusherConnectionStatus } from '@/app/(e-comm)/(adminPage)/user/notifications/components/RealtimeNotificationListener';
-import PushNotificationSetup from '@/app/components/PushNotificationSetup';
+// Removed connection status indicator to avoid user confusion
+// Removed PushNotificationSetup - web push notifications disabled
 
 interface UserMenuTriggerProps {
     user: {
@@ -41,7 +41,6 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
     const [hasFetched, setHasFetched] = useState(false);
     const name = user?.name;
     const image = user?.image;
-    const isConnected = usePusherConnectionStatus();
 
     // User-specific navigation items only (removed universal navigation)
     const userNavItems = user ? [
@@ -158,13 +157,7 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                     {alerts && alerts.length > 0 && (
                         <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full border-2 border-background animate-pulse" />
                     )}
-                    {/* Real-time connection status dot */}
-                    <span className={`absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-background transition-colors duration-300 ${isConnected
-                        ? 'bg-green-500 shadow-sm shadow-green-500/50'
-                        : 'bg-yellow-500 shadow-sm shadow-yellow-500/50'
-                        }`}
-                        title={isConnected ? 'الإشعارات الفورية متصلة' : 'الإشعارات الفورية منقطعة'}
-                    />
+                    {/* Connection status indicator removed */}
                 </Button>
             </DropdownMenuTrigger>
 
@@ -187,32 +180,19 @@ export default function UserMenuTrigger({ user, alerts }: UserMenuTriggerProps) 
                                     {name?.[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                             </Avatar>
-                            {/* Connection status dot for dropdown avatar */}
-                            <span className={`absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background transition-colors duration-300 ${isConnected
-                                ? 'bg-green-500'
-                                : 'bg-yellow-500'
-                                }`} />
+                            {/* Connection status indicator removed */}
                         </div>
                         <div className="flex-1 min-w-0">
                             <DropdownMenuLabel className="text-sm font-semibold text-foreground p-0 truncate leading-tight">
                                 {name || "المستخدم"}
                             </DropdownMenuLabel>
                             <p className="text-xs text-muted-foreground truncate">
-                                {user.email || "حساب شخصي"}
+                                {user.email || "بدون بريد إلكتروني"}
                             </p>
-                            {/* Compact connection status */}
-                            <div className="flex items-center gap-1 mt-0.5">
-                                <span className={`h-1 w-1 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                                <span className="text-[10px] text-muted-foreground/60">
-                                    {isConnected ? 'متصل' : 'منقطع'}
-                                </span>
-                            </div>
+                            {/* Compact connection status removed */}
                         </div>
                     </div>
-                    {/* Add PushNotificationSetup button here */}
-                    <div className="mt-3">
-                        <PushNotificationSetup />
-                    </div>
+                    {/* Push notifications removed - using Pusher real-time + database notifications only */}
                 </div>
 
                 {/* Enhanced Analytics - Professional UI */}

@@ -53,7 +53,7 @@ async function clearAllData() {
   await db.wishlistItem.deleteMany({});
   await db.userNotification.deleteMany({});
   // Must delete push subscriptions before users to avoid relation violations
-  await db.pushSubscription.deleteMany({});
+  // await db.pushSubscription.deleteMany({}); // PushSubscription model removed
   await db.cartItem.deleteMany({});
   await db.cart.deleteMany({});
   await db.offerProduct.deleteMany({});

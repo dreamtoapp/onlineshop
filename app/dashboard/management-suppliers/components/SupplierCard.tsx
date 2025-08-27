@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 import AddImage from '@/components/AddImage';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icons/Icon';
 import { Supplier } from '@/types/databaseTypes';
@@ -31,7 +30,7 @@ export default function SupplierCard({
     type,
     address,
 
-    products,
+    // products,
     createdAt,
   } = supplier;
 
@@ -46,7 +45,7 @@ export default function SupplierCard({
     <div className="flex flex-col rounded-xl border bg-card text-card-foreground shadow-md overflow-hidden">
 
 
-      <div className="relative h-48 w-full overflow-hidden rounded-lg bg-muted/20">
+      <div className="relative w-full aspect-square overflow-hidden rounded-none bg-muted/20">
         <AddImage
           url={supplier.logo ?? ""}
           alt={`${supplier.name}'s profile`}
@@ -59,43 +58,70 @@ export default function SupplierCard({
 
       </div>
 
-      <div className="flex flex-1 flex-col p-4 space-y-2">
+      <div className="flex flex-1 flex-col p-4 space-y-2 min-h-[160px] relative">
         <div className='flex items-center justify-between'>
           <h3 className="text-lg font-semibold truncate" title={name}>
             {name}
           </h3>
-          <Badge variant={"outline"} className='flex items-center gap-2 text-muted-foreground'><Icon name="PackageSearch" className='h-4 w-4 ' />{products.length}</Badge>
         </div>
-        <p className="text-sm text-muted-foreground truncate" title={email}>
-          {email || '-'}
+        {email && (
+          <a
+            href={`mailto:${email}`}
+            className="text-sm text-muted-foreground truncate flex items-center gap-2 hover:underline"
+            title={email}
+            role="button"
+            aria-label="إرسال بريد للمورد"
+          >
+            <Icon name="Mail" className="h-4 w-4" />
+            {email}
+          </a>
+        )}
+        {phone && (
+          <a
+            href={`tel:${phone.replace(/\D/g, '')}`}
+            className="text-sm text-muted-foreground flex items-center gap-2 hover:underline"
+            aria-label="الاتصال بالمورد"
+          >
+            <Icon name="Phone" className="h-4 w-4" />
+            {phone}
+          </a>
+        )}
+        <p className="text-sm text-muted-foreground flex items-center gap-2">
+          <Icon name="Receipt" className={`h-4 w-4 ${supplier.taxNumber ? '' : 'text-destructive'}`} />
+          {supplier.taxNumber || '—'}
         </p>
-        <p className="text-sm text-muted-foreground">{phone || '-'}</p>
-        <p>
-          <span className="inline-block rounded-md bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-800">
-            {type || 'غير محدد'}
-          </span>
-        </p>
-        <p className="text-sm text-muted-foreground">
-          تاريخ الإضافة: {formatDate(createdAt)}
-        </p>
+        <span className="absolute bottom-2 left-4 text-[10px] text-muted-foreground">
+          {formatDate(createdAt)}
+        </span>
       </div>
 
-      {/* Footer with all action icons */}
+      {/* Footer with all action icons (ordered: View, Analytics, Edit, Delete) */}
 
       <footer className="flex justify-around border-t px-4 py-2 bg-muted items-center">
+        {/* View */}
+        <Button asChild variant="ghost" size="icon" aria-label="عرض">
+          <Link href={`/dashboard/management-suppliers/view/${id}`}>
+            <Icon name="Eye" className="h-5 w-5" />
+          </Link>
+        </Button>
 
-
-        <Link href={`/dashboard/management-suppliers/view/${id}`}
+        {/* Analytics */}
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="تحليلات"
+          onClick={() => alert("comeing soon")}
         >
-          <Icon name="Eye" className="h-5 w-5" />
-        </Link>
+          <Icon name="BarChart2" className="h-5 w-5" />
+        </Button>
 
+        {/* Divider */}
+        <div className="h-6 w-px bg-border/60" aria-hidden />
 
-
-
-
+        {/* Edit */}
         <AddSupplier
           mode='update'
+          iconOnly
           title={"تعديل مورد"}
           description={"يرجى إدخال بيانات المورد"}
           defaultValues={{
@@ -105,27 +131,11 @@ export default function SupplierCard({
             email,
             phone,
             address,
+            taxNumber: supplier.taxNumber ?? '',
           }} />
 
-
-
-
-
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label="تحليلات"
-          onClick={() => alert("comeing soon")}
-        >
-          <Icon name="BarChart2" className="h-5 w-5" />
-        </Button>
-
-
-
-
+        {/* Delete */}
         <DeleteSupplierAlert supplierId={id} />
-
-
       </footer>
 
     </div>

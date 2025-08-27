@@ -1,6 +1,6 @@
 import { createOrderNotification } from '@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification';
 import { ORDER_NOTIFICATION_TEMPLATES } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
-import { PushNotificationService } from '@/lib/push-notification-service';
+// Removed PushNotificationService - web push notifications disabled
 import { OrderNotificationType } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
 import { debug, error } from '@/utils/logger';
 
@@ -88,19 +88,11 @@ export async function sendOrderNotification(data: NotificationData): Promise<Not
       inAppSuccess = false;
     }
 
-    // Step 3: Send push notification
-    debug('Sending push notification...');
+    // Step 3: Push notifications removed - using Pusher real-time + database notifications only
+    debug('Push notifications disabled - using alternative notification methods');
     try {
-      // Map notification type to push service type
-      const pushNotificationType = notificationType === 'order_delivered' ? 'delivered' : notificationType;
-
-      pushResult = await PushNotificationService.sendOrderNotification(
-        userId,
-        orderId,
-        orderNumber,
-        pushNotificationType as any,
-        driverName
-      );
+      // Push notification service removed
+      pushResult = true; // Simplified to boolean as expected by the type
 
       pushSuccess = pushResult;
       debug('Push notification result:', pushResult);

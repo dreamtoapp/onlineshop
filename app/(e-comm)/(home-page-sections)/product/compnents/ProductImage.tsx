@@ -10,7 +10,7 @@ interface ProductImageProps {
 }
 
 export default function ProductImage({ src, alt, className = '' }: ProductImageProps) {
-  const [imgSrc, setImgSrc] = useState(src || '/fallback/product-fallback.avif');
+  const [imgSrc, setImgSrc] = useState(src || '/fallback/dreamToApp2-dark.png');
 
   return (
     <div className={`relative h-full w-full ${className}`}>
@@ -20,7 +20,7 @@ export default function ProductImage({ src, alt, className = '' }: ProductImageP
         fill
         className='object-cover'
         onError={() => {
-          setImgSrc('/fallback/product-fallback.avif');
+          setImgSrc('/fallback/dreamToApp2-dark.png');
         }}
       />
     </div>

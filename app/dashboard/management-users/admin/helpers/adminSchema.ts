@@ -3,7 +3,14 @@ import { z } from 'zod';
 // Admin-specific validation schema
 export const AdminSchema = z.object({
   name: z.string().trim().nonempty('الاسم مطلوب'),
-  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة'),
+  // Make email optional and allow empty string without error
+  email: z.preprocess((v) => {
+    if (typeof v === 'string') {
+      const trimmed = v.trim();
+      return trimmed === '' ? undefined : trimmed;
+    }
+    return v;
+  }, z.string().email('صيغة البريد الإلكتروني غير صحيحة').optional()),
   phone: z
     .string()
     .trim()

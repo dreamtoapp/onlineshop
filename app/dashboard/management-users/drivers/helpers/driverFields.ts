@@ -14,6 +14,7 @@ interface Field {
 interface FieldSection {
   section: string;
   hint?: boolean;
+  collapsible?: boolean;
   fields: Field[];
 }
 
@@ -25,6 +26,7 @@ export function getDriverFields(
     {
       section: 'البيانات الشخصية',
       hint: false,
+      collapsible: false,
       fields: [
         {
           name: 'name',
@@ -46,24 +48,27 @@ export function getDriverFields(
           placeholder: 'رقم الهاتف',
           register: register('phone'),
           error: errors.phone?.message,
+          className: 'col-span-1',
         },
         {
           name: 'password',
-          type: 'password',
+          type: 'text',
           placeholder: 'كلمة المرور',
           register: register('password'),
           error: errors.password?.message,
+          className: 'col-span-1',
         },
       ],
     },
     {
       section: 'معلومات العنوان',
       hint: false,
+      collapsible: true,
       fields: [
         {
           name: 'addressLabel',
           type: 'select',
-          placeholder: 'نوع العنوان',
+          placeholder: 'نوع العنوان (اختياري)',
           register: register('addressLabel'),
           error: errors.addressLabel?.message,
           options: [
@@ -75,21 +80,21 @@ export function getDriverFields(
         {
           name: 'district',
           type: 'text',
-          placeholder: 'الحي',
+          placeholder: 'الحي (اختياري)',
           register: register('district'),
           error: errors.district?.message,
         },
         {
           name: 'street',
           type: 'text',
-          placeholder: 'الشارع',
+          placeholder: 'الشارع (اختياري)',
           register: register('street'),
           error: errors.street?.message,
         },
         {
           name: 'buildingNumber',
           type: 'text',
-          placeholder: 'رقم المبنى',
+          placeholder: 'رقم المبنى (اختياري)',
           register: register('buildingNumber'),
           error: errors.buildingNumber?.message,
         },
@@ -128,11 +133,12 @@ export function getDriverFields(
     {
       section: 'معلومات المركبة',
       hint: false,
+      collapsible: true,
       fields: [
         {
           name: 'vehicleType',
           type: 'select',
-          placeholder: 'نوع المركبة',
+          placeholder: 'نوع المركبة (اختياري)',
           register: register('vehicleType'),
           error: errors.vehicleType?.message,
           options: [
@@ -146,42 +152,42 @@ export function getDriverFields(
         {
           name: 'vehiclePlateNumber',
           type: 'text',
-          placeholder: 'رقم اللوحة',
+          placeholder: 'رقم اللوحة (اختياري)',
           register: register('vehiclePlateNumber'),
           error: errors.vehiclePlateNumber?.message,
         },
         {
           name: 'vehicleColor',
           type: 'text',
-          placeholder: 'لون المركبة',
+          placeholder: 'لون المركبة (اختياري)',
           register: register('vehicleColor'),
           error: errors.vehicleColor?.message,
         },
         {
           name: 'vehicleModel',
           type: 'text',
-          placeholder: 'موديل المركبة',
+          placeholder: 'موديل المركبة (اختياري)',
           register: register('vehicleModel'),
           error: errors.vehicleModel?.message,
         },
         {
           name: 'driverLicenseNumber',
           type: 'text',
-          placeholder: 'رقم رخصة القيادة',
+          placeholder: 'رقم رخصة القيادة (اختياري)',
           register: register('driverLicenseNumber'),
           error: errors.driverLicenseNumber?.message,
         },
         {
           name: 'experience',
           type: 'text',
-          placeholder: 'سنوات الخبرة',
+          placeholder: 'سنوات الخبرة (اختياري)',
           register: register('experience'),
           error: errors.experience?.message,
         },
         {
           name: 'maxOrders',
           type: 'number',
-          placeholder: 'الحد الأقصى للطلبات',
+          placeholder: 'الحد الأقصى للطلبات (اختياري)',
           register: register('maxOrders'),
           error: errors.maxOrders?.message,
         },

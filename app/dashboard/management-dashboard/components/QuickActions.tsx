@@ -1,59 +1,52 @@
 'use client';
 
-import { Plus, Users, Package, BarChart3, Zap } from 'lucide-react';
+import { Users, Package, BarChart3, Zap, ClipboardList, Truck } from 'lucide-react';
 import Link from '@/components/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 const quickActions = [
     {
-        title: 'منتج جديد',
-        href: '/dashboard/management-products/new',
+        id: 'products',
+        title: 'إدارة المنتجات',
+        href: '/dashboard/management-products',
         icon: Package,
         color: 'text-green-600',
-        bgColor: '',
-        shortcut: 'Ctrl+N',
     },
     {
-        title: 'عرض جديد',
-        href: '/dashboard/management-offer/new',
-        icon: Plus,
+        id: 'orders',
+        title: 'إدارة الطلبات',
+        href: '/dashboard/management-orders',
+        icon: ClipboardList,
         color: 'text-blue-600',
-        bgColor: '',
-        shortcut: 'Ctrl+O',
     },
     {
-        title: 'تقرير سريع',
+        id: 'reports',
+        title: 'التقارير',
         href: '/dashboard/management-reports',
         icon: BarChart3,
         color: 'text-purple-600',
-        bgColor: '',
-        shortcut: 'Ctrl+R',
     },
     {
-        title: 'إضافة مستخدم',
+        id: 'customers',
+        title: 'إدارة العملاء',
         href: '/dashboard/management-users/customer',
         icon: Users,
         color: 'text-orange-600',
-        bgColor: '',
-        shortcut: 'Ctrl+U',
     },
-];
-
-const recentPages = [
-    { title: 'إدارة المنتجات', href: '/dashboard/management-products', visits: 15 },
-    { title: 'الطلبات الجديدة', href: '/dashboard/orders-management', visits: 8 },
-    { title: 'تقارير المبيعات', href: '/dashboard/management-reports/sales', visits: 5 },
-    { title: 'إعدادات النظام', href: '/dashboard/settings', visits: 3 },
+    {
+        id: 'track-driver',
+        title: 'تتبع السائق',
+        href: '/dashboard/management-tracking',
+        icon: Truck,
+        color: 'text-red-600',
+    },
 ];
 
 export default function QuickActions() {
@@ -72,40 +65,20 @@ export default function QuickActions() {
                         الإجراءات السريعة
                     </DropdownMenuLabel>
 
-                    <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="grid grid-cols-2 gap-2">
                         {quickActions.map((action) => (
-                            <Link key={action.href} href={action.href}>
+                            <Link key={action.id} href={action.href}>
                                 <Card className="cursor-pointer card-hover-effect">
                                     <CardContent className="p-3">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex items-center gap-2">
                                             <action.icon className={`h-4 w-4 ${action.color} icon-enhanced`} />
                                             <span className="text-sm font-semibold">{action.title}</span>
                                         </div>
-                                        <Badge variant="outline" className="text-xs">
-                                            {action.shortcut}
-                                        </Badge>
                                     </CardContent>
                                 </Card>
                             </Link>
                         ))}
                     </div>
-
-                    <DropdownMenuSeparator />
-
-                    <DropdownMenuLabel className="text-sm font-medium text-muted-foreground mb-2">
-                        الصفحات الأخيرة
-                    </DropdownMenuLabel>
-
-                    {recentPages.map((page) => (
-                        <DropdownMenuItem key={page.href} asChild>
-                            <Link href={page.href} className="flex items-center justify-between">
-                                <span className="text-sm">{page.title}</span>
-                                <Badge variant="secondary" className="text-xs">
-                                    {page.visits}
-                                </Badge>
-                            </Link>
-                        </DropdownMenuItem>
-                    ))}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

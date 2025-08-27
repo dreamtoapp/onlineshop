@@ -94,7 +94,7 @@ export default function DriverCard({ driver }: DriverCardProps) {
     };
 
     return (
-        <Card className='flex flex-col overflow-hidden rounded-lg border border-border bg-background text-foreground shadow-md transition-shadow hover:shadow-lg'>
+        <Card className='flex flex-col overflow-hidden rounded-lg border border-border bg-background text-foreground shadow-md'>
             {/* Card Header with Driver-specific styling */}
             <CardHeader className='border-b border-border bg-muted/50 p-4'>
                 <div className='flex items-center justify-between'>
@@ -109,8 +109,8 @@ export default function DriverCard({ driver }: DriverCardProps) {
 
             {/* Card Content */}
             <CardContent className='flex-1 space-y-4 p-4'>
-                {/* Image */}
-                <div className="relative h-48 w-full overflow-hidden rounded-lg bg-muted/20">
+                {/* Image - square for 60% visual weight */}
+                <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-muted/20">
                     <AddImage
                         url={safeDriver.imageUrl}
                         alt={`${safeDriver.name}'s profile`}
@@ -121,8 +121,8 @@ export default function DriverCard({ driver }: DriverCardProps) {
                     />
                 </div>
 
-                {/* Driver Details */}
-                <div className='space-y-2'>
+                {/* Driver Details - 40% content with stable height */}
+                <div className='space-y-2 min-h-[160px]'>
                     <p className='flex items-center gap-2 text-sm text-muted-foreground'>
                         <Icon name="Mail" size="xs" className="text-primary" />
                         <strong className='font-medium'>Email:</strong> {safeDriver.email || 'No Email'}

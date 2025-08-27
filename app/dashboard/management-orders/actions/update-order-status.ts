@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { OrderStatus } from '@prisma/client';
-import { OrderNotificationType } from '@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes';
+
 
 interface UpdateOrderStatusParams {
   orderId: string;
@@ -100,23 +100,19 @@ export async function updateOrderStatus({
     try {
       const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
       const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
-      const { PushNotificationService } = await import('@/lib/push-notification-service');
+      // const { PushNotificationService } = await import('@/lib/push-notification-service'); // Removed - web push disabled
 
       let template;
-      let notificationType: OrderNotificationType;
 
       switch (newStatus) {
         case OrderStatus.IN_TRANSIT:
           template = ORDER_NOTIFICATION_TEMPLATES.TRIP_STARTED(order.orderNumber, order.driver?.name || '');
-          notificationType = 'trip_started' as OrderNotificationType;
           break;
         case OrderStatus.DELIVERED:
           template = ORDER_NOTIFICATION_TEMPLATES.ORDER_DELIVERED(order.orderNumber);
-          notificationType = 'order_delivered' as OrderNotificationType;
           break;
         case OrderStatus.CANCELED:
           template = ORDER_NOTIFICATION_TEMPLATES.ORDER_CANCELLED(order.orderNumber);
-          notificationType = 'order_cancelled' as OrderNotificationType;
           break;
         default:
           return {
@@ -140,18 +136,8 @@ export async function updateOrderStatus({
         ...template
       });
 
-      // Send push notification
-      const pushNotificationType = notificationType === 'order_delivered' ? 'delivered' : 
-                                  notificationType === 'trip_started' ? 'trip_started' : 
-                                  'cancelled';
-      
-      await PushNotificationService.sendOrderNotification(
-        order.customerId,
-        orderId,
-        order.orderNumber,
-        pushNotificationType as any,
-        order.driver?.name || undefined
-      );
+      // Push notifications removed - using Pusher real-time + database notifications only
+      console.log('📱 Push notifications disabled - using alternative notification methods');
 
     } catch (error) {
       console.error('❌ [STATUS_UPDATE] Notification error:', error);
@@ -177,7 +163,7 @@ export async function updateOrderStatus({
 
   } catch (error) {
     console.error('Error updating order status:', error);
-    
+
     return {
       success: false,
       message: 'حدث خطأ أثناء تحديث حالة الطلب',

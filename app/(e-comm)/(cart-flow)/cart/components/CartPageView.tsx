@@ -3,15 +3,14 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import { useCheckIsLogin } from '@/hooks/use-check-islogin';
 import { useCartStore } from '../cart-controller/cartStore';
 import { useRouter } from 'next/navigation';
 import CartQuantityControls from '../cart-controller/CartQuantityControls';
-import CartPageSkeleton from './CartPageSkeleton';
 import EmptyCart from './EmptyCart';
 import CartProgressIndicator from './CartProgressIndicator';
 import OrderSummary from './OrderSummary';
 import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
 
 // Types
 type GuestCartItem = { product: any; quantity: number };
@@ -32,7 +31,7 @@ function CartItem({ item }: { item: ServerCartItem | GuestCartItem }) {
             {/* Product Info */}
             <div className="flex gap-4 flex-1">
                 <Image
-                    src={item.product?.imageUrl || '/fallback/product-fallback.avif'}
+                    src={item.product?.imageUrl || '/fallback/dreamToApp2-dark.png'}
                     alt={item.product?.name || 'صورة المنتج'}
                     width={96}
                     height={96}
@@ -101,9 +100,9 @@ interface CartPageViewProps {
 }
 
 export default function CartPageView({ platformSettings }: CartPageViewProps) {
-    const { isAuthenticated, isLoading } = useCheckIsLogin();
     const { cart } = useCartStore();
     const router = useRouter();
+    const [showLoginDialog, setShowLoginDialog] = useState(false);
 
     // Cart calculations using platform settings
     const items = Object.values(cart);
@@ -114,44 +113,38 @@ export default function CartPageView({ platformSettings }: CartPageViewProps) {
 
     // Simple checkout handler
     const handleCheckout = () => {
-        if (isAuthenticated) {
-            router.push('/checkout');
-        }
+        router.push('/checkout');
     };
 
-    if (isLoading) {
-        return <CartPageSkeleton />;
+    if (items.length === 0) {
+        return <EmptyCart />;
     }
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4">
             <CartProgressIndicator />
 
-            {items.length === 0 ? (
-                <EmptyCart />
-            ) : (
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                    {/* Order Summary - First on mobile, 4/12 on desktop */}
-                    <div className="xl:col-span-4 order-1 xl:order-2">
-                        <OrderSummary
-                            items={items}
-                            subtotal={subtotal}
-                            shipping={shipping}
-                            tax={tax}
-                            total={total}
-                            taxPercentage={platformSettings.taxPercentage}
-                            onCheckout={handleCheckout}
-                            showLoginDialog={false}
-                            setShowLoginDialog={() => { }}
-                        />
-                    </div>
-
-                    {/* Cart Items - Second on mobile, 8/12 on desktop */}
-                    <div className="xl:col-span-8 space-y-6 order-2 xl:order-1">
-                        <CartItemsList items={items} />
-                    </div>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                {/* Order Summary - First on mobile, 4/12 on desktop */}
+                <div className="xl:col-span-4 order-1 xl:order-2">
+                    <OrderSummary
+                        items={items}
+                        subtotal={subtotal}
+                        shipping={shipping}
+                        tax={tax}
+                        total={total}
+                        taxPercentage={platformSettings.taxPercentage}
+                        onCheckout={handleCheckout}
+                        showLoginDialog={showLoginDialog}
+                        setShowLoginDialog={setShowLoginDialog}
+                    />
                 </div>
-            )}
+
+                {/* Cart Items - Second on mobile, 8/12 on desktop */}
+                <div className="xl:col-span-8 space-y-6 order-2 xl:order-1">
+                    <CartItemsList items={items} />
+                </div>
+            </div>
         </div>
     );
 } 

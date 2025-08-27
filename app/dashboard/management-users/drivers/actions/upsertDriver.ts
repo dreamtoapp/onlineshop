@@ -76,19 +76,21 @@ export async function upsertDriver(
           experience: experience ? parseInt(experience) : 0,
           maxOrders: maxOrders ? parseInt(maxOrders) : 3,
           // Create default address using Address Book system
-          addresses: {
-            create: {
-              label: addressLabel,
-              district,
-              street,
-              buildingNumber,
-              floor,
-              apartmentNumber,
-              landmark,
-              deliveryInstructions,
-              isDefault: true,
-            },
-          },
+          addresses: addressLabel || district || street || buildingNumber || floor || apartmentNumber || landmark || deliveryInstructions
+            ? {
+              create: {
+                label: addressLabel || '',
+                district: district || '',
+                street: street || '',
+                buildingNumber: buildingNumber || '',
+                floor: floor || undefined,
+                apartmentNumber: apartmentNumber || undefined,
+                landmark: landmark || undefined,
+                deliveryInstructions: deliveryInstructions || undefined,
+                isDefault: true,
+              },
+            }
+            : undefined,
         },
       });
 
@@ -151,7 +153,7 @@ export async function upsertDriver(
         where: { userId: driverId, isDefault: true },
       });
 
-      if (existingAddress) {
+      if (existingAddress && (addressLabel || district || street || buildingNumber || floor || apartmentNumber || landmark || deliveryInstructions)) {
         // Update existing default address
         await prisma.address.update({
           where: { id: existingAddress.id },
@@ -166,15 +168,15 @@ export async function upsertDriver(
             deliveryInstructions,
           },
         });
-      } else {
+      } else if (addressLabel || district || street || buildingNumber || floor || apartmentNumber || landmark || deliveryInstructions) {
         // Create new default address
         await prisma.address.create({
           data: {
             userId: driverId,
-            label: addressLabel,
-            district,
-            street,
-            buildingNumber,
+            label: addressLabel || '',
+            district: district || '',
+            street: street || '',
+            buildingNumber: buildingNumber || '',
             floor,
             apartmentNumber,
             landmark,

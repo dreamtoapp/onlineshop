@@ -65,7 +65,7 @@ export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavig
                                             isItemActive && "text-primary font-medium"
                                         )}>
                                             <div className="flex items-center gap-3 w-full">
-                                                <Icon name={item.icon} className="h-4 w-4" />
+                                                {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                                 <span>{item.label}</span>
                                                 {item.badge && (
                                                     <Badge variant="secondary" className="text-xs">
@@ -126,7 +126,7 @@ export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavig
                                             : "hover:bg-accent hover:text-accent-foreground"
                                     )}
                                 >
-                                    <Icon name={item.icon} className="h-4 w-4" />
+                                    {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                     <span>{item.label}</span>
                                     {item.badge && (
                                         <Badge variant="secondary" className="text-xs">

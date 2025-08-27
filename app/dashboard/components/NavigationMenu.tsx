@@ -86,7 +86,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                                         isItemActive && 'bg-primary text-primary-foreground'
                                     )}
                                 >
-                                    <Icon name={item.icon} className="h-4 w-4" />
+                                    {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                     <span>{item.label}</span>
                                     {item.badge && (
                                         <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
@@ -155,7 +155,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                         )}
                     >
                         <Link href={item.href}>
-                            <Icon name={item.icon} className="h-4 w-4" />
+                            {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                             <span>{item.label}</span>
                             {item.badge && (
                                 <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">

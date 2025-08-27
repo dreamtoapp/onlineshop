@@ -17,6 +17,7 @@ interface ProductCardProps {
     className?: string;
     index?: number; // For analytics tracking
     priority?: boolean;
+    logo?: string; // Company logo for fallback
 }
 
 const ProductCard = memo(({
@@ -24,7 +25,8 @@ const ProductCard = memo(({
     quantity,
     isInCart,
     index,
-    priority
+    priority,
+    logo = '/fallback/dreamToApp2-dark.png'
 }: ProductCardProps) => {
     const router = useRouter();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
@@ -101,71 +103,79 @@ const ProductCard = memo(({
             />
 
             <Card
-                className={`group  relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none min-h-[220px] sm:min-h-[320px] w-full max-w-sm mx-auto flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 card-hover-effect card-border-glow`}
+                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-card/95 shadow-xl border-none w-full flex flex-col"
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
             >
-                {/* Media Section */}
-                <ProductCardMedia
-                    product={product}
-                    inCart={currentCartState}
-                    isOutOfStock={stockInfo.isOutOfStock}
-                    lowStock={stockInfo.lowStock}
-                    stockQuantity={product.stockQuantity}
-                    priority={priority}
-                />
-                {/* Content Section */}
-                <div className="flex-1 flex flex-col p-3 sm:p-5 gap-3">
-                    {/* Product Name & Type */}
-                    <div className="space-y-2">
+                {/* Media Section - 60% height (400x400) - CLIENT REQUIREMENT + INDUSTRY STANDARD */}
+                <div className="relative w-full aspect-square">
+                    <ProductCardMedia
+                        product={product}
+                        inCart={currentCartState}
+                        isOutOfStock={stockInfo.isOutOfStock}
+                        lowStock={stockInfo.lowStock}
+                        stockQuantity={product.stockQuantity}
+                        priority={priority}
+                        logo={logo}
+                    />
+                </div>
+                {/* Content Section - 40% height (400x200) - OPTIMIZED FOR MOBILE */}
+                <div className="flex-1 flex flex-col p-4 gap-3 min-h-[160px]">
+                    {/* Product Name & Type - Enhanced Typography Hierarchy */}
+                    <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-sm leading-tight text-foreground group-hover:text-feature-products transition-colors duration-200 line-clamp-2" title={product.name}>
+                            <h3 className="font-bold text-sm sm:text-base leading-tight text-foreground line-clamp-2" title={product.name}>
                                 {product.name}
                             </h3>
                         </div>
-                        {/* Price Section */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold text-feature-commerce">
+                        {/* Price Section - Enhanced Visual Hierarchy */}
+                        <div className="flex items-center gap-3">
+                            <span className="text-lg sm:text-xl font-bold text-feature-commerce">
                                 {product.price.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
                             </span>
                             {pricingInfo.hasDiscount && (
-                                <span className="text-sm line-through text-muted-foreground">
+                                <span className="text-sm line-through text-muted-foreground/70">
                                     {product.compareAtPrice?.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    {/* Footer: Compact, expert UI/UX */}
-                    <div className="pt-2 text-center flex flex-row justify-between items-center">
-                        <div className="flex items-center justify-center gap-4 text-sm">
-                            {/* Rating: show only if exists */}
+                    {/* Enhanced Product Page Link */}
+                    <div className="pt-2 text-center">
+                        <Link
+                            href={`/product/${product.slug}`}
+                            className="inline-flex items-center gap-2 rounded-lg border border-primary text-primary px-3 py-2 text-xs font-semibold shadow-sm bg-transparent focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none"
+                        >
+                            <Icon name="Package" className="w-4 h-4 text-green-600" />
+                            <span>صفحة المنتج</span>
+                        </Link>
+                    </div>
+                    {/* Analytics Footer: Enhanced UI/UX with Micro-interactions */}
+                    <div className="pt-2 text-center border-t border-border/20">
+                        <div className="flex items-center justify-center gap-4 text-sm py-2">
+                            {/* Rating */}
                             {typeof product.rating === 'number' && product.rating > 0 && (
                                 <span className="flex items-center gap-1 text-yellow-500">
                                     <Star className="w-4 h-4 fill-current" fill="currentColor" />
                                     <span className="text-foreground font-medium">{product.rating}</span>
                                 </span>
                             )}
-                            {/* Comments: only if reviewCount > 0 */}
+                            {/* Comments */}
                             {product.reviewCount > 0 && (
                                 <span className="flex items-center gap-1 text-muted-foreground">
                                     <MessageCircle className="w-4 h-4" />
-                                    {product.reviewCount}
+                                    <span className="font-medium">{product.reviewCount}</span>
                                 </span>
                             )}
                             {/* Preview count */}
                             <span className="flex items-center gap-1 text-primary">
                                 <Eye className="w-4 h-4" />
-                                {product.previewCount}
+                                <span className="font-medium">{product.previewCount}</span>
                             </span>
-                            {/* Details link as button with icon */}
-
                         </div>
-                        <Link href={`/product/${product.slug}`} className="inline-flex items-center gap-1 rounded-md border border-primary text-primary px-3 py-1 text-xs font-semibold shadow-sm bg-transparent hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none">
-                            <Icon name="Package" className="w-4 h-4 text-green-600" />
-                            <span>صفحة المنتج</span>
-                        </Link>
                     </div>
+
                     {/* Actions */}
                     <ProductCardActions
                         product={product}

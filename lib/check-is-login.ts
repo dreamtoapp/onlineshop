@@ -4,21 +4,60 @@
 import { auth } from '@/auth';
 import { User } from '@/types/databaseTypes';
 import db from '@/lib/prisma';
+import { unstable_cache } from 'next/cache';
 
-export const checkIsLogin = async (): Promise<User | null> => {
+// Define a consistent partial user type for authentication
+type AuthUser = Pick<User, 'id' | 'email' | 'name' | 'role' | 'isActive'>;
+
+// Simple cache function in the same file
+const getCachedUser = unstable_cache(
+  async (userId: string): Promise<AuthUser | null> => {
+    try {
+      return await db.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, name: true, role: true, isActive: true }
+      });
+    } catch (error) {
+      console.error('[CACHE_ERROR]', error);
+      return null;
+    }
+  },
+  ['user-data'],
+  { tags: ['user'], revalidate: 5 * 60 }
+);
+
+export const checkIsLogin = async (): Promise<AuthUser | null> => {
   try {
     const session = await auth();
-    // Removed console.log for cleaner build output
-    if (!session?.user) return null;
-    
-    // Convert session user to User type by fetching from database
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-    });
-    
+
+    // Check session exists
+    if (!session?.user?.id) {
+      return null;
+    }
+
+    // Try cache first
+    let user: AuthUser | null = await getCachedUser(session.user.id);
+
+    // If not in cache, fetch from DB
+    if (!user) {
+      user = await db.user.findUnique({
+        where: { id: session.user.id },
+        select: { id: true, email: true, name: true, role: true, isActive: true }
+      });
+    }
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.isActive) {
+      return null;
+    }
+
     return user;
+
   } catch (error) {
-    // Removed console.error for cleaner build output
+    console.error('[AUTH_ERROR]', error);
     return null;
   }
 };

@@ -30,7 +30,7 @@ const ProductCardActions = React.memo(function ProductCardActions({
     const handleCloseModal = () => setModalOpen(false);
 
     return (
-        <div className="flex flex-col gap-3 mt-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex flex-col gap-2 mt-auto" onClick={e => e.stopPropagation()}>
             {quantity > 0 ? (
                 <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-muted/50 to-muted/30 backdrop-blur-sm rounded-full p-1.5 border border-border/50">
                     <QuantityControls

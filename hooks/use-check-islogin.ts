@@ -5,16 +5,16 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 import { checkIsLogin } from '@/lib/check-is-login';
-import { User } from '@/types/databaseTypes';
 import { debug } from '@/utils/logger';
-// import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
+
+// Define AuthUser type based on what checkIsLogin returns
+type AuthUser = Awaited<ReturnType<typeof checkIsLogin>>;
 
 // Custom type definitions
-
 export type AuthStatus = 'authenticated' | 'unauthenticated' | 'loading';
 
 export const useCheckIsLogin = () => {
-  const [session, setSession] = useState<User | null>(null);
+  const [session, setSession] = useState<AuthUser | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [error, setError] = useState<string | null>(null);
 

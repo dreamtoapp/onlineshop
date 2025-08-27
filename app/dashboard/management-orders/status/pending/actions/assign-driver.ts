@@ -60,15 +60,15 @@ export async function assignDriver(orderId: string, driverId: string) {
     // Send notifications to customer
     try {
       console.log('🚀 [PENDING ASSIGNMENT] Sending notifications...');
-      
+
       // Import notification functions directly
       const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
       const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/helpers/notificationTemplates');
-      const { PushNotificationService } = await import('@/lib/push-notification-service');
-      
+      // const { PushNotificationService } = await import('@/lib/push-notification-service'); // Removed - web push disabled
+
       // Create notification template
       const template = ORDER_NOTIFICATION_TEMPLATES.ORDER_SHIPPED(order.orderNumber, driver.name || undefined);
-      
+
       // Send in-app notification
       console.log('📱 [PENDING ASSIGNMENT] Sending in-app notification...');
       const inAppResult = await createOrderNotification({
@@ -78,19 +78,14 @@ export async function assignDriver(orderId: string, driverId: string) {
         driverName: driver.name || undefined,
         ...template
       });
-      
+
       // Send push notification
-      console.log('🔔 [PENDING ASSIGNMENT] Sending push notification...');
-      const pushResult = await PushNotificationService.sendOrderNotification(
-        order.customerId,
-        orderId,
-        order.orderNumber,
-        'order_shipped',
-        driver.name || undefined
-      );
-      
+      console.log('🔔 [PENDING ASSIGNMENT] Push notifications disabled...');
+      // Push notifications removed - using Pusher real-time + database notifications only
+      const pushResult = { success: true, message: 'Push notifications disabled' };
+
       console.log(`✅ [PENDING ASSIGNMENT] Notifications sent - In-app: ${inAppResult.success}, Push: ${pushResult}`);
-      
+
     } catch (error) {
       console.error('❌ [PENDING ASSIGNMENT] Notification error:', error);
     }

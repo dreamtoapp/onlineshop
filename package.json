@@ -1,7 +1,7 @@
 {
   "name": "www.dreamtoapp-ecomm-.com",
   "type": "module",
-  "version": "1.2.23",
+  "version": "1.3.23",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "studio": "prisma studio",
     "seed": "tsx prisma/fashionSeedData.ts",
+    "seed-man": "tsx prisma/manClothSeedData.ts",
+
     "postinstall": "prisma generate",
     "format": "prettier --write .",
     "analyze": "cross-env ANALYZE=true next build",
@@ -86,7 +88,6 @@
     "tailwind-merge": "^3.3.1",
     "ua-parser-js": "^2.0.3",
     "vaul": "^1.1.2",
-    "web-push": "^3.6.7",
     "web-vitals": "^5.0.1",
     "zod": "^3.24.3",
     "zustand": "^5.0.3"
@@ -106,7 +107,6 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "autoprefixer": "^10.4.21",

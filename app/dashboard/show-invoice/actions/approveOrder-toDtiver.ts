@@ -38,14 +38,14 @@ export const approveDriverToOrder = async (orderId: string, driverId: string) =>
     console.log('🚀 Starting notification process for approved driver...');
     const { createOrderNotification } = await import('@/app/(e-comm)/(adminPage)/user/notifications/actions/createOrderNotification');
     const { ORDER_NOTIFICATION_TEMPLATES } = await import('@/app/(e-comm)/(adminPage)/user/notifications/types/notificationTypes');
-    const { PushNotificationService } = await import('@/lib/push-notification-service');
-    
+    // const { PushNotificationService } = await import('@/lib/push-notification-service'); // Removed - web push disabled
+
     // Use the ORDER_SHIPPED template (since this is also a shipping event)
     const template = ORDER_NOTIFICATION_TEMPLATES.ORDER_SHIPPED(
       existingOrder.orderNumber,
       driver?.name || 'غير معروف'
     );
-    
+
     // Create in-app notification (fallback)
     await createOrderNotification({
       userId: existingOrder.customerId,
@@ -54,16 +54,10 @@ export const approveDriverToOrder = async (orderId: string, driverId: string) =>
       driverName: driver?.name || undefined,
       ...template
     });
-    
-    // Send push notification (order_shipped)
-    await PushNotificationService.sendOrderNotification(
-      existingOrder.customerId,
-      existingOrder.id,
-      existingOrder.orderNumber,
-      'order_shipped',
-      driver?.name || undefined
-    );
-    
+
+    // Push notifications removed - using Pusher real-time + database notifications only
+    console.log('📱 Push notifications disabled - using alternative notification methods');
+
     console.log(`✅ Order shipped notification sent for approved order ${existingOrder.orderNumber}`);
   } catch (error) {
     console.error('❌ Failed to send order shipped notifications:', error);

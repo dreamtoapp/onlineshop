@@ -32,6 +32,7 @@ model Supplier {
   phone        String                @default("")
   address      String                @default("")
   type         String                @default("company")
+  taxNumber    String?               // Optional supplier tax number
   products     Product[]
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt
@@ -159,7 +160,7 @@ model User {
   cart                Cart? // User's cart
   UserNotification    UserNotification[]
   errorLogs           ErrorLog[]
-  pushSubscriptions   PushSubscription[] // Change to one-to-many
+  // pushSubscriptions   PushSubscription[] // Removed - web push notifications disabled
   // Driver-specific fields
   vehicleType         VehicleType? // Type of vehicle for drivers
   vehiclePlateNumber  String? // Vehicle plate number
@@ -839,20 +840,21 @@ enum ErrorStatus {
   IGNORED
 }
 
-model PushSubscription {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  userName  String?
-  role      String? // Store the user's role (ADMIN, DRIVER, etc.)
-  endpoint  String   @unique
-  p256dh    String
-  auth      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // @@map("push_subscriptions")
-}
+// model PushSubscription {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//   userId    String   @db.ObjectId
+//   user      User     @relation(fields: [userId], references: [id])
+//   userName  String?
+//   role      String? // Store the user's role (ADMIN, DRIVER, etc.)
+//   endpoint  String   @unique
+//   p256dh    String
+//   auth      String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   // @@map("push_subscriptions")
+// }
+// ☝️ PushSubscription model removed - web push notifications disabled
 
 // --- WhatsApp Webhook Persistence ---
 model WhatsappMessage {

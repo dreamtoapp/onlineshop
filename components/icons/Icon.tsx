@@ -3,14 +3,14 @@ import { cva } from 'class-variance-authority';
 
 import {
     AlertCircle, Zap, Check, Minus, ChevronLeft, ChevronRight, MoreHorizontal, X, PanelLeft, Circle, Info,
-    UploadCloud, ZoomIn, Trash2, ImageOff, Map, MapPinOff, Plus, Loader2, AlertTriangle, Home, Search,
+    UploadCloud, ZoomIn, Trash2, Trash, ImageOff, Map, MapPinOff, Plus, Loader2, AlertTriangle, Home, Search,
     HelpCircle, RefreshCw, ArrowLeft, User, Mail, FileText, Calendar, CheckCircle2, Package, Calculator,
     DollarSign, Receipt, Users, TrendingUp, Award, PlayCircle, Clock, Truck, Phone, Navigation, UserCheck,
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, Menu, LocateFixed, Tag, Share2, Flame, Star, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
-    ShoppingCart, ShoppingBag, CreditCard, LogOut, BookOpen, Settings, Grid3X3, Shield, BarChart3, Megaphone, Database, MousePointerBan,
-    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand
+    ShoppingCart, ShoppingBag, CreditCard, LogOut, BookOpen, Settings, Grid3X3, Shield, BarChart3, BarChart2, Megaphone, Database, MousePointerBan,
+    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand, Eye
 } from 'lucide-react';
 
 // Local iconVariants definition (copied from lib/utils)
@@ -58,8 +58,8 @@ const iconMap = {
     Send, Copy, Rocket, Timer, Car, List, PhoneCall, LayoutGrid, LayoutDashboard, Store, ClipboardList,
     XCircle, Activity, Tags, Warehouse, Headset, Sun, Moon, SortAsc, SortDesc, Heart, Edit, ChevronUp,
     ChevronDown, LocateFixed, Tag, Menu, Star, Share2, Flame, Server, Download, Bug, Bell, Globe, History, MessageSquare, MessageCircle, Wrench,
-    ShoppingCart, ShoppingBag, CreditCard, LogOut, Grid3X3, Settings, BookOpen, Shield, BarChart3, Megaphone, Database, MousePointerBan,
-    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand
+    ShoppingCart, ShoppingBag, CreditCard, LogOut, Grid3X3, Settings, BookOpen, Shield, BarChart3, BarChart2, Megaphone, Database, MousePointerBan,
+    Building2, MapPin, Cog, Palette, RotateCcw, Undo, File, Expand, Eye, Trash
 };
 
 // Types for size and variant based on iconVariants

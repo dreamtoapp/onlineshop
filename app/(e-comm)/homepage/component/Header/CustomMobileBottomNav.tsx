@@ -1,6 +1,6 @@
 import Link from '@/components/link';
 import WishlistIconServer from './WishlistIconServer';
-import CartButtonWithBadge from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
+import CartDrawer from '../../../(cart-flow)/cart/cart-controller/CartDrawer';
 import WhatsappMetaButton from './WhatsappMetaButton';
 import { Icon } from '@/components/icons/Icon';
 
@@ -27,7 +27,7 @@ export default function CustomMobileBottomNav() {
                 <Icon name="Tags" className="w-7 h-7 mb-1 text-muted-foreground group-hover:text-primary" />
                 <span className="sr-only">Categories</span>
             </Link>
-            <CartButtonWithBadge />
+            <CartDrawer />
             <WishlistIconServer />
             <WhatsappMetaButton />
         </nav>

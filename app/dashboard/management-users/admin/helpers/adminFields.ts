@@ -29,42 +29,42 @@ export const getAdminFields = (
   register: UseFormRegister<AdminFormData>,
   errors: FieldErrors<AdminFormData>
 ): FieldSection[] => [
-  {
-    section: 'البيانات الشخصية',
-    hint: false,
-    fields: [
-      {
-        name: 'name',
-        type: 'text',
-        placeholder: 'الاسم',
-        register: register('name'),
-        error: errors.name?.message,
-      },
-      {
-        name: 'email',
-        type: 'email',
-        placeholder: 'البريد الإلكتروني',
-        register: register('email'),
-        error: errors.email?.message,
-      },
-      {
-        name: 'phone',
-        type: 'tel',
-        placeholder: 'رقم الهاتف',
-        register: register('phone'),
-        maxLength: 10,
-        error: errors.phone?.message,
-      },
-      {
-        name: 'password',
-        type: 'text',
-        placeholder: 'كلمة المرور',
-        register: register('password'),
-        error: errors.password?.message,
-      },
+    {
+      section: 'البيانات الشخصية',
+      hint: false,
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          placeholder: 'الاسم',
+          register: register('name'),
+          error: errors.name?.message,
+        },
+        {
+          name: 'email',
+          type: 'email',
+          placeholder: 'البريد الإلكتروني (اختياري)',
+          register: register('email'),
+          error: errors.email?.message,
+        },
+        {
+          name: 'phone',
+          type: 'tel',
+          placeholder: 'رقم الهاتف',
+          register: register('phone'),
+          maxLength: 10,
+          error: errors.phone?.message,
+        },
+        {
+          name: 'password',
+          type: 'text',
+          placeholder: 'كلمة المرور',
+          register: register('password'),
+          error: errors.password?.message,
+        },
 
-    ],
-  },
+      ],
+    },
 
 
-]; 
+  ]; 

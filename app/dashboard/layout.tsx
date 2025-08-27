@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { UserRole } from '@prisma/client';
 import NotificationPortal from '@/components/ui/NotificationPortal';
-import ServiceWorkerRegistration from '@/app/components/ServiceWorkerRegistration';
+// Removed ServiceWorkerRegistration - web push notifications disabled
 import AdminNotificationWrapper from '@/app/components/AdminNotificationWrapper';
 import DashboardNav from './components/DashboardNav';
 import DashboardFooter from './components/DashboardFooter';
@@ -38,7 +38,7 @@ export default async function LayoutNew({ children }: { children: React.ReactNod
 
             {/* Notification Components */}
             <NotificationPortal />
-            <ServiceWorkerRegistration />
+            {/* ServiceWorkerRegistration removed - web push notifications disabled */}
             <AdminNotificationWrapper />
         </div>
     );

@@ -3,7 +3,7 @@ import Logo from './Logo';
 import SearchBar from './SearchBar';
 import UserMenuTrigger from './UserMenuTrigger';
 import UniversalBurgerMenu from './UniversalBurgerMenu';
-import CartIconClient from '../../../(cart-flow)/cart/cart-controller/CartButtonWithBadge';
+import CartIconClient from '../../../(cart-flow)/cart/cart-controller/CartDrawer';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { UserRole } from '@/constant/enums';
 import Link from '@/components/link';

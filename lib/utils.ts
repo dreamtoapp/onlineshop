@@ -1,9 +1,24 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 import { cva } from 'class-variance-authority'; // Import cva
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Get dynamic company logo from database with fallback
+export async function getCompanyLogo(): Promise<string> {
+  try {
+    // Dynamic import to avoid server/client boundary issues
+    const { companyInfo } = await import('@/app/(e-comm)/actions/companyDetail');
+    const company = await companyInfo();
+
+    // Return company logo if available, otherwise fallback to static logo
+    return company?.logo || '/fallback/dreamToApp2-dark.png';
+  } catch (error) {
+    console.warn('Failed to fetch company logo, using fallback:', error);
+    return '/fallback/dreamToApp2-dark.png';
+  }
 }
 
 // Icon CVA Variants (moved from components/icons/index.tsx)
@@ -69,11 +84,11 @@ export function slugify(text: string): string {
 export function generateUniqueSlug(baseSlug: string, existingSlugs: string[]): string {
   let uniqueSlug = baseSlug;
   let counter = 1;
-  
+
   while (existingSlugs.includes(uniqueSlug)) {
     uniqueSlug = `${baseSlug}-${counter}`;
     counter++;
   }
-  
+
   return uniqueSlug;
 }

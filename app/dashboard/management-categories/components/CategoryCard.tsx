@@ -33,8 +33,8 @@ export default function CategoryCard({ category }: CategoryCardProps) {
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
-      {/* Image Upload */}
-      <div className="relative h-40 w-full overflow-hidden bg-muted/20">
+      {/* Image Upload - square media */}
+      <div className="relative w-full aspect-square overflow-hidden bg-muted/20">
         <AddImage
           url={imageUrl ?? ''}
           alt={`صورة ${name}`}
@@ -45,8 +45,8 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         />
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-1 p-4">
+      {/* Content - stable height */}
+      <div className="flex flex-1 flex-col gap-2 p-4 min-h-[160px]">
         <div className='flex items-center justify-between'>
           <h3 className="text-lg font-semibold truncate" title={name}>
             {name}

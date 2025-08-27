@@ -31,28 +31,89 @@ export async function getCart(): Promise<CartWithItems | null> {
   const user = await checkIsLogin();
   const localCartId = await getCartIdFromCookie();
 
+  // ULTRA-SAFE cart query with comprehensive error handling
+  const safeGetCart = async (where: any) => {
+    try {
+      console.log('[getCart] Attempting safe cart query with:', where);
+
+      // First, get cart without product relation to avoid the error
+      const cart = await db.cart.findUnique({
+        where,
+        include: { items: true }, // Only get items, not products yet
+      });
+
+      if (!cart || !cart.items || cart.items.length === 0) {
+        console.log('[getCart] No cart or items found');
+        return cart;
+      }
+
+      // Now safely get products for each item
+      const safeItems: any[] = [];
+      const orphanedItemIds: string[] = [];
+
+      for (const item of cart.items) {
+        try {
+          const product = await db.product.findUnique({
+            where: { id: item.productId }
+          });
+
+          if (product) {
+            safeItems.push({ ...item, product });
+          } else {
+            console.log(`[getCart] Found orphaned item: ${item.id} for product: ${item.productId}`);
+            orphanedItemIds.push(item.id);
+          }
+        } catch (productError) {
+          console.error(`[getCart] Error fetching product ${item.productId}:`, productError);
+          orphanedItemIds.push(item.id);
+        }
+      }
+
+      // Clean up orphaned items immediately and non-blocking
+      if (orphanedItemIds.length > 0) {
+        console.log(`[getCart] Cleaning up ${orphanedItemIds.length} orphaned items`);
+        Promise.resolve().then(async () => {
+          try {
+            await db.cartItem.deleteMany({
+              where: { id: { in: orphanedItemIds } }
+            });
+            console.log(`[getCart] Successfully cleaned up ${orphanedItemIds.length} orphaned items`);
+          } catch (cleanupError) {
+            console.error('[getCart] Cleanup error:', cleanupError);
+          }
+        });
+      }
+
+      return { ...cart, items: safeItems };
+
+    } catch (error) {
+      console.error('[getCart] Cart query failed:', error);
+      // Return empty cart structure to prevent complete failure
+      return { id: '', userId: user?.id || null, items: [], createdAt: new Date(), updatedAt: new Date() };
+    }
+  };
+
   // Logged-in user
   if (user) {
-    let userCart = await db.cart.findUnique({
-      where: { userId: user.id },
-      include: { items: { include: { product: true } } },
-    });
+    console.log('[getCart] Getting user cart for:', user.id);
+    let userCart = await safeGetCart({ userId: user.id });
 
     // Merge guest cart if present
     if (localCartId) {
       try {
-        const localCart = await db.cart.findUnique({
-          where: { id: localCartId },
-          include: { items: { include: { product: true } } },
-        });
+        console.log('[getCart] Merging guest cart:', localCartId);
+        const localCart = await safeGetCart({ id: localCartId });
 
-        if (localCart && localCart.items.length > 0) {
-          if (userCart) {
+        if (localCart && localCart.items && localCart.items.length > 0) {
+          if (userCart && userCart.id) {
             await db.$transaction(async (tx) => {
               for (const item of localCart.items) {
-                if (!userCart) throw new Error('userCart is unexpectedly null');
+                if (!userCart || !userCart.id) throw new Error('userCart is unexpectedly null');
+                // Only process items with valid products
+                if (!item.product) continue;
+
                 const existingItem = userCart.items.find(
-                  (i: typeof item) => i.productId === item.productId
+                  (i: any) => i.productId === item.productId
                 );
                 if (existingItem) {
                   await tx.cartItem.update({
@@ -77,10 +138,8 @@ export async function getCart(): Promise<CartWithItems | null> {
               data: { userId: user.id },
             });
           }
-          userCart = await db.cart.findUnique({
-            where: { userId: user.id },
-            include: { items: { include: { product: true } } },
-          });
+          // Re-fetch user cart after merge
+          userCart = await safeGetCart({ userId: user.id });
 
           // Clear the cookie immediately after successful merge
           await clearCartIdCookie();
@@ -95,17 +154,16 @@ export async function getCart(): Promise<CartWithItems | null> {
         await clearCartIdCookie();
       }
     }
-    const result = userCart;
-    return result;
+    return userCart;
   }
 
   // Guest
   if (localCartId) {
-    return await db.cart.findUnique({
-      where: { id: localCartId },
-      include: { items: { include: { product: true } } },
-    });
+    console.log('[getCart] Getting guest cart for:', localCartId);
+    return await safeGetCart({ id: localCartId });
   }
+
+  console.log('[getCart] No user or cart ID found');
   return null;
 }
 
@@ -241,6 +299,18 @@ export async function mergeGuestCartOnLogin(guestCartId: string, userId: string)
     await db.$transaction(async (tx) => {
       for (const item of guestCart.items) {
         if (!userCart) throw new Error('userCart is unexpectedly null');
+
+        // Safety check: Verify the product exists before merging
+        const productExists = await tx.product.findUnique({
+          where: { id: item.productId },
+          select: { id: true }
+        });
+
+        if (!productExists) {
+          console.log(`[mergeGuestCartOnLogin] Skipping item with non-existent product: ${item.productId}`);
+          continue;
+        }
+
         const existingItem = await tx.cartItem.findFirst({
           where: { cartId: userCart.id, productId: item.productId },
         });
@@ -388,9 +458,17 @@ export async function updateItemQuantityByProduct(productId: string, delta: numb
   const cart = await getCart();
   console.log('[updateItemQuantityByProduct] cart found:', !!cart, 'items count:', cart?.items?.length || 0);
   if (!cart || !cart.items) return;
+
   const item = cart.items.find((i) => i.productId === productId);
   console.log('[updateItemQuantityByProduct] item found:', !!item, 'current quantity:', item?.quantity || 0);
   if (!item) return;
+
+  // Additional safety check: ensure the item has a valid product
+  if (!item.product) {
+    console.log('[updateItemQuantityByProduct] Item has null product, skipping update');
+    return;
+  }
+
   const newQty = Math.max(1, (item.quantity ?? 0) + delta); // Prevent going below 1
   console.log('[updateItemQuantityByProduct] updating quantity from', item.quantity, 'to', newQty);
   await updateItemQuantity(item.id, newQty);

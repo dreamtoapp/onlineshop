@@ -12,6 +12,7 @@ import { ProductFilters } from '../helpers/useProductInfiniteScroll';
 interface ProductInfiniteGridProps {
     initialProducts: any[];
     filters: ProductFilters;
+    logo?: string; // Company logo for fallback
 }
 
 const PAGE_SIZE = 8;
@@ -31,7 +32,7 @@ function buildQuery(filters: ProductFilters, pageIndex: number) {
     return `/api/products-grid?${params.toString()}`;
 }
 
-export default function ProductInfiniteGrid({ initialProducts, filters }: ProductInfiniteGridProps) {
+export default function ProductInfiniteGrid({ initialProducts, filters, logo = '/fallback/dreamToApp2-dark.png' }: ProductInfiniteGridProps) {
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && (!previousPageData.products || previousPageData.products.length === 0)) return null;
         return buildQuery(filters, pageIndex);
@@ -84,13 +85,13 @@ export default function ProductInfiniteGrid({ initialProducts, filters }: Produc
         <div className="container mx-auto bg-transparent border-none shadow-none">
             {products.length > 0 ? (
                 <>
-                    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 bg-transparent border-none shadow-none" aria-label="قائمة المنتجات">
+                    <ul className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5 bg-transparent border-none shadow-none" aria-label="قائمة المنتجات">
                         {products.map((product: any, index: number) => (
                             <li key={product.id || index} className="" data-index={index} style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}>
-                                <ProductCardAdapter product={product} className="h-full w-full" index={index} priority={index < 8} />
+                                <ProductCardAdapter product={product} className="h-full w-full" index={index} priority={index < 8} logo={logo} />
                             </li>
                         ))}
-                        {loading && Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={`skeleton_${i}`} />)}
+                        {loading && Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton key={`skeleton_${i}`} />)}
                     </ul>
                     <div ref={ref} className="mt-8 flex w-full flex-col items-center py-6" role="status" aria-live="polite">
                         {error && (
